@@ -1,4 +1,4 @@
-station.id,site,latitude,longitude,elevation.m,sampling.date,visit.type,sampling.year,date.time,air.temp,relative.humidity,wind.speed,wind.gust,accumulated.precip,wind.cardinal.direction,atm.pressure,sea.level.pressure
+station.id,site,latitude,longitude,elevation.m,sampling.date,visit.type,sampling.year,date.time,air.temp,relative.humidity,wind.speed,wind.gust,accumulated.precip,wind.cardinaldirection,atm.pressure,sea.level.pressure
 D4238,Washington_2020_08,30.2849,-96.46034,121.92,5/30/21,i,2021,04/01/2021 19:03 CDT,17.78,30,2.23,4.92,0,ENE,101299.91,102758.52
 D4238,Washington_2020_08,30.2849,-96.46034,121.92,5/30/21,i,2021,04/01/2021 19:13 CDT,17.22,32,1.79,2.68,0,ENE,101299.91,102761.35
 D4238,Washington_2020_08,30.2849,-96.46034,121.92,5/30/21,i,2021,04/01/2021 19:23 CDT,16.67,33,1.79,2.23,0,ENE,101266.54,102730.29

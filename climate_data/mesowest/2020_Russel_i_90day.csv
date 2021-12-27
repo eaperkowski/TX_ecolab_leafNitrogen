@@ -1,4 +1,4 @@
-station.id,property,latitude,longitude,elevation.ft,sampling.date,visit.type,sampling.year,date.time,air.temp,relative.humidity,wind.speed,wind.gust,accumulated.precip,wind.cardinal.direction,atm.pressure,sea.level.pressure
+station.id,property,latitude,longitude,elevation.ft,sampling.date,visit.type,sampling.year,date.time,air.temp,relative.humidity,wind.speed,wind.gust,accumulated.precip,wind.cardinaldirection,atm.pressure,sea.level.pressure
 KGYB,Russel_2020_02,30.16917,-96.8,148.1328,6/21/20,i,2021,03/23/2020 00:15 CDT,18,100,2.06,,,S,100086.08,101837.78
 KGYB,Russel_2020_03,30.16917,-96.8,148.1328,6/22/20,i,2022,03/23/2020 00:35 CDT,18,98.75,2.06,,,SSW,100119.34,101871.62
 KGYB,Russel_2020_04,30.16917,-96.8,148.1328,6/23/20,i,2023,03/23/2020 00:55 CDT,18,99.37,2.06,,,S,100086.08,101837.78

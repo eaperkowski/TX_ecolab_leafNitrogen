@@ -1,4 +1,4 @@
-station.id,site,latitude,longitude,elevation.m,sampling.date,visit.type,sampling.year,date.time,atm.pressure,air.temp,relative.humidity,wind.speed,wind.gust,incremental.precip,solar.rad,wind.cardinal.direction,sea.level.pressure
+station.id,site,latitude,longitude,elevation.m,sampling.date,visit.type,sampling.year,date.time,atm.pressure,air.temp,relative.humidity,wind.speed,wind.gust,incremental.precip,solar.rad,wind.cardinaldirection,sea.level.pressure
 TWB51,Sansaba_2020_01,31.24169,-98.31394,436.7784,6/16/20,i,2020,04/17/2020 19:00 CDT,97378,9.99,77.73,1.26,8.16,0,34.56,NNE,102620.08
 TWB51,Sansaba_2020_01,31.24169,-98.31394,436.7784,6/16/20,i,2020,04/17/2020 19:05 CDT,97328,9.99,78.07,1.87,8.16,0,37.16,E,102567.39
 TWB51,Sansaba_2020_01,31.24169,-98.31394,436.7784,6/16/20,i,2020,04/17/2020 19:10 CDT,97283,9.88,76.41,1.62,8.16,0,38.71,E,102522.05

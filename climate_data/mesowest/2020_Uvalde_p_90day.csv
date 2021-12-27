@@ -1,4 +1,4 @@
-station.id,site,latitude,longitude,elevation.m,sampling.date,visit.type,sampling.year,date.time,atm.pressure,air.temp,relative.humidity,wind.speed,wind.gust,solar.rad,wind.cardinal.direction,sea.level.pressure
+station.id,site,latitude,longitude,elevation.m,sampling.date,visit.type,sampling.year,date.time,atm.pressure,air.temp,relative.humidity,wind.speed,wind.gust,solar.rad,wind.cardinaldirection,sea.level.pressure
 TWB14,Uvalde_2020_02,29.52639,-100.01833,436.7784,7/20/20,p,2020,04/23/2020 00:00 CDT,96469,12.51,77.22,1.84,11.83,0,NW,101615.32
 TWB14,Uvalde_2020_02,29.52639,-100.01833,436.7784,7/20/20,p,2020,04/23/2020 00:05 CDT,96476,12.51,77.35,2.1,11.83,0,NW,101622.69
 TWB14,Uvalde_2020_02,29.52639,-100.01833,436.7784,7/20/20,p,2020,04/23/2020 00:10 CDT,96476,12.47,77.55,1.74,11.83,0,WNW,101623.43

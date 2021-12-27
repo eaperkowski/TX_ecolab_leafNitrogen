@@ -1,4 +1,4 @@
-station.id,site,latitude,longitude,elevation.m,sampling.date,visit.type,sampling.year,date.time,atm.pressure,air.temp,relative.humidity,wind.speed,wind.gust,solar.rad,incremental.precip,accumulated.precip,additive.precip,wind.cardinaldirection,seal.level.pressure
+station.id,site,latitude,longitude,elevation.m,sampling.date,visit.type,sampling.year,date.time,atm.pressure,air.temp,relative.humidity,wind.speed,wind.gust,solar.rad,incremental.precip,accumulated.precip,additive.precip,wind.cardinaldirection,sea.level.pressure
 TMPT2,Bell_2020_05,31.0564,-97.3469,174.6504,6/19/20,i,2020,05/03/2020 00:04 CDT,99086,23.33,82,4.02,8.94,0,,,375.92,S,101096.08
 TMPT2,Bell_2020_05,31.0564,-97.3469,174.6504,6/19/20,i,2020,05/03/2020 01:04 CDT,99086,22.22,89,4.47,9.84,0,,,375.92,S,101103.69
 TMPT2,Bell_2020_05,31.0564,-97.3469,174.6504,6/19/20,i,2020,05/03/2020 02:04 CDT,99086,21.67,91,4.92,8.49,0,,,375.92,S,101107.49

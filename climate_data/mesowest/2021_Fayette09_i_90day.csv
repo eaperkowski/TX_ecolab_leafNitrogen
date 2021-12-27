@@ -1,4 +1,4 @@
-station.id,site,latitude,longitude,elevation.m,sampling.date,visit.type,sampling.year,date.time,air.temp,relative.humidity,wind.speed,wind.gust,accumulated.precip,wind.cardinal.direction,atm.pressure,sea.level.pressure
+station.id,site,latitude,longitude,elevation.m,sampling.date,visit.type,sampling.year,date.time,air.temp,relative.humidity,wind.speed,wind.gust,accumulated.precip,wind.cardinaldirection,atm.pressure,sea.level.pressure
 E4729,Fayette_2020_09,29.71067,-96.712,95.0976,5/29/21,i,2021,04/01/2021 00:00 CDT,15,46,3.58,7.6,0.254,ENE,101757.47,102909.92
 E4729,Fayette_2020_09,29.71067,-96.712,95.0976,5/29/21,i,2021,04/01/2021 00:05 CDT,15,46,3.13,6.7,0.254,ENE,101757.47,102909.92
 E4729,Fayette_2020_09,29.71067,-96.712,95.0976,5/29/21,i,2021,04/01/2021 00:10 CDT,15,46,3.13,7.6,0.254,NE,101757.47,102909.92

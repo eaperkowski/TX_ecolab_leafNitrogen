@@ -1,4 +1,4 @@
-station.id,site,latitude,longitude,elevation.m,sampling.date,visit.type,sampling.year,date.time,air.temp,relative.humidity,wind.speed,wind.gust,accumulated.precip,wind.cardinal.direction,atm.pressure,sea.level.pressure
+station.id,site,latitude,longitude,elevation.m,sampling.date,visit.type,sampling.year,date.time,air.temp,relative.humidity,wind.speed,wind.gust,accumulated.precip,wind.cardinaldirection,atm.pressure,sea.level.pressure
 D1824,Austin_2020_03,29.80333,-96.12117,54.864,5/29/21,i,2021,03/31/2021 19:02 CDT,20,62,4.47,8.49,0.762,NE,101673.17,102324.85
 D1824,Austin_2020_03,29.80333,-96.12117,54.864,5/29/21,i,2021,03/31/2021 19:07 CDT,20,62,3.13,8.49,0.762,NE,101706.81,102358.71
 D1824,Austin_2020_03,29.80333,-96.12117,54.864,5/29/21,i,2021,03/31/2021 19:12 CDT,19.44,61,3.13,7.15,0.762,N,101706.81,102359.96

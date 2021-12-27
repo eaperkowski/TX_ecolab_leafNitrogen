@@ -1,4 +1,4 @@
-station.id,site,latitude,longitude,elevation.ft,sampling.date,visit.type,sampling.year,date.time,additive.precip
+station.id,site,latitude,longitude,elevation.m,sampling.date,visit.type,sampling.year,date.time,additive.precip
 NMOT2,Uvalde_2020_02,29.52639,-100.01833,379.1712,5/24/21,i,2021,04/02/2021 00:00 CDT,335.026
 NMOT2,Uvalde_2020_02,29.52639,-100.01833,379.1712,5/24/21,i,2021,04/02/2021 00:15 CDT,335.026
 NMOT2,Uvalde_2020_02,29.52639,-100.01833,379.1712,5/24/21,i,2021,04/02/2021 00:30 CDT,335.026

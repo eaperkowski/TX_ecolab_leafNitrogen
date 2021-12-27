@@ -1,4 +1,4 @@
-station.id,site,latitude,longitude,elevation.m,sampling.date,visit.type,sampling.year,date.time,air.temp,relative.humidity,wind.speed,wind.gust,solar.rad,precip_accum_set_1,wind.cardinal.direction
+station.id,site,latitude,longitude,elevation.m,sampling.date,visit.type,sampling.year,date.time,air.temp,relative.humidity,wind.speed,wind.gust,solar.rad,additive.precip,wind.cardinaldirection
 JCWT2,Fayette_2021_12,29.9505,-97.370972,151.7904,5/28/21,i,2021,03/31/2021 00:39 CDT,22.78,87,2.23,5.81,0,104.394,SSE
 JCWT2,Fayette_2021_12,29.9505,-97.370972,151.7904,5/28/21,i,2021,03/31/2021 01:39 CDT,22.22,88,1.79,4.92,0,104.394,S
 JCWT2,Fayette_2021_12,29.9505,-97.370972,151.7904,5/28/21,i,2021,03/31/2021 02:39 CDT,22.22,88,2.23,4.92,0,104.394,S

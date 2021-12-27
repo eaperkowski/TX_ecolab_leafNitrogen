@@ -1,4 +1,4 @@
-station.id,site,latitude,longitude,elevation.m,sampling.date,visit.type,sampling.year,date.time,air.temp,relative.humidity,wind.speed,wind.gust,incremental.precip,wind.cardinal.direction,atm.pressure,sea.level.pressure
+station.id,site,latitude,longitude,elevation.m,sampling.date,visit.type,sampling.year,date.time,air.temp,relative.humidity,wind.speed,wind.gust,incremental.precip,wind.cardinaldirection,atm.pressure,sea.level.pressure
 KBBD,Menard_2020_01,31.17917,-99.32389,556.8696,9/30/21,i,2021,07/03/2021 00:15 CDT,24,83.37,2.57,,,E,95153.51,101404.35
 KBBD,Menard_2020_01,31.17917,-99.32389,556.8696,9/30/21,i,2021,07/03/2021 00:35 CDT,24,83.37,2.57,,,ESE,95153.51,101404.35
 KBBD,Menard_2020_01,31.17917,-99.32389,556.8696,9/30/21,i,2021,07/03/2021 00:55 CDT,24,83.37,2.57,,,E,95153.51,101404.35

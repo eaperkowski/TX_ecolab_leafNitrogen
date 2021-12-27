@@ -1,4 +1,4 @@
-station.id,site,latitude,longitude,elevation.m,sampling.date,visit.type,sampling.year,date.time,air.temp,relative.humidty,wind.speed,wind.gust,accumulated.precip,wind.cardinal.direction,atm.pressure,sea.level.pressure
+station.id,site,latitude,longitude,elevation.m,sampling.date,visit.type,sampling.year,date.time,air.temp,relative.humidty,wind.speed,wind.gust,accumulated.precip,wind.cardinaldirection,atm.pressure,sea.level.pressure
 KIAH,Harris_2020_03,29.9844,-95.36075,27.1272,6/1/21,i,2021,03/28/2021 00:00 CDT,24,83.37,2.57,,,SW,101029.65,101345.09
 KIAH,Harris_2020_03,29.9844,-95.36075,27.1272,6/1/21,i,2021,03/28/2021 00:05 CDT,24,83.37,2.06,,,SW,101029.65,101345.09
 KIAH,Harris_2020_03,29.9844,-95.36075,27.1272,6/1/21,i,2021,03/28/2021 00:10 CDT,24,83.37,2.57,,,SW,101029.65,101345.09

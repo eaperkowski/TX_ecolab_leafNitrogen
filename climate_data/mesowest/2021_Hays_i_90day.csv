@@ -1,4 +1,4 @@
-station.id,site,latitude,longitude,elevation.m,sampling.date,visit.type,sampling.year,date.time,atm.pressure,air.temp,relative.humidity,wind.speed,wind.gust,solar.rad,additive.precip,wind.cardinal.direction,sea.level.pressure
+station.id,site,latitude,longitude,elevation.m,sampling.date,visit.type,sampling.year,date.time,atm.pressure,air.temp,relative.humidity,wind.speed,wind.gust,solar.rad,additive.precip,wind.cardinaldirection,sea.level.pressure
 HWWT2,Hays_2021_54,30.046611,-98.200833,380.3904,5/26/21,i,2021,03/28/2021 23:00 UTC,98070,22.78,20,2.23,6.26,476,99.06,NE,102453.55
 HWWT2,Hays_2021_54,30.046611,-98.200833,380.3904,5/26/21,i,2021,03/29/2021 00:00 UTC,98070,21.11,24,1.79,6.26,244,99.06,NE,102478.86
 HWWT2,Hays_2021_54,30.046611,-98.200833,380.3904,5/26/21,i,2021,03/29/2021 01:00 UTC,98104,16.67,36,0.45,4.02,18,99.06,E,102583.15

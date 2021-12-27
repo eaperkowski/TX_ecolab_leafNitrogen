@@ -1,4 +1,4 @@
-station.id,site,latitude,longitude,elevation.m,sampling.date,visit.type,sampling.year,date.time,air.temp,relative.humidity,wind.speed,wind.gust,incremental.precip,accumulated.precip,additive.precipt,solar.rad,wind.cardinaldirection,atm.pressure,sea.level.pressure
+station.id,site,latitude,longitude,elevation.m,sampling.date,visit.type,sampling.year,date.time,air.temp,relative.humidity,wind.speed,wind.gust,incremental.precip,accumulated.precip,additive.precip,solar.rad,wind.cardinaldirection,atm.pressure,sea.level.pressure
 F6098,Bexar_2019_13,29.5045,-98.57533,304.8,6/18/20,i,2020,04/21/2020 00:01 UTC,32.22,22,0.9,3.13,,0,,137,S,97090.81,100447.25
 F6098,Bexar_2019_13,29.5045,-98.57533,304.8,6/18/20,i,2020,04/21/2020 00:05 UTC,31.67,23,1.79,4.92,,0,,74,SW,97090.81,100453.39
 F6098,Bexar_2019_13,29.5045,-98.57533,304.8,6/18/20,i,2020,04/21/2020 00:10 UTC,31.67,24,0.45,4.92,,0,,102,S,97090.81,100453.38

@@ -1,4 +1,4 @@
-station.id,site,latitude,longitude,elevation.m,sampling.date,visit.type,sampling.year,date.time,atm.pressure,air.temp,relative.humidty,wind.speed,wind.gust,incremental.precip,solar.rad,wind.cardinal.direction,sea.level.pressure
+station.id,site,latitude,longitude,elevation.m,sampling.date,visit.type,sampling.year,date.time,atm.pressure,air.temp,relative.humidty,wind.speed,wind.gust,incremental.precip,solar.rad,wind.cardinaldirection,sea.level.pressure
 TWB06,Bandera_2020_03,29.8019,-99.47114,661.416,6/27/21,p,2021,03/28/2021 00:00 CDT,94088,20.83,59.56,9.06,13.16,0,0.23,ENE,101547.46
 TWB06,Bandera_2020_03,29.8019,-99.47114,661.416,6/27/21,p,2021,03/28/2021 00:05 CDT,94113,20.65,57.84,7.67,12.83,0,0.72,ENE,101579.18
 TWB06,Bandera_2020_03,29.8019,-99.47114,661.416,6/27/21,p,2021,03/28/2021 00:10 CDT,94124,20.46,55.65,8.18,12.83,0,0,NE,101596.06

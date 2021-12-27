@@ -1,4 +1,4 @@
-station.id,site,latitude,longitude,elevation.m,sampling.date,visit.type,sampling.year,date.time,air.temp,relative.humidity,wind.speed,wind.gust,accumulated.rpecip,wind.cardinal direction,atm.pressure,sea.level.pressure
+station.id,site,latitude,longitude,elevation.m,sampling.date,visit.type,sampling.year,date.time,air.temp,relative.humidity,wind.speed,wind.gust,accumulated.rpecip,wind.cardinaldirection,atm.pressure,sea.level.pressure
 F2569,Brazos_2020_18,30.4733,-96.4792,75.8952,5/30/21,i,2021,04/01/2021 19:00 CDT,18.89,33,0.9,3.58,0,ENE,101855.73,102763.22
 F2569,Brazos_2020_18,30.4733,-96.4792,75.8952,5/30/21,i,2021,04/01/2021 19:16 CDT,17.78,37,0.45,1.34,0,ENE,101889.3,102800.57
 F2569,Brazos_2020_18,30.4733,-96.4792,75.8952,5/30/21,i,2021,04/01/2021 19:30 CDT,16.67,39,0.9,1.79,0,ENE,101855.73,102770.2

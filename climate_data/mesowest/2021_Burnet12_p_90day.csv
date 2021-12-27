@@ -1,4 +1,4 @@
-station.id,site,latitude,longitude,elevation.m,sampling.date,visit.type,sampling.year,date.time,air.temp,relative.humidity,wind.speed,wind.gust,accumulated.precip,wind.cardinal.direction,atm.pressure,sea.level.pressure
+station.id,site,latitude,longitude,elevation.m,sampling.date,visit.type,sampling.year,date.time,air.temp,relative.humidity,wind.speed,wind.gust,accumulated.precip,wind.cardinaldirection,atm.pressure,sea.level.pressure
 AU961,Burnet_2020_12,30.88,-98.10267,390.144,6/26/21,p,2021,03/29/2021 00:00 CDT,14.44,40,0.9,1.34,0,SE,97753.75,102369.67
 AU961,Burnet_2020_12,30.88,-98.10267,390.144,6/26/21,p,2021,03/29/2021 00:17 CDT,14.44,40,0.9,1.34,0,SE,97721.43,102335.82
 AU961,Burnet_2020_12,30.88,-98.10267,390.144,6/26/21,p,2021,03/29/2021 00:30 CDT,13.89,42,1.34,1.79,0,SSW,97721.43,102344.83

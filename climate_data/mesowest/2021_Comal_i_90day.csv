@@ -1,4 +1,4 @@
-station.id,site,latitude,longitude,elevation.m,sampling.date,visit.type,sampling.year,date.time,air.temp,relative.humidity,wind.speed,wind.gust,accumulated.precip,wind.cardinal.direction,atm.pressure,sea.level.pressure
+station.id,site,latitude,longitude,elevation.m,sampling.date,visit.type,sampling.year,date.time,air.temp,relative.humidity,wind.speed,wind.gust,accumulated.precip,wind.cardinaldirection,atm.pressure,sea.level.pressure
 F7587,Comal_2020_19,29.9545,-98.322,357.8352,5/36/21,i,2021,05/13/2021 14:31 CDT,21.11,67,1.34,4.02,0,NNW,98262.14,102413.06
 F7587,Comal_2020_19,29.9545,-98.322,357.8352,5/36/21,i,2021,05/13/2021 14:35 CDT,21.11,69,0.9,4.02,0,NNE,98262.14,102413.05
 F7587,Comal_2020_19,29.9545,-98.322,357.8352,5/36/21,i,2021,05/13/2021 14:40 CDT,21.11,67,1.79,4.47,0,E,98262.14,102413.06
