@@ -1,4 +1,4 @@
-station.id,site,latitude,longitude,elevation.m,sampling.date,visit.type,sampling.year,date.time,air.temp,relative.humidity,wind.speed,accumulated_precip,wind.cardinaldirection,atm.pressure,sea.level.pressure
+station.id,site,latitude,longitude,elevation.m,sampling.date,visit.type,sampling.year,date.time,air.temp,relative.humidity,wind.speed,accumulated.precip,wind.cardinaldirection,atm.pressure,sea.level.pressure
 D6536,Williamson_2019_10,30.52783,-97.78317,267.9192,7/18/20,p,2020,04/20/2020 01:16 CDT,15,65,0,0,,97617.68,100758.29
 D6536,Williamson_2019_10,30.52783,-97.78317,267.9192,7/18/20,p,2020,04/20/2020 01:46 CDT,15.56,69,0,0,,97617.68,100752.1
 D6536,Williamson_2019_10,30.52783,-97.78317,267.9192,7/18/20,p,2020,04/20/2020 04:00 CDT,16.67,69,0,0,,97650.48,100773.78

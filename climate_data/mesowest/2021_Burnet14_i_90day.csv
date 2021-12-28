@@ -1,4 +1,4 @@
-station.id,site,latitude,longitude,elevation.m,sampling.date,visit.type,sampling.year,date.time,air.temp,relative.humidty,wind.speed,wind.gust,accumulated.precip,wind.cardinaldirection,atm.pressure,sea.level.pressure
+station.id,site,latitude,longitude,elevation.m,sampling.date,visit.type,sampling.year,date.time,air.temp,relative.humidty,wind.speed,wind.gust,incremental.precip,wind.cardinaldirection,atm.pressure,sea.level.pressure
 KBMQ,Burnet_2020_14,30.74056,-98.23528,391.9728,5/27/21,i,2021,03/30/2021 00:00 CDT,17,51.76,4.12,,,SSE,96892.07,101447.75
 KBMQ,Burnet_2020_14,30.74056,-98.23528,391.9728,5/27/21,i,2021,03/30/2021 00:05 CDT,17,51.76,3.6,,,SSE,96892.07,101447.75
 KBMQ,Burnet_2020_14,30.74056,-98.23528,391.9728,5/27/21,i,2021,03/30/2021 00:10 CDT,17,51.76,4.63,7.2,,SSE,96892.07,101447.75
