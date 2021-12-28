@@ -26,25 +26,54 @@ mesowest.hourly <- df.mesowest %>%
   mutate(date.time = as.POSIXct(strptime(date.time, 
                                          format = "%m/%d/%Y %H:%M CDT"))) %>%
   mutate(date.time.hr = floor_date(date.time, unit = "hour")) %>%
-  separate(date.time.hr, into = c("date", "time.round"), sep = " ", remove = FALSE) %>%
-  dplyr::group_by(site, sampling.year, visit.type, date, time.round) %>%
+  separate(date.time.hr, into = c("date", "time.round"), 
+           sep = " ", remove = FALSE) %>%
+  dplyr::group_by(site, sampling.year, sampling.date, visit.type, date, time.round) %>%
   dplyr::summarize(air.temp = mean(air.temp, na.rm = TRUE),
                    relative.humidity = mean(relative.humidity, na.rm = TRUE),
                    wind.speed = mean(wind.speed, na.rm = TRUE),
                    wind.gust = max(wind.gust, na.rm = TRUE),
                    solar.rad = max(solar.rad, na.rm = TRUE),
-                   incremental.precip = max(incremental.precip, na.rm = TRUE),
+                   incremental.precip = sum(incremental.precip, na.rm = TRUE),
                    accumulated.precip = max(accumulated.precip, na.rm = TRUE),
                    additive.precip = max(additive.precip, na.rm = TRUE),
                    sea.level.pressure = mean(sea.level.pressure, na.rm = TRUE),
                    atm.pressure = mean(atm.pressure, na.rm = TRUE)) %>%
+  dplyr::mutate(additive.precip = additive.precip - lag(additive.precip),
+                additive.precip = ifelse(additive.precip == "NaN" | 
+                                           is.na(additive.precip) == TRUE, 
+                                         0, additive.precip),
+                accumulated.precip = ifelse(accumulated.precip == "-Inf", 
+                                            0, accumulated.precip),
+                accum.precip = accumulated.precip - lag(accumulated.precip),
+                accum.precip = ifelse(time.round == "00:00:00", 
+                                      accumulated.precip, accum.precip),
+                hourly.precip = incremental.precip + accum.precip + additive.precip,
+                hourly.precip = ifelse(hourly.precip == "Inf", 0, hourly.precip)) %>%
+  dplyr::select(-c(incremental.precip:additive.precip, accum.precip)) %>%
   data.frame()
 
 ## Convert all -Inf values to NA
-short.merged[short.merged == "-Inf"] <- NA
+mesowest.hourly[mesowest.hourly == "-Inf"] <- NA
 
 ## Write .csv to "data_sheets" folder
-write.csv
+write.csv(mesowest.hourly, "../data_sheets/TXeco_mesowest_hourly.csv")
+
+################################################################
+# Calculate daily means for evapotranspiration estimate and 
+# SPEI/AI calculations. Hargreaves requires Tmax, Tmin
+################################################################
+mesowest.daily <- mesowest.hourly %>%
+  group_by(site, sampling.year, sampling.date, visit.type, date) %>%
+  summarize(mean.temp = mean(air.temp, na.rm = TRUE),
+            sd.temp = sd(air.temp, na.rm = TRUE),
+            max.temp = max(air.temp, na.rm = TRUE),
+            min.temp = min(air.temp, na.rm = TRUE),
+            daily.precip = sum(hourly.precip, na.rm = TRUE))
+
+## Write .csv to "data_sheets" folder
+write.csv(mesowest.daily, "../data_sheets/TXeco_mesowest_daily.csv")
+
 
 ################################################################
 # Import and clean NOAA 2006-2020 climate data into central .csv
@@ -57,15 +86,17 @@ file.list.normals <- list.files(path = "../climate_data/normals/",
 file.list.normals <- setNames(file.list.normals, file.list.normals)
 df.normals <- lapply(file.list.normals, read.csv)
 
+## Convert to SI units
 normals <- df.normals %>%
   merge_all() %>%
-  mutate(norm.precip = norm.precip * 2.54,
-            norm.tavg = fahrenheit.to.celsius(norm.tavg),
-            norm.tavg.sd = norm.tavg.sd * 0.556,
-            norm.tmax = fahrenheit.to.celsius(norm.tmax),
-            norm.tmax.sd = norm.tmax.sd * 0.556,
-            norm.tmin = fahrenheit.to.celsius(norm.tmin),
-            norm.tmin.sd = norm.tmin.sd * 0.556)
+  mutate(norm.precip = norm.precip * 25.4,
+         norm.tavg = fahrenheit.to.celsius(norm.tavg),
+         norm.tavg.sd = norm.tavg.sd * 0.556,
+         norm.tmax = fahrenheit.to.celsius(norm.tmax),
+         norm.tmax.sd = norm.tmax.sd * 0.556,
+         norm.tmin = fahrenheit.to.celsius(norm.tmin),
+         norm.tmin.sd = norm.tmin.sd * 0.556)
 
+## Write .csv to "data_sheets" folder
 write.csv(normals, "../data_sheets/TXeco_climate_normals.csv")
 
