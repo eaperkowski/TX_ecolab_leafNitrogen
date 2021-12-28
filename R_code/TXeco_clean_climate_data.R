@@ -20,36 +20,33 @@ file.list.mesowest <- setNames(file.list.mesowest, file.list.mesowest)
 df.mesowest <- lapply(file.list.mesowest, read.csv)
 
 ## Merge mesowest climate data from all properties and both sampling years into 
-## single df, calculate daily estimates
+## single df, calculate hourly estimates
 mesowest.hourly <- df.mesowest %>%
   merge_all() %>%
-  mutate(date.time = as.POSIXct(strptime(date.time, 
+  dplyr::mutate(date.time = as.POSIXct(strptime(date.time, 
                                          format = "%m/%d/%Y %H:%M CDT"))) %>%
-  mutate(date.time.hr = floor_date(date.time, unit = "hour")) %>%
+  dplyr::mutate(date.time.hr = floor_date(date.time, unit = "hour")) %>%
   separate(date.time.hr, into = c("date", "time.round"), 
            sep = " ", remove = FALSE) %>%
-  dplyr::group_by(site, sampling.year, sampling.date, visit.type, date, time.round) %>%
+  group_by(site, sampling.year, sampling.date, visit.type, date, time.round) %>%
   dplyr::summarize(air.temp = mean(air.temp, na.rm = TRUE),
                    relative.humidity = mean(relative.humidity, na.rm = TRUE),
-                   wind.speed = mean(wind.speed, na.rm = TRUE),
-                   wind.gust = max(wind.gust, na.rm = TRUE),
-                   solar.rad = max(solar.rad, na.rm = TRUE),
                    incremental.precip = sum(incremental.precip, na.rm = TRUE),
                    accumulated.precip = max(accumulated.precip, na.rm = TRUE),
                    additive.precip = max(additive.precip, na.rm = TRUE),
                    sea.level.pressure = mean(sea.level.pressure, na.rm = TRUE),
                    atm.pressure = mean(atm.pressure, na.rm = TRUE)) %>%
   dplyr::mutate(additive.precip = additive.precip - lag(additive.precip),
-                additive.precip = ifelse(additive.precip == "NaN" | 
-                                           is.na(additive.precip) == TRUE, 
-                                         0, additive.precip),
-                accumulated.precip = ifelse(accumulated.precip == "-Inf", 
-                                            0, accumulated.precip),
-                accum.precip = accumulated.precip - lag(accumulated.precip),
-                accum.precip = ifelse(time.round == "00:00:00", 
-                                      accumulated.precip, accum.precip),
-                hourly.precip = incremental.precip + accum.precip + additive.precip,
-                hourly.precip = ifelse(hourly.precip == "Inf", 0, hourly.precip)) %>%
+         additive.precip = ifelse(additive.precip == "NaN" | 
+                                    is.na(additive.precip) == TRUE, 
+                                  0, additive.precip),
+         accumulated.precip = ifelse(accumulated.precip == "-Inf", 
+                                     0, accumulated.precip),
+         accum.precip = accumulated.precip - lag(accumulated.precip),
+         accum.precip = ifelse(time.round == "00:00:00", 
+                               accumulated.precip, accum.precip),
+         hourly.precip = incremental.precip + accum.precip + additive.precip,
+         hourly.precip = ifelse(hourly.precip == "Inf", 0, hourly.precip)) %>%
   dplyr::select(-c(incremental.precip:additive.precip, accum.precip)) %>%
   data.frame()
 
@@ -69,7 +66,8 @@ mesowest.daily <- mesowest.hourly %>%
             sd.temp = sd(air.temp, na.rm = TRUE),
             max.temp = max(air.temp, na.rm = TRUE),
             min.temp = min(air.temp, na.rm = TRUE),
-            daily.precip = sum(hourly.precip, na.rm = TRUE))
+            daily.precip = sum(hourly.precip, na.rm = TRUE)) %>%
+  filter(is.na(sd.temp) == FALSE)
 
 ## Write .csv to "data_sheets" folder
 write.csv(mesowest.daily, "../data_sheets/TXeco_mesowest_daily.csv")
