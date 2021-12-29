@@ -9,3 +9,5 @@ Repository for all things related to TX Ecolab study investigating primary drive
 - R_code = contains R scripts for cleaning climate data. Folder will also contain more data cleaning, data analysis, and plot scripts once they are compiled
 
 - data_sheets = contains cleaned data files compiled from R scripts
+
+- leaf_area = contains flat-bed scans of focal leaves. Files are earmarked for sample year via the "2020eco_" or "2021eco_" prefix
