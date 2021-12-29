@@ -49,7 +49,6 @@ mesowest.hourly <- df.mesowest %>%
          hourly.precip = ifelse(hourly.precip == "Inf", 0, hourly.precip)) %>%
   dplyr::select(-c(incremental.precip:additive.precip, accum.precip)) %>%
   data.frame()
-
 ## Convert all -Inf values to NA
 mesowest.hourly[mesowest.hourly == "-Inf"] <- NA
 
@@ -66,12 +65,12 @@ mesowest.daily <- mesowest.hourly %>%
             sd.temp = sd(air.temp, na.rm = TRUE),
             max.temp = max(air.temp, na.rm = TRUE),
             min.temp = min(air.temp, na.rm = TRUE),
-            daily.precip = sum(hourly.precip, na.rm = TRUE)) %>%
-  filter(is.na(sd.temp) == FALSE)
+            daily.precip = sum(hourly.precip, na.rm = TRUE))
+
+unique(mesowest.daily$site)
 
 ## Write .csv to "data_sheets" folder
 write.csv(mesowest.daily, "../data_sheets/TXeco_mesowest_daily.csv")
-
 
 ################################################################
 # Import and clean NOAA 2006-2020 climate data into central .csv
