@@ -153,6 +153,13 @@ normals <- separate(normals, site.long,
                     into = c("site", "sampling.year", "visit.type"),
                     sep = " ")
 
+
+normal.summary <- normals %>%
+  filter(sampling.year == "2021") %>%
+  group_by(site, visit.type) %>%
+  summarize(spei = mean(spei, na.rm = TRUE),
+            aridity = mean(aridity, na.rm = TRUE))
+
 ################################################################
 # Calculate 15-yr normal SPEI and AI for all sites
 ################################################################
