@@ -49,6 +49,10 @@ mesowest.hourly <- df.mesowest %>%
          hourly.precip = ifelse(hourly.precip == "Inf", 0, hourly.precip)) %>%
   dplyr::select(-c(incremental.precip:additive.precip, accum.precip)) %>%
   data.frame()
+
+## Rename "site" column to "property
+names(mesowest.hourly)[names(mesowest.hourly) == "site"] <- "property"
+
 ## Convert all -Inf values to NA
 mesowest.hourly[mesowest.hourly == "-Inf"] <- NA
 
@@ -60,14 +64,12 @@ write.csv(mesowest.hourly, "../data_sheets/TXeco_mesowest_hourly.csv")
 # SPEI/AI calculations. Hargreaves requires Tmax, Tmin
 ################################################################
 mesowest.daily <- mesowest.hourly %>%
-  group_by(site, sampling.year, sampling.date, visit.type, date) %>%
+  group_by(property, sampling.year, sampling.date, visit.type, date) %>%
   summarize(mean.temp = mean(air.temp, na.rm = TRUE),
             sd.temp = sd(air.temp, na.rm = TRUE),
             max.temp = max(air.temp, na.rm = TRUE),
             min.temp = min(air.temp, na.rm = TRUE),
             daily.precip = sum(hourly.precip, na.rm = TRUE))
-
-unique(mesowest.daily$site)
 
 ## Write .csv to "data_sheets" folder
 write.csv(mesowest.daily, "../data_sheets/TXeco_mesowest_daily.csv")
@@ -93,6 +95,9 @@ normals <- df.normals %>%
          norm.tmax.sd = norm.tmax.sd * 0.556,
          norm.tmin = fahrenheit.to.celsius(norm.tmin),
          norm.tmin.sd = norm.tmin.sd * 0.556)
+
+## Rename site to property
+names(normals)[names(normals) == "site"] <- "property"
 
 ## Write .csv to "data_sheets" folder
 write.csv(normals, "../data_sheets/TXeco_climate_normals.csv")

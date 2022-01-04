@@ -26,14 +26,13 @@ site.coords <- read.csv("../data_sheets/TXeco_sitecoords.csv",
 daily.means$sampling.date <- mdy(daily.means$sampling.date)
 daily.means$date <- ymd(daily.means$date)
 
-
 # Subset data frame to only include 30 days leading up to sampling 
 # date
 daily.means <- daily.means %>%
   full_join(site.coords) %>%
-  group_by(site, sampling.year, visit.type) %>%
+  group_by(property, sampling.year, visit.type) %>%
   filter(date < sampling.date & date > sampling.date - 30) %>%
-  unite("site.long", c(site, sampling.year, visit.type), sep = " ")
+  unite("site.long", c(property, sampling.year, visit.type), sep = " ")
 
 
 ################################################################
@@ -58,10 +57,9 @@ for(i in seq_along(daily.means)) {
 ## Merge list of data.frames into single data.frame
 daily.means <- merge_all(daily.means)
 
-
 ## Separate concatenated "site.long" back to three separate columns
 daily.means <- separate(daily.means, site.long, 
-                        into = c("site", "sampling.year", "visit.type"),
+                        into = c("property", "sampling.year", "visit.type"),
                         sep = " ")
 
 ################################################################
@@ -69,13 +67,11 @@ daily.means <- separate(daily.means, site.long,
 ################################################################
 ## Determine average monthly precipitation, et0 by visit type and property
 monthly.mean <- daily.means %>%
-  group_by(site, sampling.year, visit.type) %>%
+  group_by(property, sampling.year, visit.type, latitude, longitude) %>%
   summarize(monthly.precip = sum(daily.precip, na.rm = TRUE),
             monthly.et0 = mean(et0, na.rm = TRUE)) %>%
   mutate(monthly.water.balance = as.numeric(monthly.precip - monthly.et0)) %>%
-  full_join(site.coords)
-
-unique(monthly.mean$site)
+  select(site = property, everything())
 
 ## Calculate SPEI and aridity index values
 monthly.spei <- spei(data = as.ts(monthly.mean$monthly.water.balance), scale = 1)
@@ -125,10 +121,14 @@ ggplot(data = subset(monthly.mean, visit.type == "p" &
 # site to pass Hargreaves function through
 ################################################################
 normals <- normals %>%
-  select(site, sampling.year, visit.type, month, 
+  select(property, sampling.year, visit.type, month, 
          norm.precip, norm.tmax, norm.tmin) %>%
   full_join(site.coords) %>%
-  unite("site.long", c(site, sampling.year, visit.type), sep = " ")
+  group_by(property, sampling.year, visit.type, month, latitude, longitude) %>%
+  summarize(norm.precip = mean(norm.precip, na.rm = TRUE),
+            norm.tmax = mean(norm.tmax, na.rm = TRUE),
+            norm.tmin = mean(norm.tmin, na.rm = TRUE)) %>%
+  unite("site.long", c(property, sampling.year, visit.type), sep = " ")
 
 normals <- setNames(split(x = normals,
                                f = normals$site.long),
@@ -140,8 +140,8 @@ normals <- setNames(split(x = normals,
 ################################################################
 for(i in seq_along(normals)) {
   normals[[i]]$et0 <- as.numeric(hargreaves(Tmin = as.numeric(normals[[i]]$norm.tmin),
-                                                Tmax = as.numeric(normals[[i]]$norm.tmax),
-                                                lat = unique(normals[[i]]$latitude)))
+                                            Tmax = as.numeric(normals[[i]]$norm.tmax),
+                                            lat = unique(normals[[i]]$latitude)))
 }
 
 ## Merge list of data.frames into single data.frame
@@ -152,13 +152,6 @@ normals <- merge_all(normals)
 normals <- separate(normals, site.long, 
                     into = c("site", "sampling.year", "visit.type"),
                     sep = " ")
-
-
-normal.summary <- normals %>%
-  filter(sampling.year == "2021") %>%
-  group_by(site, visit.type) %>%
-  summarize(spei = mean(spei, na.rm = TRUE),
-            aridity = mean(aridity, na.rm = TRUE))
 
 ################################################################
 # Calculate 15-yr normal SPEI and AI for all sites
@@ -176,22 +169,43 @@ normals$spei <- normals.spei$fitted
 normals$aridity <- normals$norm.precip / normals$et0
 
 normals.gs <- normals %>%
-  filter(month == "5" | month == "6" | month == "7") %>%
+  #filter(month == "5" | month == "6" | month == "7") %>%
   group_by(site, visit.type, sampling.year, longitude) %>%
   summarize(mean.aridity = mean(aridity, na.rm = TRUE),
             mean.spei = mean(spei, na.rm = TRUE))
 
+## 2021 field sites
 ggplot(data = subset(normals.gs, sampling.year == "2021" & visit.type == "i"), 
-       aes(x = reorder(site, longitude), y = mean.spei)) +
+       aes(x = reorder(site, longitude), y = mean.aridity)) +
   geom_bar(stat = "identity", position = "dodge") +
-  labs(x = "Site", y = "SPEI") +
+  labs(x = "Site", y = "Aridity index (P/PET)") +
   theme(axis.text.x = element_text(angle = 45,
                                    hjust = 1))
   
 ggplot(data = subset(normals.gs, sampling.year == "2021" & visit.type == "p"), 
-       aes(x = reorder(site, longitude), y = mean.spei)) +
+       aes(x = reorder(site, longitude), y = mean.aridity)) +
   geom_bar(stat = "identity", position = "dodge") +
-  labs(x = "Site", y = "SPEI") +
+  labs(x = "Site", y = "Aridity index (P/PET)") +
   theme(axis.text.x = element_text(angle = 45,
                                    hjust = 1))
 
+## 2020 field sites
+ggplot(data = subset(normals.gs, sampling.year == "2020" & visit.type == "i"), 
+       aes(x = reorder(site, longitude), y = mean.aridity)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(x = "Site", y = "Aridity index (P/PET)") +
+  theme(axis.text.x = element_text(angle = 45,
+                                   hjust = 1))
+ggplot(data = subset(normals.gs, sampling.year == "2020" & visit.type == "p"), 
+       aes(x = reorder(site, longitude), y = mean.aridity)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(x = "Site", y = "Aridity index (P/PET)") +
+  theme(axis.text.x = element_text(angle = 45,
+                                   hjust = 1))
+
+
+normal.summary <- normals %>%
+  filter(sampling.year == "2021") %>%
+  group_by(site, visit.type) %>%
+  summarize(spei = mean(spei, na.rm = TRUE),
+            aridity = mean(aridity, na.rm = TRUE))
