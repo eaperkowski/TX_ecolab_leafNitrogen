@@ -1,4 +1,4 @@
-"","site","sampling.year","sampling.date","visit.type","date","mean.temp","sd.temp","max.temp","min.temp","daily.precip"
+"","property","sampling.year","sampling.date","visit.type","date","mean.temp","sd.temp","max.temp","min.temp","daily.precip"
 "1","Austin_2020_03",2021,"5/29/21","i","2021-03-31",17.6015,1.4994266728394,19.4875,15.7425,0
 "2","Austin_2020_03",2021,"5/29/21","i","2021-04-01",15.2623516414141,4.51860284661873,21.3433333333333,9.07333333333333,0
 "3","Austin_2020_03",2021,"5/29/21","i","2021-04-02",12.9584976851852,5.61060744787105,19.9066666666667,5,0

@@ -1,4 +1,4 @@
-"","station.id","site","latitude","longitude","elevation.m","sampling.date","visit.type","sampling.year","month","norm.precip","norm.tavg","norm.tavg.sd","norm.tmax","norm.tmax.sd","norm.tmin","norm.tmin.sd"
+"","station.id","property","latitude","longitude","elevation.m","sampling.date","visit.type","sampling.year","month","norm.precip","norm.tavg","norm.tavg.sd","norm.tmax","norm.tmax.sd","norm.tmin","norm.tmin.sd"
 "205","USC00410433","Williamson_2019_10",30.4144,-97.7664,268.2,"6/19/20","i",2020,1,68.072,9.5,2.0016,16.11,2.2796,2.94,1.946
 "206","USC00410433","Williamson_2019_10",30.4144,-97.7664,268.2,"6/19/20","i",2020,2,36.322,11.67,2.224,18.33,2.8912,5.06,1.8904
 "207","USC00410433","Williamson_2019_10",30.4144,-97.7664,268.2,"6/19/20","i",2020,3,77.47,16.22,1.8904,22.83,1.7792,9.61,2.2796
