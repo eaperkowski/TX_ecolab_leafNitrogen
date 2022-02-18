@@ -6,6 +6,23 @@ library(SPEI)
 library(tidyverse)
 library(lubridate)
 library(reshape)
+library(ggpubr)
+
+## Central figure theme
+pubtheme <- theme_bw() +
+  theme(panel.background = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_text(size = 16, face = "bold"),
+        panel.border = element_rect(size = 3, fill = NA),
+        axis.text = element_text(size = 15, color = "black"),
+        axis.title = element_text(size = 15, face = "bold"),
+        legend.box.background = element_blank(),
+        legend.key = element_rect(fill = NA),
+        legend.background=element_blank(),
+        legend.text = element_text(size = 15),
+        legend.title = element_text(size = 14, face = "bold"),
+        axis.ticks.length = unit(0.25, "cm"),
+        panel.grid.minor = element_blank())
 
 ################################################################
 # Import daily weather means, 2006-2020 Normals csv files,
@@ -28,93 +45,105 @@ daily.means$date <- ymd(daily.means$date)
 
 # Subset data frame to only include 30 days leading up to sampling 
 # date
-daily.means <- daily.means %>%
+monthly.mean <- daily.means %>%
   full_join(site.coords) %>%
-  group_by(property, sampling.year, visit.type) %>%
-  filter(date < sampling.date & date > sampling.date - 30) %>%
-  unite("site.long", c(property, sampling.year, visit.type), sep = " ")
-
+  unite("site.long", c(property, sampling.year, visit.type), sep = " ") %>%
+  mutate(month = month(date)) %>%
+  group_by(site.long, month, latitude, longitude) %>%
+  summarize(tmax.mean = mean(max.temp, na.rm = TRUE),
+            tmin.mean = mean(min.temp, na.rm = TRUE),
+            monthly.precip = sum(daily.precip, na.rm = TRUE))
 
 ################################################################
 # Separate properties into list of data frames. This is necessary
 # because SPEI requires a time series notation that can only
 # be accomplished through a series of unique lists
 ################################################################
-daily.means <- setNames(split(x = daily.means,
-                              f = daily.means$site.long),
-                        paste0(unique(daily.means$site.long)))
+monthly.mean <- setNames(split(x = monthly.mean,
+                              f = monthly.mean$site.long),
+                         paste0(unique(monthly.mean$site.long)))
+
+# Clean missing data points
+monthly.mean[["Uvalde_2020_02 2021 p"]] <- monthly.mean[["Uvalde_2020_02 2021 p"]][-4,]
+monthly.mean[["Uvalde_2020_02 2021 i"]] <- monthly.mean[["Uvalde_2020_02 2021 i"]][-4,]
 
 ################################################################
 # Use Hargreaves equation to estimate 30-day reference 
 # evapotranspiration, merge back to central data frame
 ################################################################
-for(i in seq_along(daily.means)) {
-  daily.means[[i]]$et0 <- as.numeric(hargreaves(Tmin = as.numeric(daily.means[[i]]$min.temp),
-                                                Tmax = as.numeric(daily.means[[i]]$max.temp),
-                                                lat = unique(daily.means[[i]]$latitude)))
+for(i in seq_along(monthly.mean)) {
+  monthly.mean[[i]]$et0 <- as.numeric(hargreaves(Tmin = monthly.mean[[i]]$tmin.mean,
+                                                Tmax = monthly.mean[[i]]$tmax.mean,
+                                                lat = unique(monthly.mean[[i]]$latitude)))
+  
+  monthly.mean[[i]]$water.balance <- monthly.mean[[i]]$monthly.precip - monthly.mean[[i]]$et0
+  monthly.mean[[i]]$spei <- spei(data = as.ts(monthly.mean[[i]]$water.balance), scale = 1)$fitted
+  monthly.mean[[i]]$aridity <- monthly.mean[[i]]$monthly.precip / monthly.mean[[i]]$et0
 }
 
+
 ## Merge list of data.frames into single data.frame
-daily.means <- merge_all(daily.means)
+monthly.mean <- merge_all(monthly.mean)
 
 ## Separate concatenated "site.long" back to three separate columns
-daily.means <- separate(daily.means, site.long, 
-                        into = c("property", "sampling.year", "visit.type"),
+monthly.mean <- separate(monthly.mean, site.long, 
+                        into = c("site", "sampling.year", "visit.type"),
                         sep = " ")
 
-################################################################
-# Calculate 30-day SPEI and AI for all site visits
-################################################################
-## Determine average monthly precipitation, et0 by visit type and property
-monthly.mean <- daily.means %>%
-  group_by(property, sampling.year, visit.type, latitude, longitude) %>%
-  summarize(monthly.precip = sum(daily.precip, na.rm = TRUE),
-            monthly.et0 = mean(et0, na.rm = TRUE)) %>%
-  mutate(monthly.water.balance = as.numeric(monthly.precip - monthly.et0)) %>%
-  select(site = property, everything())
-
-## Calculate SPEI and aridity index values
-monthly.spei <- spei(data = as.ts(monthly.mean$monthly.water.balance), scale = 1)
-
-## Add SPEI and aridity index values into monthly mean data frame
-monthly.mean$spei <- monthly.spei$fitted
-monthly.mean$aridity <- monthly.mean$monthly.precip / monthly.mean$monthly.et0
+monthly.mean$test.spei <- spei(data = as.ts(monthly.mean$water.balance), scale = 1)$fitted
 
 ################################################################
 # Visualize 30-day aridity index
 ################################################################
 # Initial site visits for 2020 and 2021
-ggplot(data = subset(monthly.mean, visit.type == "i" & 
-                       sampling.year == "2021" & site != "Menard_2020_01"), 
-       aes(x = reorder(site, longitude), y = spei)) +
+init.2021 <- ggplot(data = subset(monthly.mean, visit.type == "i" & 
+                                    sampling.year == "2021"), 
+                    aes(x = reorder(site, longitude), y = test.spei)) +
+  geom_boxplot()
+  geom_bar(stat = "identity", position = "dodge") +
+  scale_y_continuous(limits = c(-2, 2), breaks = seq(-2, 2, 1)) +
+  labs(x = "Site", y = NULL) +
+  pubtheme +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 12))
+
+
+init.2020 <-ggplot(data = subset(monthly.mean, visit.type == "i" & 
+                                   sampling.year == "2020"), 
+                   aes(x = reorder(site, longitude), y = spei)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(x = NULL, y = "30-day SPEI") +
+  scale_y_continuous(limits = c(-2, 2), breaks = seq(-2, 2, 1)) +
+  pubtheme +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 12))
+
+ggarrange(init.2020, init.2021, ncol = 2, align = "hv")
+
+# Primary site visits for 2020 and 2021
+prim.2021 <- ggplot(data = subset(monthly.mean, visit.type == "p" & 
+                       sampling.year == "2021"), 
+       aes(x = reorder(site, spei), y = spei)) +
   geom_bar(stat = "identity", position = "dodge") +
   labs(x = "Site", y = "SPEI") +
-  theme(axis.text.x = element_text(angle = 45,
-                                   hjust = 1))
-ggplot(data = subset(monthly.mean, visit.type == "i" & 
-                       sampling.year == "2020"), 
-       aes(x = reorder(site, longitude), y = spei)) +
-  geom_bar(stat = "identity", position = "dodge") +
-  labs(x = NULL, y = "SPEI") +
+  pubtheme +
   theme(axis.text.x = element_text(angle = 45,
                                    hjust = 1))
 
-# Primary site visits for 2020 and 2021
-ggplot(data = subset(monthly.mean, visit.type == "p" & 
-                       sampling.year == "2021"), 
-       aes(x = reorder(site, longitude), y = spei)) +
-  geom_bar(stat = "identity", position = "dodge") +
-  labs(x = "Site", y = "SPEI") +
-  theme(axis.text.x = element_text(angle = 45,
-                                   hjust = 1))
-ggplot(data = subset(monthly.mean, visit.type == "p" & 
-                       sampling.year == "2020"), 
-       aes(x = reorder(site, longitude), y = spei)) +
+prim.2020 <- ggplot(data = subset(monthly.mean, visit.type == "p" & 
+                                    sampling.year == "2020"), 
+                    aes(x = reorder(site, longitude), y = spei)) +
   geom_bar(stat = "identity", position = "dodge") +
   labs(x = NULL, y = "SPEI") +
   theme_bw() +
   theme(axis.text.x = element_text(angle = 45,
                                    hjust = 1)) 
+
+
+ggarrange(init.2021, prim.2021, 
+          ncol = 2, nrow = 1, common.legend = TRUE,
+          align = "hv", legend = "right", labels = "AUTO",
+          font.label = list(size = 18, face = "bold")) %>%
+  ggexport(filename = "/Users/eaperkowski/Desktop/2021eco_spei.png", 
+           width = 7000, height = 4000, res = 600)
 
 ################################################################
 # Clean normals data sheet and put in list of data frames by
@@ -142,10 +171,17 @@ for(i in seq_along(normals)) {
   normals[[i]]$et0 <- as.numeric(hargreaves(Tmin = as.numeric(normals[[i]]$norm.tmin),
                                             Tmax = as.numeric(normals[[i]]$norm.tmax),
                                             lat = unique(normals[[i]]$latitude)))
+  normals[[i]]$water.balance <- as.numeric(normals[[i]]$norm.precip - normals[[i]]$et0)
+  normals[[i]]$spei <- as.vector(spei(data = as.ts(normals[[i]]$water.balance), scale = 1)$fitted)
+  normals[[i]]$aridity <- normals[[i]]$norm.precip / normals[[i]]$et0
 }
 
 ## Merge list of data.frames into single data.frame
 normals <- merge_all(normals)
+
+ggplot(data = normals, aes(x = month, y = aridity, color = site.long)) +
+  geom_line() +
+  facet_grid
 
 
 ## Separate concatenated "site.long" back to three separate columns
@@ -156,32 +192,34 @@ normals <- separate(normals, site.long,
 ################################################################
 # Calculate 15-yr normal SPEI and AI for all sites
 ################################################################
-## Determine average monthly precipitation, et0 by visit type and property
-normals <- normals %>%
-  group_by(site, sampling.year, visit.type) %>%
-  mutate(water.balance = as.numeric(norm.precip - et0))
-
-## Calculate SPEI and aridity index values
-normals.spei <- spei(data = as.ts(normals$water.balance), scale = 1)
-
-## Add SPEI and aridity index values into monthly mean data frame
-normals$spei <- normals.spei$fitted
-normals$aridity <- normals$norm.precip / normals$et0
-
 normals.gs <- normals %>%
-  #filter(month == "5" | month == "6" | month == "7") %>%
   group_by(site, visit.type, sampling.year, longitude) %>%
-  summarize(mean.aridity = mean(aridity, na.rm = TRUE),
-            mean.spei = mean(spei, na.rm = TRUE))
+  summarize(mean.annual.aridity = mean(aridity, na.rm = TRUE),
+            mean.annual.spei = mean(spei, na.rm = TRUE))
 
-## 2021 field sites
-ggplot(data = subset(normals.gs, sampling.year == "2021" & visit.type == "i"), 
-       aes(x = reorder(site, longitude), y = mean.aridity)) +
+## Initial field site visits
+norm.2021 <- ggplot(data = subset(normals.gs, sampling.year == "2021" & visit.type == "i"), 
+       aes(x = reorder(site, longitude), y = mean.spei)) +
   geom_bar(stat = "identity", position = "dodge") +
-  labs(x = "Site", y = "Aridity index (P/PET)") +
+  labs(x = "Site", y = "15-year normal SPEI") +
+  pubtheme +
   theme(axis.text.x = element_text(angle = 45,
                                    hjust = 1))
   
+norm.2020 <- ggplot(data = subset(normals.gs, sampling.year == "2020" & visit.type == "i"), 
+                    aes(x = reorder(site, longitude), y = mean.spei)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(x = "Site", y = "15-year normal SPEI") +
+  pubtheme +
+  theme(axis.text.x = element_text(angle = 45,
+                                   hjust = 1))
+
+
+
+ggarrange(norm.2021) %>%
+  ggexport(filename = "/Users/eaperkowski/Desktop/2021eco_norm_spei.png", 
+           width = 4500, height = 4000, res = 600)
+
 ggplot(data = subset(normals.gs, sampling.year == "2021" & visit.type == "p"), 
        aes(x = reorder(site, longitude), y = mean.aridity)) +
   geom_bar(stat = "identity", position = "dodge") +

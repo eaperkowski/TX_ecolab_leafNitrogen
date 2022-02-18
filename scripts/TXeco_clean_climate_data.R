@@ -21,13 +21,20 @@ df.mesowest <- lapply(file.list.mesowest, read.csv)
 
 ## Merge mesowest climate data from all properties and both sampling years into 
 ## single df, calculate hourly estimates
+
+## Note to self: would it be easier to do a for loop and iteratively calculate 
+## these hourly estimates? You could then just calculate daily averages
+
 mesowest.hourly <- df.mesowest %>%
   merge_all() %>%
-  dplyr::mutate(date.time = as.POSIXct(strptime(date.time, 
-                                         format = "%m/%d/%Y %H:%M CDT"))) %>%
-  dplyr::mutate(date.time.hr = floor_date(date.time, unit = "hour")) %>%
+  mutate(date.time.round = floor_date(as.POSIXct(strptime(date.time,
+                                                          format = "%m/%d/%Y %H:%M CDT")), 
+                                      unit = "hour")) %>%
+  #mutate(date.time.hr = floor_date(date.time, unit = "hour")) %>%
   separate(date.time.hr, into = c("date", "time.round"), 
-           sep = " ", remove = FALSE) %>%
+           sep = " ", remove = FALSE)
+
+test <- mesowest.hourly %>%
   group_by(site, sampling.year, sampling.date, visit.type, date, time.round) %>%
   dplyr::summarize(air.temp = mean(air.temp, na.rm = TRUE),
                    relative.humidity = mean(relative.humidity, na.rm = TRUE),
@@ -37,16 +44,16 @@ mesowest.hourly <- df.mesowest %>%
                    sea.level.pressure = mean(sea.level.pressure, na.rm = TRUE),
                    atm.pressure = mean(atm.pressure, na.rm = TRUE)) %>%
   dplyr::mutate(additive.precip = additive.precip - lag(additive.precip),
-         additive.precip = ifelse(additive.precip == "NaN" | 
-                                    is.na(additive.precip) == TRUE, 
-                                  0, additive.precip),
-         accumulated.precip = ifelse(accumulated.precip == "-Inf", 
-                                     0, accumulated.precip),
-         accum.precip = accumulated.precip - lag(accumulated.precip),
-         accum.precip = ifelse(time.round == "00:00:00", 
-                               accumulated.precip, accum.precip),
-         hourly.precip = incremental.precip + accum.precip + additive.precip,
-         hourly.precip = ifelse(hourly.precip == "Inf", 0, hourly.precip)) %>%
+                additive.precip = ifelse(additive.precip == "NaN" | 
+                                           is.na(additive.precip) == TRUE, 
+                                         0, additive.precip),
+                accumulated.precip = ifelse(accumulated.precip == "-Inf", 
+                                            0, accumulated.precip),
+                accum.precip = accumulated.precip - lag(accumulated.precip),
+                accum.precip = ifelse(time.round == "00:00:00", 
+                                      accumulated.precip, accum.precip),
+                hourly.precip = incremental.precip + accum.precip + additive.precip,
+                hourly.precip = ifelse(hourly.precip == "Inf", 0, hourly.precip)) %>%
   dplyr::select(-c(incremental.precip:additive.precip, accum.precip)) %>%
   data.frame()
 
@@ -57,7 +64,8 @@ names(mesowest.hourly)[names(mesowest.hourly) == "site"] <- "property"
 mesowest.hourly[mesowest.hourly == "-Inf"] <- NA
 
 ## Write .csv to "data_sheets" folder
-write.csv(mesowest.hourly, "../data_sheets/TXeco_mesowest_hourly.csv")
+write.csv(mesowest.hourly, "../data_sheets/TXeco_mesowest_hourly.csv", 
+          row.names = FALSE)
 
 ################################################################
 # Calculate daily means for evapotranspiration estimate and 
@@ -72,7 +80,7 @@ mesowest.daily <- mesowest.hourly %>%
             daily.precip = sum(hourly.precip, na.rm = TRUE))
 
 ## Write .csv to "data_sheets" folder
-write.csv(mesowest.daily, "../data_sheets/TXeco_mesowest_daily.csv")
+write.csv(mesowest.daily, "../data_sheets/TXeco_mesowest_daily.csv", row.names = FALSE)
 
 ################################################################
 # Import and clean NOAA 2006-2020 climate data into central .csv
@@ -96,9 +104,6 @@ normals <- df.normals %>%
          norm.tmin = fahrenheit.to.celsius(norm.tmin),
          norm.tmin.sd = norm.tmin.sd * 0.556)
 
-## Rename site to property
-names(normals)[names(normals) == "site"] <- "property"
-
 ## Write .csv to "data_sheets" folder
-write.csv(normals, "../data_sheets/TXeco_climate_normals.csv")
+write.csv(normals, "../data_sheets/TXeco_climate_normals.csv", row.names = FALSE)
 
