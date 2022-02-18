@@ -12,11 +12,14 @@ library(weathermetrics)
 # central .csv and export to "data_sheets" folder
 ################################################################
 ## Import mesowest files
-file.list.mesowest <- list.files(path = "../climate_data/mesowest/",
+file.list.mesowest <- list.files(path = "../climate_data/mesowest",
                         recursive = TRUE,
                         pattern = "\\.csv$",
                         full.names = TRUE)
-file.list.mesowest <- setNames(file.list.mesowest, file.list.mesowest)
+file.list.mesowest <- setNames(file.list.mesowest, 
+                               str_extract(basename(file.list.mesowest), 
+                                           '.*(?=\\.csv)'))
+
 df.mesowest <- lapply(file.list.mesowest, read.csv)
 
 ## Merge mesowest climate data from all properties and both sampling years into 
@@ -27,12 +30,14 @@ df.mesowest <- lapply(file.list.mesowest, read.csv)
 
 mesowest.hourly <- df.mesowest %>%
   merge_all() %>%
+  filter(sampling.year == "2020") %>%
   mutate(date.time.round = floor_date(as.POSIXct(strptime(date.time,
-                                                          format = "%m/%d/%Y %H:%M CDT")), 
+                                                          format = "%m/%d/%Y %H:%M UTC")), 
                                       unit = "hour")) %>%
-  #mutate(date.time.hr = floor_date(date.time, unit = "hour")) %>%
-  separate(date.time.hr, into = c("date", "time.round"), 
+  separate(date.time.round, into = c("date", "time.round"), 
            sep = " ", remove = FALSE)
+
+## STOPPED HERE 02-18-22 ##
 
 test <- mesowest.hourly %>%
   group_by(site, sampling.year, sampling.date, visit.type, date, time.round) %>%
