@@ -78,10 +78,12 @@ for(i in seq_along(daily.mesowest)) {
                      atm.pressure = mean(atm.pressure, na.rm = TRUE))
 }
 
+# Merge into single data frame, rename site col to "property", then save .csv
 daily.mesowest <- merge_all(daily.mesowest)
 daily.mesowest <- arrange(daily.mesowest, site)
+names(daily.mesowest)[2] <- "property"
 
-write.csv(daily.mesowest, "../data_sheets/TXeco_climate_dailymesowest.csv")
+write.csv(daily.mesowest, "../data_sheets/TXeco_climate_dailymesowest.csv", row.names = FALSE)
 
 
 ##########################################################################
@@ -91,7 +93,7 @@ write.csv(daily.mesowest, "../data_sheets/TXeco_climate_dailymesowest.csv")
 monthly.mesowest <- daily.mesowest %>%
   mutate(year = year(local.date),
          month = month(local.date)) %>%
-  group_by(site, year, month) %>%
+  group_by(property, year, month) %>%
   dplyr::summarize(month.tmean = mean(t.mean, na.rm = TRUE),
                    month.tmax = mean(t.max, na.rm = TRUE),
                    month.tmin = mean(t.min, na.rm = TRUE),
@@ -99,7 +101,7 @@ monthly.mesowest <- daily.mesowest %>%
                    month.precip = sum(daily.precip, na.rm = TRUE),
                    month.sea.pressure = mean(sea.level.pressure, na.rm = TRUE),
                    month.atm.pressure = mean(atm.pressure, na.rm = TRUE))
-write.csv(monthly.mesowest, "../data_sheets/TXeco_climate_monthlymesowest.csv")
+write.csv(monthly.mesowest, "../data_sheets/TXeco_climate_monthlymesowest.csv", row.names = FALSE)
 
 
 ################################################################
