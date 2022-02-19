@@ -1,91 +1,106 @@
-################################################################
+##########################################################################
 # Load libraries
-################################################################
+##########################################################################
 library(tidyverse)
 library(lubridate)
 library(dplyr)
 library(reshape)
 library(weathermetrics)
 
-################################################################
+##########################################################################
 # Import and clean mesowest files into hourly climate data into
 # central .csv and export to "data_sheets" folder
-################################################################
+##########################################################################
 ## Import mesowest files
-file.list.mesowest <- list.files(path = "../climate_data/mesowest",
+file.list.mesowest <- list.files(path = "../climate_data/new_mesowest",
                         recursive = TRUE,
                         pattern = "\\.csv$",
                         full.names = TRUE)
 file.list.mesowest <- setNames(file.list.mesowest, 
                                str_extract(basename(file.list.mesowest), 
                                            '.*(?=\\.csv)'))
-
 df.mesowest <- lapply(file.list.mesowest, read.csv)
 
-## Merge mesowest climate data from all properties and both sampling years into 
-## single df, calculate hourly estimates
+##########################################################################
+# For-loop to convert UTC time to local time, use lubridate to account 
+# for daylight savings. Then, summarize hourly temp, rh, precip, and 
+# pressure data. Finally, calculate additive precipitation based on lag() 
+# from the previous row and sum precipitation types to get hourly 
+# precipitation data. Tested to make sure time correction was accurate 
+# and that no precip data spills to subsequent day
+##########################################################################
+for(i in seq_along(df.mesowest)) {
+  df.mesowest[[i]] <- df.mesowest[[i]] %>%
+    mutate(utc.datetime = mdy_hm(date.time),
+           local.datetime = with_tz(mdy_hm(date.time), tz = "America/Chicago"),
+           local.date = date(local.datetime),
+           local.hour = hour(local.datetime)) %>%
+    group_by(local.date, local.hour, site) %>%
+    dplyr::summarize(temp = mean(air.temp, na.rm = TRUE),
+                     relative.humidity = mean(relative.humidity, na.rm = TRUE),
+                     incremental.precip = sum(incremental.precip, na.rm = TRUE),
+                     accumulated.precip = max(accumulated.precip, na.rm = TRUE),
+                     additive.precip = max(additive.precip, na.rm = TRUE),
+                     sea.level.pressure = mean(sea.level.pressure, na.rm = TRUE),
+                     atm.pressure = mean(atm.pressure, na.rm = TRUE)) %>%
+    mutate(accumulated.precip = ifelse(accumulated.precip == "-Inf", 0,
+                                       accumulated.precip),
+           additive.precip = ifelse(additive.precip == "-Inf", 0,
+                                    additive.precip))
+  
+  df.mesowest[[i]]$additive.precip <- df.mesowest[[i]]$additive.precip - lag(df.mesowest[[i]]$additive.precip)
+  df.mesowest[[i]]$accumulated.precip <- df.mesowest[[i]]$accumulated.precip - lag(df.mesowest[[i]]$accumulated.precip)
+  df.mesowest[[i]]$accumulated.precip <- ifelse(df.mesowest[[i]]$accumulated.precip < 0, 0, df.mesowest[[i]]$accumulated.precip)
+  df.mesowest[[i]]$additive.precip <- ifelse(df.mesowest[[i]]$additive.precip < 0 | df.mesowest[[i]]$additive.precip > 50, 0, df.mesowest[[i]]$additive.precip)
+  df.mesowest[[i]]$hourly.precip <- df.mesowest[[i]]$incremental.precip + df.mesowest[[i]]$additive.precip + df.mesowest[[i]]$accumulated.precip
 
-## Note to self: would it be easier to do a for loop and iteratively calculate 
-## these hourly estimates? You could then just calculate daily averages
+  }
 
-mesowest.hourly <- df.mesowest %>%
-  merge_all() %>%
-  filter(sampling.year == "2020") %>%
-  mutate(date.time.round = floor_date(as.POSIXct(strptime(date.time,
-                                                          format = "%m/%d/%Y %H:%M UTC")), 
-                                      unit = "hour")) %>%
-  separate(date.time.round, into = c("date", "time.round"), 
-           sep = " ", remove = FALSE)
 
-## STOPPED HERE 02-18-22 ##
+##########################################################################
+# For-loop to calculate daily mean, min, and max temps, precip totals,
+# relative humidity, and pressure data from hourly data. This file will
+# be saved as a .csv to calculate short term weather variables that will
+# be used in statistical models. It will also be used in this file to 
+# calculate monthly means to pass on to drought and aridity indices
+##########################################################################
+daily.mesowest <- df.mesowest
 
-test <- mesowest.hourly %>%
-  group_by(site, sampling.year, sampling.date, visit.type, date, time.round) %>%
-  dplyr::summarize(air.temp = mean(air.temp, na.rm = TRUE),
-                   relative.humidity = mean(relative.humidity, na.rm = TRUE),
-                   incremental.precip = sum(incremental.precip, na.rm = TRUE),
-                   accumulated.precip = max(accumulated.precip, na.rm = TRUE),
-                   additive.precip = max(additive.precip, na.rm = TRUE),
-                   sea.level.pressure = mean(sea.level.pressure, na.rm = TRUE),
-                   atm.pressure = mean(atm.pressure, na.rm = TRUE)) %>%
-  dplyr::mutate(additive.precip = additive.precip - lag(additive.precip),
-                additive.precip = ifelse(additive.precip == "NaN" | 
-                                           is.na(additive.precip) == TRUE, 
-                                         0, additive.precip),
-                accumulated.precip = ifelse(accumulated.precip == "-Inf", 
-                                            0, accumulated.precip),
-                accum.precip = accumulated.precip - lag(accumulated.precip),
-                accum.precip = ifelse(time.round == "00:00:00", 
-                                      accumulated.precip, accum.precip),
-                hourly.precip = incremental.precip + accum.precip + additive.precip,
-                hourly.precip = ifelse(hourly.precip == "Inf", 0, hourly.precip)) %>%
-  dplyr::select(-c(incremental.precip:additive.precip, accum.precip)) %>%
-  data.frame()
+for(i in seq_along(daily.mesowest)) {
+  daily.mesowest[[i]] <- daily.mesowest[[i]] %>%
+    group_by(local.date, site) %>%
+    dplyr::summarize(t.mean = mean(temp, na.rm = TRUE),
+                     t.max = max(temp, na.rm = TRUE),
+                     t.min = min(temp, na.rm = TRUE),
+                     relative.humidity = mean(relative.humidity, na.rm = TRUE),
+                     daily.precip = sum(hourly.precip, na.rm = TRUE),
+                     sea.level.pressure = mean(sea.level.pressure, na.rm = TRUE),
+                     atm.pressure = mean(atm.pressure, na.rm = TRUE))
+}
 
-## Rename "site" column to "property
-names(mesowest.hourly)[names(mesowest.hourly) == "site"] <- "property"
+daily.mesowest <- merge_all(daily.mesowest)
+daily.mesowest <- arrange(daily.mesowest, site)
 
-## Convert all -Inf values to NA
-mesowest.hourly[mesowest.hourly == "-Inf"] <- NA
+write.csv(daily.mesowest, "../data_sheets/TXeco_climate_dailymesowest.csv")
 
-## Write .csv to "data_sheets" folder
-write.csv(mesowest.hourly, "../data_sheets/TXeco_mesowest_hourly.csv", 
-          row.names = FALSE)
 
-################################################################
-# Calculate daily means for evapotranspiration estimate and 
-# SPEI/AI calculations. Hargreaves requires Tmax, Tmin
-################################################################
-mesowest.daily <- mesowest.hourly %>%
-  group_by(property, sampling.year, sampling.date, visit.type, date) %>%
-  summarize(mean.temp = mean(air.temp, na.rm = TRUE),
-            sd.temp = sd(air.temp, na.rm = TRUE),
-            max.temp = max(air.temp, na.rm = TRUE),
-            min.temp = min(air.temp, na.rm = TRUE),
-            daily.precip = sum(hourly.precip, na.rm = TRUE))
+##########################################################################
+# Calculate monthly temperature min, max, and mean, mean rh, total precip,
+# and atmospheric pressure
+##########################################################################
+monthly.mesowest <- daily.mesowest %>%
+  mutate(year = year(local.date),
+         month = month(local.date)) %>%
+  group_by(site, year, month) %>%
+  dplyr::summarize(month.tmean = mean(t.mean, na.rm = TRUE),
+                   month.tmax = mean(t.max, na.rm = TRUE),
+                   month.tmin = mean(t.min, na.rm = TRUE),
+                   month.rh = mean(relative.humidity, na.rm = TRUE),
+                   month.precip = sum(daily.precip, na.rm = TRUE),
+                   month.sea.pressure = mean(sea.level.pressure, na.rm = TRUE),
+                   month.atm.pressure = mean(atm.pressure, na.rm = TRUE))
+write.csv(monthly.mesowest, "../data_sheets/TXeco_climate_monthlymesowest.csv")
 
-## Write .csv to "data_sheets" folder
-write.csv(mesowest.daily, "../data_sheets/TXeco_mesowest_daily.csv", row.names = FALSE)
 
 ################################################################
 # Import and clean NOAA 2006-2020 climate data into central .csv
