@@ -35,7 +35,7 @@ for(i in seq_along(df.mesowest)) {
            local.datetime = with_tz(mdy_hm(date.time), tz = "America/Chicago"),
            local.date = date(local.datetime),
            local.hour = hour(local.datetime)) %>%
-    group_by(local.date, local.hour, site) %>%
+    group_by(local.date, local.hour, site, visit.type) %>%
     dplyr::summarize(temp = mean(air.temp, na.rm = TRUE),
                      relative.humidity = mean(relative.humidity, na.rm = TRUE),
                      incremental.precip = sum(incremental.precip, na.rm = TRUE),
@@ -68,7 +68,7 @@ daily.mesowest <- df.mesowest
 
 for(i in seq_along(daily.mesowest)) {
   daily.mesowest[[i]] <- daily.mesowest[[i]] %>%
-    group_by(local.date, site) %>%
+    group_by(local.date, site, visit.type) %>%
     dplyr::summarize(t.mean = mean(temp, na.rm = TRUE),
                      t.max = max(temp, na.rm = TRUE),
                      t.min = min(temp, na.rm = TRUE),
@@ -93,7 +93,7 @@ write.csv(daily.mesowest, "../data_sheets/TXeco_climate_dailymesowest.csv", row.
 monthly.mesowest <- daily.mesowest %>%
   mutate(year = year(local.date),
          month = month(local.date)) %>%
-  group_by(property, year, month) %>%
+  group_by(property, visit.type, year, month) %>%
   dplyr::summarize(month.tmean = mean(t.mean, na.rm = TRUE),
                    month.tmax = mean(t.max, na.rm = TRUE),
                    month.tmin = mean(t.min, na.rm = TRUE),
