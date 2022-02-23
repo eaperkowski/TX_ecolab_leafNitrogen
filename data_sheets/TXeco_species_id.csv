@@ -51,21 +51,21 @@ site,d13C,d15n,photo,id,coll.number,NCRS.code,family,growth.habit,duration,group
 2020eco_Blanco_i_13,-13.17,1.03,c4,Bothriochloa saccaroides,BOSA,BOSA,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
 2020eco_Blanco_i_14,-13.62,0.05,c4,Cynodon dactylon,CYDA,CYDA,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
 2020eco_Blanco_i_15,-12.61,-0.07,c4,Cynodon dactylon,CYDA,CYDA,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
-2020eco_Brazos_i_01,-14.03,3.36,c4,Sorghum hapepense L.,SOHA,SOHA,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
-2020eco_Brazos_i_02,-13.18,0.77,c4,Sorghum hapepense L.,SOHA,SOHA,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
-2020eco_Brazos_i_03,-13.6,1.16,c4,Sorghum hapepense L.,SOHA,SOHA,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
-2020eco_Brazos_i_04,-29.76,8.38,c3,Solanum elaeagnifolium,SOEL,SOEL,Solanaceae,forb,perennial,dicot,no,c3_forb
-2020eco_Brazos_i_05,-28.77,5.41,c3,Solanum elaeagnifolium,SOEL,SOEL,Solanaceae,forb,perennial,dicot,no,c3_forb
-2020eco_Brazos_i_06,-30.09,8.22,c3,Solanum elaeagnifolium,SOEL,SOEL,Solanaceae,forb,perennial,dicot,no,c3_forb
-2020eco_Brazos_i_07,-13.52,-0.06,c4,Sorghum hapepense L.,SOHA,SOHA,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
-2020eco_Brazos_i_08,-13,-1.76,c4,Sorghum hapepense L.,SOHA,SOHA,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
-2020eco_Brazos_i_09,-13.07,-1.39,c4,Sorghum hapepense L.,SOHA,SOHA,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
-2020eco_Brazos_i_10,-31.16,-3.29,c3,,,,,shrub,perennial,dicot,no,c3_shrub
-2020eco_Brazos_i_11,-32.3,-6.59,c3,,,,,shrub,perennial,dicot,no,c3_shrub
-2020eco_Brazos_i_12,-31.02,-3.96,c3,,,,,shrub,perennial,dicot,no,c3_shrub
-2020eco_Brazos_i_13,-31.5,-2.63,c3,,,,,forb,,dicot,,c3_forb
-2020eco_Brazos_i_14,-32.1,-0.24,c3,,,,,forb,,dicot,,c3_forb
-2020eco_Brazos_i_15,-31.96,-1.58,c3,,,,,forb,,dicot,,c3_forb
+2020eco_Brazos18_i_01,-14.03,3.36,c4,Sorghum hapepense L.,SOHA,SOHA,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
+2020eco_Brazos18_i_02,-13.18,0.77,c4,Sorghum hapepense L.,SOHA,SOHA,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
+2020eco_Brazos18_i_03,-13.6,1.16,c4,Sorghum hapepense L.,SOHA,SOHA,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
+2020eco_Brazos18_i_04,-29.76,8.38,c3,Solanum elaeagnifolium,SOEL,SOEL,Solanaceae,forb,perennial,dicot,no,c3_forb
+2020eco_Brazos18_i_05,-28.77,5.41,c3,Solanum elaeagnifolium,SOEL,SOEL,Solanaceae,forb,perennial,dicot,no,c3_forb
+2020eco_Brazos18_i_06,-30.09,8.22,c3,Solanum elaeagnifolium,SOEL,SOEL,Solanaceae,forb,perennial,dicot,no,c3_forb
+2020eco_Brazos18_i_07,-13.52,-0.06,c4,Sorghum hapepense L.,SOHA,SOHA,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
+2020eco_Brazos18_i_08,-13,-1.76,c4,Sorghum hapepense L.,SOHA,SOHA,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
+2020eco_Brazos18_i_09,-13.07,-1.39,c4,Sorghum hapepense L.,SOHA,SOHA,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
+2020eco_Brazos18_i_10,-31.16,-3.29,c3,,,,,shrub,perennial,dicot,no,c3_shrub
+2020eco_Brazos18_i_11,-32.3,-6.59,c3,,,,,shrub,perennial,dicot,no,c3_shrub
+2020eco_Brazos18_i_12,-31.02,-3.96,c3,,,,,shrub,perennial,dicot,no,c3_shrub
+2020eco_Brazos18_i_13,-31.5,-2.63,c3,,,,,forb,,dicot,,c3_forb
+2020eco_Brazos18_i_14,-32.1,-0.24,c3,,,,,forb,,dicot,,c3_forb
+2020eco_Brazos18_i_15,-31.96,-1.58,c3,,,,,forb,,dicot,,c3_forb
 2020eco_Comal_i_01,-13.19,-0.9,c4,Carex planostachys,CAPL3,CAPL3,Cyperaceae,graminoid,perennial,monocot,no,c4_graminoid
 2020eco_Comal_i_02,-13.19,0.02,c4,Carex planostachys,CAPL3,CAPL3,Cyperaceae,graminoid,perennial,monocot,no,c4_graminoid
 2020eco_Comal_i_03,-13.06,2.04,c4,Carex planostachys,CAPL3,CAPL3,Cyperaceae,graminoid,perennial,monocot,no,c4_graminoid
