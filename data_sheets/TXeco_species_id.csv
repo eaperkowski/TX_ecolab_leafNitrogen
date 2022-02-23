@@ -3,9 +3,9 @@ site,d13C,d15n,photo,id,coll.number,NCRS.code,family,growth.habit,duration,group
 2020eco_Bell_i_02,-14.14,5.38,c4,,,,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
 2020eco_Bell_i_03,-13.91,2.03,c4,,,,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
 2020eco_Bell_i_04,-13.76,7.11,c4,,,,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
-2020eco_Bell_i_05,-28.99,-0.99,c3,Prosopis glandulosa,PRGL2,PRGL2,Fabaceae,shrub,perennial,dicot,yes,c3_shrub
-2020eco_Bell_i_06,-28.9,-0.42,c3,Prosopis glandulosa,PRGL2,PRGL2,Fabaceae,shrub,perennial,dicot,yes,c3_shrub
-2020eco_Bell_i_07,-27.18,-0.95,c3,Prosopis glandulosa,PRGL2,PRGL2,Fabaceae,shrub,perennial,dicot,yes,c3_shrub
+2020eco_Bell_i_05,-28.99,-0.99,c3,Prosopis glandulosa,PRGL2,PRGL2,Fabaceae,shrub,perennial,dicot,yes,legume
+2020eco_Bell_i_06,-28.9,-0.42,c3,Prosopis glandulosa,PRGL2,PRGL2,Fabaceae,shrub,perennial,dicot,yes,legume
+2020eco_Bell_i_07,-27.18,-0.95,c3,Prosopis glandulosa,PRGL2,PRGL2,Fabaceae,shrub,perennial,dicot,yes,legume
 2020eco_Bell_i_08,-14.32,1.9,c4,Sorghum hapepense L.,SOHA,SOHA,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
 2020eco_Bell_i_09,-19.86,1.33,c4,Sorghum hapepense L.,SOHA,SOHA,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
 2020eco_Bexar_i_01,-26.72,1.71,c3,Ratibida peduncularis,RAPE3,RAPE3,Asteraceae,forb,perennial,dicot,no,c3_forb
@@ -17,15 +17,15 @@ site,d13C,d15n,photo,id,coll.number,NCRS.code,family,growth.habit,duration,group
 2020eco_Bexar_i_07,-13.25,1.46,c4,Sorghum hapepense L.,SOHA,SOHA,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
 2020eco_Bexar_i_08,-13.39,1.7,c4,Sorghum hapepense L.,SOHA,SOHA,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
 2020eco_Bexar_i_09,-13.14,1.47,c4,Sorghum hapepense L.,SOHA,SOHA,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
-2020eco_Bexar_i_10,-28.92,-0.13,c3,Prosopis glandulosa,PRGL2,PRGL2,Fabaceae,shrub,perennial,dicot,yes,c3_shrub
-2020eco_Bexar_i_11,-29.77,-0.23,c3,Prosopis glandulosa,PRGL2,PRGL2,Fabaceae,shrub,perennial,dicot,yes,c3_shrub
-2020eco_Bexar_i_12,-26.52,1.57,c3,Prosopis glandulosa,PRGL2,PRGL2,Fabaceae,shrub,perennial,dicot,yes,c3_shrub
+2020eco_Bexar_i_10,-28.92,-0.13,c3,Prosopis glandulosa,PRGL2,PRGL2,Fabaceae,shrub,perennial,dicot,yes,legume
+2020eco_Bexar_i_11,-29.77,-0.23,c3,Prosopis glandulosa,PRGL2,PRGL2,Fabaceae,shrub,perennial,dicot,yes,legume
+2020eco_Bexar_i_12,-26.52,1.57,c3,Prosopis glandulosa,PRGL2,PRGL2,Fabaceae,shrub,perennial,dicot,yes,legume
 2020eco_Bexar_i_13,-30.89,-1.34,c3,Ratibida peduncularis,RAPE3,RAPE3,Asteraceae,forb,perennial,dicot,no,c3_forb
 2020eco_Bexar_i_14,-30.79,-1.55,c3,Ratibida peduncularis,RAPE3,RAPE3,Asteraceae,forb,perennial,dicot,no,c3_forb
 2020eco_Bexar_i_15,,,c3,Ratibida peduncularis,RAPE3,RAPE3,Asteraceae,forb,perennial,dicot,no,c3_forb
 2020eco_Bexar_p_1a,-28.31,1.4,c3,Ratibida peduncularis,RAPE3,RAPE3,Asteraceae,forb,perennial,dicot,no,c3_forb
 2020eco_Bexar_p_1b,-29.06,8.05,c3,,,,,forb,,dicot,no,c3_forb
-2020eco_Bexar_p_1c,-28.69,0.69,c3,Prosopis glandulosa,PRGL2,PRGL2,Fabaceae,shrub,perennial,dicot,yes,c3_shrub
+2020eco_Bexar_p_1c,-28.69,0.69,c3,Prosopis glandulosa,PRGL2,PRGL2,Fabaceae,shrub,perennial,dicot,yes,legume
 2020eco_Bexar_p_1d,-28.73,1.48,c3,Ambrosia artemisiifolia L.,AMAR2,AMAR2,Asteraceae,forb,annual,dicot,no,c3_forb
 2020eco_Bexar_p_2a,-28.72,-0.61,c3,Ratibida peduncularis,RAPE3,RAPE3,Asteraceae,forb,perennial,dicot,no,c3_forb
 2020eco_Bexar_p_2b,-26.55,3.62,c3,,,,,forb,,dicot,,c3_forb
@@ -35,7 +35,7 @@ site,d13C,d15n,photo,id,coll.number,NCRS.code,family,growth.habit,duration,group
 2020eco_Bexar_p_4a,-29.64,-0.71,c3,,,,Euphorbiaceae,forb,annual,dicot,no,c3_forb
 2020eco_Bexar_p_4b,-29.96,1.73,c3,Solanum elaeagnifolium,SOEL,SOEL,Solanaceae,forb,perennial,dicot,no,c3_forb
 2020eco_Bexar_p_4c,-28.46,-0.23,c3,Ambrosia artemisiifolia L.,AMAR2,AMAR2,Asteraceae,forb,annual,dicot,no,c3_forb
-2020eco_Bexar_p_mes,-27.84,-0.38,c3,Prosopis glandulosa,PRGL2,PRGL2,Fabaceae,shrub,perennial,dicot,yes,c3_shrub
+2020eco_Bexar_p_mes,-27.84,-0.38,c3,Prosopis glandulosa,PRGL2,PRGL2,Fabaceae,shrub,perennial,dicot,yes,legume
 2020eco_Blanco_i_01,-29.95,0.28,c3,Wedelia acapulcensis,WEAC,WEAC,Asteraceae,shrub,perennial,dicot,no,c3_shrub
 2020eco_Blanco_i_02,-29.11,-0.27,c3,Wedelia acapulcensis,WEAC,WEAC,Asteraceae,shrub,perennial,dicot,no,c3_shrub
 2020eco_Blanco_i_03,-29.03,0.13,c3,Wedelia acapulcensis,WEAC,WEAC,Asteraceae,shrub,perennial,dicot,no,c3_shrub
@@ -107,9 +107,9 @@ site,d13C,d15n,photo,id,coll.number,NCRS.code,family,growth.habit,duration,group
 2020eco_Fayette_i_13,-29.76,-2.1,c3,,,,,shrub,perennial,dicot,no,c3_shrub
 2020eco_Fayette_i_14,-29.3,-1.42,c3,,,,,shrub,perennial,dicot,no,c3_shrub
 2020eco_Fayette_i_15,-29.93,-1.89,c3,,,,,shrub,perennial,dicot,no,c3_shrub
-2020eco_Harris_i_01,-30.4,-1.15,c3,Prosopis glandulosa,PRGL2,PRGL2,Fabaceae,shrub,perennial,dicot,yes,c3_shrub
-2020eco_Harris_i_02,-27.75,-0.54,c3,Prosopis glandulosa,PRGL2,PRGL2,Fabaceae,shrub,perennial,dicot,yes,c3_shrub
-2020eco_Harris_i_03,-26.9,0.2,c3,Prosopis glandulosa,PRGL2,PRGL2,Fabaceae,shrub,perennial,dicot,yes,c3_shrub
+2020eco_Harris_i_01,-30.4,-1.15,c3,Prosopis glandulosa,PRGL2,PRGL2,Fabaceae,shrub,perennial,dicot,yes,legume
+2020eco_Harris_i_02,-27.75,-0.54,c3,Prosopis glandulosa,PRGL2,PRGL2,Fabaceae,shrub,perennial,dicot,yes,legume
+2020eco_Harris_i_03,-26.9,0.2,c3,Prosopis glandulosa,PRGL2,PRGL2,Fabaceae,shrub,perennial,dicot,yes,legume
 2020eco_Harris_i_04,-13.22,-1.14,c4,Sorghum hapepense L.,SOHA,SOHA,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
 2020eco_Harris_i_05,-13.18,0.2,c4,Sorghum hapepense L.,SOHA,SOHA,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
 2020eco_Harris_i_06,-13.08,0.37,c4,Sorghum hapepense L.,SOHA,SOHA,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
@@ -134,13 +134,13 @@ site,d13C,d15n,photo,id,coll.number,NCRS.code,family,growth.habit,duration,group
 2020eco_Harris_p_4a,-13.54,4.58,c4,Sorghum hapepense L.,SOHA,SOHA,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
 2020eco_Harris_p_5a,-12.99,6.33,c4,Sorghum hapepense L.,SOHA,SOHA,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
 2020eco_Harris_p_5b,-31.14,4.51,c3,Ambrosia artemisiifolia L.,AMAR2,AMAR2,Asteraceae,forb,annual,dicot,no,c3_forb
-2020eco_Harris_p_mes,-29.44,-0.78,c3,Prosopis glandulosa,PRGL2,PRGL2,Fabaceae,shrub,perennial,dicot,yes,c3_shrub
+2020eco_Harris_p_mes,-29.44,-0.78,c3,Prosopis glandulosa,PRGL2,PRGL2,Fabaceae,shrub,perennial,dicot,yes,legume
 2020eco_Menard_i_01,-29.86,4.88,c3,Ambrosia artemisiifolia L.,AMAR2,AMAR2,Asteraceae,forb,annual,dicot,no,c3_forb
 2020eco_Menard_i_02,-29.75,4.83,c3,Ambrosia artemisiifolia L.,AMAR2,AMAR2,Asteraceae,forb,annual,dicot,no,c3_forb
 2020eco_Menard_i_03,-29.75,5.66,c3,Ambrosia artemisiifolia L.,AMAR2,AMAR2,Asteraceae,forb,annual,dicot,no,c3_forb
-2020eco_Menard_i_04,-27.75,0.8,c3,Prosopis glandulosa,PRGL2,PRGL2,Fabaceae,shrub,perennial,dicot,yes,c3_shrub
-2020eco_Menard_i_05,-26.76,0.21,c3,Prosopis glandulosa,PRGL2,PRGL2,Fabaceae,shrub,perennial,dicot,yes,c3_shrub
-2020eco_Menard_i_06,-27.79,1.12,c3,Prosopis glandulosa,PRGL2,PRGL2,Fabaceae,shrub,perennial,dicot,yes,c3_shrub
+2020eco_Menard_i_04,-27.75,0.8,c3,Prosopis glandulosa,PRGL2,PRGL2,Fabaceae,shrub,perennial,dicot,yes,legume
+2020eco_Menard_i_05,-26.76,0.21,c3,Prosopis glandulosa,PRGL2,PRGL2,Fabaceae,shrub,perennial,dicot,yes,legume
+2020eco_Menard_i_06,-27.79,1.12,c3,Prosopis glandulosa,PRGL2,PRGL2,Fabaceae,shrub,perennial,dicot,yes,legume
 2020eco_Menard_i_07,-28.13,1.02,c3,Helianthus annuus L.,HEAN 3,HEAN 3,Asteraceae,forb,annual,dicot,no,c3_forb
 2020eco_Menard_i_08,-29.16,0.71,c3,Helianthus annuus L.,HEAN 3,HEAN 3,Asteraceae,forb,annual,dicot,no,c3_forb
 2020eco_Menard_i_09,-28.11,1.74,c3,Helianthus annuus L.,HEAN 3,HEAN 3,Asteraceae,forb,annual,dicot,no,c3_forb
@@ -162,7 +162,7 @@ site,d13C,d15n,photo,id,coll.number,NCRS.code,family,growth.habit,duration,group
 2020eco_Menard_p_2f,-27.19,1.46,c3,,,,,graminoid,,monocot,no,c3_graminoid
 2020eco_Menard_p_3a,-28.36,1.4,c3,Ratibida peduncularis,RAPE3,RAPE3,Asteraceae,forb,perennial,dicot,no,c3_forb
 2020eco_Menard_p_3b,-26.72,1.78,c3,,,,,graminoid,,monocot,no,c3_graminoid
-2020eco_Menard_p_3c,-27.51,1.65,c3,Prosopis glandulosa,PRGL2,PRGL2,Fabaceae,shrub,perennial,dicot,yes,c3_shrub
+2020eco_Menard_p_3c,-27.51,1.65,c3,Prosopis glandulosa,PRGL2,PRGL2,Fabaceae,shrub,perennial,dicot,yes,legume
 2020eco_Menard_p_3d,-28.12,2.54,c3,,,,,forb,,dicot,,c3_forb
 2020eco_Menard_p_4a,-27.87,3.17,c3,Ambrosia artemisiifolia L.,AMAR2,AMAR2,Asteraceae,forb,annual,dicot,no,c3_forb
 2020eco_Menard_p_4b,-27.83,1.87,c3,,,,,forb,,dicot,,c3_forb
@@ -184,11 +184,11 @@ site,d13C,d15n,photo,id,coll.number,NCRS.code,family,growth.habit,duration,group
 2020eco_Russel_i_13,,,c3,,,,,shrub,perennial,monocot,no,c3_shrub
 2020eco_Russel_i_14,-31.02,-4.34,c3,,,,,shrub,perennial,monocot,no,c3_shrub
 2020eco_Russel_i_15,-30.83,-3.29,c3,,,,,shrub,perennial,monocot,no,c3_shrub
-2020eco_Sansaba_i_01,-27.07,-1.21,c3,Prosopis glandulosa,PRGL2,PRGL2,Fabaceae,shrub,perennial,dicot,yes,c3_shrub
-2020eco_Sansaba_i_02,-25.52,-0.43,c3,Prosopis glandulosa,PRGL2,PRGL2,Fabaceae,shrub,perennial,dicot,yes,c3_shrub
+2020eco_Sansaba_i_01,-27.07,-1.21,c3,Prosopis glandulosa,PRGL2,PRGL2,Fabaceae,shrub,perennial,dicot,yes,legume
+2020eco_Sansaba_i_02,-25.52,-0.43,c3,Prosopis glandulosa,PRGL2,PRGL2,Fabaceae,shrub,perennial,dicot,yes,legume
 2020eco_Sansaba_i_03,-30.63,-0.91,c3,Heterotheca canescens,HECA8,HECA8,Asteraceae,forb,perennial,dicot,no,c3_forb
 2020eco_Sansaba_i_04,-30.77,-0.7,c3,Heterotheca canescens,HECA8,HECA8,Asteraceae,forb,perennial,dicot,no,c3_forb
-2020eco_Sansaba_i_05,-13.89,3.31,c4,,,,,grass,,monocot,no,c4_grass
+2020eco_Sansaba_i_05,-13.89,3.31,c4,,,,,grass,,monocot,no,c4_graminoid
 2020eco_Sansaba_i_06,-29.52,-2.44,c3,Asclepias asperula,ASAS,ASAS,Asclepiadaceae,forb,perennial,dicot,no,c3_forb
 2020eco_Sansaba_i_07,-30.35,-2.78,c3,Asclepias asperula,ASAS,ASAS,Asclepiadaceae,forb,perennial,dicot,no,c3_forb
 2020eco_Sansaba_i_08,-29.74,-2.74,c3,Asclepias asperula,ASAS,ASAS,Asclepiadaceae,forb,perennial,dicot,no,c3_forb
@@ -197,8 +197,8 @@ site,d13C,d15n,photo,id,coll.number,NCRS.code,family,growth.habit,duration,group
 2020eco_Sansaba_i_11,-27.57,-0.23,c3,,,,,graminoid,perennial,monocot,no,c3_graminoid
 2020eco_Sansaba_i_12,-27.25,0.73,c3,Nassella leucotricha,NALE3,NALE3,Poaceae,graminoid,perennial,monocot,no,c3_graminoid
 2020eco_Sansaba_i_13,-28.02,-2.05,c3,,,,,graminoid,perennial,monocot,no,c3_graminoid
-2020eco_Sansaba_i_14,-27.02,-1.13,c3,Prosopis glandulosa,PRGL2,PRGL2,Fabaceae,shrub,perennial,dicot,yes,c3_shrub
-2020eco_Sansaba_i_15,-23.44,-0.41,c3,Prosopis glandulosa,PRGL2,PRGL2,Fabaceae,shrub,perennial,dicot,yes,c3_shrub
+2020eco_Sansaba_i_14,-27.02,-1.13,c3,Prosopis glandulosa,PRGL2,PRGL2,Fabaceae,shrub,perennial,dicot,yes,legume
+2020eco_Sansaba_i_15,-23.44,-0.41,c3,Prosopis glandulosa,PRGL2,PRGL2,Fabaceae,shrub,perennial,dicot,yes,legume
 2020eco_Uvalde_i_01,-12.82,0.23,c4,Schizachyrium spp.,SCHIZ4,SCHIZ4,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
 2020eco_Uvalde_i_02,-26.32,-1.42,c3,Nassella leucotricha,NALE3,NALE3,Poaceae,graminoid,perennial,monocot,no,c3_graminoid
 2020eco_Uvalde_i_03,-12.86,-1.51,c4,Schizachyrium spp.,SCHIZ4,SCHIZ4,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
@@ -224,7 +224,7 @@ site,d13C,d15n,photo,id,coll.number,NCRS.code,family,growth.habit,duration,group
 2020eco_Uvalde_p_4a,-29.87,1.74,c3,,,,Poaceae,graminoid,perennial,monocot,no,c3_graminoid
 2020eco_Uvalde_p_4b,-30.94,1.89,c3,,,,Euphorbiaceae,forb,annual,dicot,no,c3_forb
 2020eco_Uvalde_p_4c,-31.61,0.04,c3,Solanum elaeagnifolium,SOEL,SOEL,Solanaceae,forb,perennial,dicot,no,c3_forb
-2020eco_Uvalde_p_4d,,,,,,,,forb,,dicot,no,_forb
+2020eco_Uvalde_p_4d,,,c3,,,,,forb,,dicot,no,c3_forb
 2020eco_Uvalde_p_4e,-30.71,-2.05,c3,,,,,forb,,dicot,no,c3_forb
 2020eco_Uvalde_p_5a,-14.65,0.96,c4,,,,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
 2020eco_Uvalde_p_5b,-29.02,3.67,c3,,,,,forb,,dicot,no,c3_forb
@@ -256,23 +256,23 @@ site,d13C,d15n,photo,id,coll.number,NCRS.code,family,growth.habit,duration,group
 2020eco_Williamson10_i_10,-14.31,-0.89,c4,Carex spp.,CAREX,,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
 2020eco_Williamson10_i_11,-13.16,-1.12,c4,Carex spp.,CAREX,,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
 2020eco_Williamson10_i_12,-12.85,-2.06,c4,Carex spp.,9,,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
-2020eco_Williamson10_i_13,-29.07,-0.82,c3,Prosopis glandulosa,PRGL2,PRGL2,Fabaceae,shrub,perennial,dicot,yes,c3_shrub
-2020eco_Williamson10_i_14,-27.85,-1.79,c3,Prosopis glandulosa,PRGL2,PRGL2,Fabaceae,shrub,perennial,dicot,yes,c3_shrub
-2020eco_Williamson10_i_15,-28.45,-1.69,c3,Prosopis glandulosa,PRGL2,PRGL2,Fabaceae,shrub,perennial,dicot,yes,c3_shrub
+2020eco_Williamson10_i_13,-29.07,-0.82,c3,Prosopis glandulosa,PRGL2,PRGL2,Fabaceae,shrub,perennial,dicot,yes,legume
+2020eco_Williamson10_i_14,-27.85,-1.79,c3,Prosopis glandulosa,PRGL2,PRGL2,Fabaceae,shrub,perennial,dicot,yes,legume
+2020eco_Williamson10_i_15,-28.45,-1.69,c3,Prosopis glandulosa,PRGL2,PRGL2,Fabaceae,shrub,perennial,dicot,yes,legume
 2020eco_Williamson10_p_1a,-31.68,-2.91,c3,,CAREX,,,forb,,dicot,,c3_forb
 2020eco_Williamson10_p_1b,-14.49,-0.06,c4,Carex spp.,CAREX,,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
 2020eco_Williamson10_p_1c,-29.93,-3.16,c3,Ratibida peduncularis,RAPE3,RAPE3,Asteraceae,forb,perrennial,dicot,no,c3_forb
 2020eco_Williamson10_p_2a,-12.9,-1.74,c4,Carex spp.,CAREX,,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
-2020eco_Williamson10_p_2b,-28.43,-2.11,c3,Prosopis glandulosa,PRGL2,PRGL2,Fabaceae,shrub,perennial,dicot,yes,c3_shrub
-2020eco_Williamson10_p_3a,-29.01,-0.18,c3,Prosopis glandulosa,PRGL2,PRGL2,Fabaceae,shrub,perennial,dicot,yes,c3_shrub
+2020eco_Williamson10_p_2b,-28.43,-2.11,c3,Prosopis glandulosa,PRGL2,PRGL2,Fabaceae,shrub,perennial,dicot,yes,legume
+2020eco_Williamson10_p_3a,-29.01,-0.18,c3,Prosopis glandulosa,PRGL2,PRGL2,Fabaceae,shrub,perennial,dicot,yes,legume
 2020eco_Williamson10_p_3b,-30.15,-1.9,c3,Ratibida peduncularis,RAPE3,RAPE3,Asteraceae,forb,perrennial,dicot,no,c3_forb
 2020eco_Williamson10_p_3c,-13.6,-1.99,c4,Carex spp.,CAREX,,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
 2020eco_Williamson10_p_3d,-14.92,-0.3,c4,Carex spp.,CAREX,,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
 2020eco_Williamson10_p_4a,-13.88,-2.5,c4,Carex spp.,CAREX,,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
 2020eco_Williamson10_p_5a,-29.12,-3.15,c3,,CAREX,,Euphorbiaceae,forb,annual,dicot,no,c3_forb
-2020eco_Williamson10_p_5b,-29.17,-0.24,c3,Prosopis glandulosa,PRGL2,PRGL2,Fabaceae,shrub,perennial,dicot,yes,c3_shrub
+2020eco_Williamson10_p_5b,-29.17,-0.24,c3,Prosopis glandulosa,PRGL2,PRGL2,Fabaceae,shrub,perennial,dicot,yes,legume
 2020eco_Williamson10_p_5c,-13.56,-0.35,c4,Carex spp.,CAREX,,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
-2020eco_Williamson10_p_mes,-26.78,-0.92,c3,Prosopis glandulosa,PRGL2,PRGL2,Fabaceae,shrub,perennial,dicot,yes,c3_shrub
+2020eco_Williamson10_p_mes,-26.78,-0.92,c3,Prosopis glandulosa,PRGL2,PRGL2,Fabaceae,shrub,perennial,dicot,yes,legume
 2021eco_Austin_i_01,,,c3,Ambrosia psilostachya,AMPS,AMPS,Asteraceae,forb,perennial,dicot,no,c3_forb
 2021eco_Austin_i_02,,,c3,Ambrosia psilostachya,AMPS,AMPS,Asteraceae,forb,perennial,dicot,no,c3_forb
 2021eco_Austin_i_03,,,c3,Ambrosia psilostachya,AMPS,AMPS,Asteraceae,forb,perennial,dicot,no,c3_forb
@@ -285,9 +285,9 @@ site,d13C,d15n,photo,id,coll.number,NCRS.code,family,growth.habit,duration,group
 2021eco_Austin_i_10,,,c3,,,,,forb,,dicot,,c3_forb
 2021eco_Austin_i_11,,,c3,,,,,forb,,dicot,,c3_forb
 2021eco_Austin_i_12,,,c3,,,,,forb,,dicot,,c3_forb
-2021eco_Austin_i_13,,,c3,Mimosa spp.,MIQU2,MIQU2,Fabaceae,forb,perennial,dicot,yes,c3_forb
-2021eco_Austin_i_14,,,c3,Mimosa spp.,MIQU2,MIQU2,Fabaceae,forb,perennial,dicot,yes,c3_forb
-2021eco_Austin_i_15,,,c3,Mimosa spp.,MIQU2,MIQU2,Fabaceae,forb,perennial,dicot,yes,c3_forb
+2021eco_Austin_i_13,,,c3,Mimosa spp.,MIQU2,MIQU2,Fabaceae,forb,perennial,dicot,yes,legume
+2021eco_Austin_i_14,,,c3,Mimosa spp.,MIQU2,MIQU2,Fabaceae,forb,perennial,dicot,yes,legume
+2021eco_Austin_i_15,,,c3,Mimosa spp.,MIQU2,MIQU2,Fabaceae,forb,perennial,dicot,yes,legume
 2021eco_Bandera_i_01,,,c3,Solanum elaeagnifolium,SOEL,SOEL,Solanaceae,forb,perennial,dicot,no,c3_forb
 2021eco_Bandera_i_02,,,c3,Solanum elaeagnifolium,SOEL,SOEL,Solanaceae,forb,perennial,dicot,no,c3_forb
 2021eco_Bandera_i_03,,,c3,Solanum elaeagnifolium,SOEL,SOEL,Solanaceae,forb,perennial,dicot,no,c3_forb
@@ -344,7 +344,7 @@ site,d13C,d15n,photo,id,coll.number,NCRS.code,family,growth.habit,duration,group
 2021eco_Bell_p_4a,,,c3,Asclepias syriaca,ASSY,ASSY,Asclepiadaceae,forb,perennial,dicot,no,c3_forb
 2021eco_Bell_p_4b,,,c3,Ratibida columnifera,RACO3,RACO3,Asteraceae,forb,perennial,dicot,no,c3_forb
 2021eco_Bell_p_4c,,,c3,Croton glandulosus,CRGLL,CRGLL,Euphorbiaceae,forb,annual,dicot,,c3_forb
-2021eco_Bell_p_4d,,,c3,Mimosa spp.,MIQU2,MIQU2,Fabaceae,forb,perennial,dicot,yes,c3_forb
+2021eco_Bell_p_4d,,,c3,Mimosa spp.,MIQU2,MIQU2,Fabaceae,forb,perennial,dicot,yes,legume
 2021eco_Bell_p_5a,,,c3,Asclepias syriaca,ASSY,ASSY,Asclepiadaceae,forb,perennial,dicot,no,c3_forb
 2021eco_Bell_p_5b,,,c3,Croton glandulosus,CRGLL,CRGLL,Euphorbiaceae,forb,annual,dicot,,c3_forb
 2021eco_Bell_p_5c,,,c3,Nassella leucotricha,NALE6,NALE6,Poaceae,graminoid,perennial,monocot,no,c3_graminoid
@@ -378,9 +378,9 @@ site,d13C,d15n,photo,id,coll.number,NCRS.code,family,growth.habit,duration,group
 2021eco_Brazos18_i_10,,,c3,Diospyros texana,DITE3,DITE3,Ebenaceae,tree,perennial,dicot,no,c3_tree
 2021eco_Brazos18_i_11,,,c3,Diospyros texana,DITE4,DITE4,Ebenaceae,tree,perennial,dicot,no,c3_tree
 2021eco_Brazos18_i_12,,,c3,Diospyros texana,DITE5,DITE5,Ebenaceae,tree,perennial,dicot,no,c3_tree
-2021eco_Brazos18_i_13,,,c3,Mimosa spp.,MIQU2,MIQU2,Fabaceae,forb,perennial,dicot,yes,c3_forb
-2021eco_Brazos18_i_14,,,c3,Mimosa spp.,MIQU2,MIQU2,Fabaceae,forb,perennial,dicot,yes,c3_forb
-2021eco_Brazos18_i_15,,,c3,Mimosa spp.,MIQU2,MIQU2,Fabaceae,forb,perennial,dicot,yes,c3_forb
+2021eco_Brazos18_i_13,,,c3,Mimosa spp.,MIQU2,MIQU2,Fabaceae,forb,perennial,dicot,yes,legume
+2021eco_Brazos18_i_14,,,c3,Mimosa spp.,MIQU2,MIQU2,Fabaceae,forb,perennial,dicot,yes,legume
+2021eco_Brazos18_i_15,,,c3,Mimosa spp.,MIQU2,MIQU2,Fabaceae,forb,perennial,dicot,yes,legume
 2021eco_Burnet12_i_01,,,c3,Ratibida columnifera,RACO3,RACO3,Asteraceae,forb,perennial,dicot,no,c3_forb
 2021eco_Burnet12_i_02,,,c3,Ratibida columnifera,RACO3,RACO3,Asteraceae,forb,perennial,dicot,no,c3_forb
 2021eco_Burnet12_i_03,,,c3,Ratibida columnifera,RACO3,RACO3,Asteraceae,forb,perennial,dicot,no,c3_forb
@@ -431,9 +431,9 @@ site,d13C,d15n,photo,id,coll.number,NCRS.code,family,growth.habit,duration,group
 2021eco_Comal_i_04,,,c3,Wedelia acapulcensis,WEAC,WEAC,Asteraceae,shrub,perennial,dicot,no,c3_shrub
 2021eco_Comal_i_05,,,c3,Wedelia acapulcensis,WEAC,WEAC,Asteraceae,shrub,perennial,dicot,no,c3_shrub
 2021eco_Comal_i_06,,,c3,Wedelia acapulcensis,WEAC,WEAC,Asteraceae,shrub,perennial,dicot,no,c3_shrub
-2021eco_Comal_i_07,,,c3,Mimosa spp.,MIQU2,MIQU2,Fabaceae,forb,perennial,dicot,yes,c3_forb
-2021eco_Comal_i_08,,,c3,Mimosa spp.,MIQU2,MIQU2,Fabaceae,forb,perennial,dicot,yes,c3_forb
-2021eco_Comal_i_09,,,c3,Mimosa spp.,MIQU2,MIQU2,Fabaceae,forb,perennial,dicot,yes,c3_forb
+2021eco_Comal_i_07,,,c3,Mimosa spp.,MIQU2,MIQU2,Fabaceae,forb,perennial,dicot,yes,legume
+2021eco_Comal_i_08,,,c3,Mimosa spp.,MIQU2,MIQU2,Fabaceae,forb,perennial,dicot,yes,legume
+2021eco_Comal_i_09,,,c3,Mimosa spp.,MIQU2,MIQU2,Fabaceae,forb,perennial,dicot,yes,legume
 2021eco_Comal_i_10,,,c4,,LOPE,LOPE,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
 2021eco_Comal_i_11,,,c4,,LOPE,LOPE,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
 2021eco_Comal_i_12,,,c4,,LOPE,LOPE,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
@@ -461,9 +461,9 @@ site,d13C,d15n,photo,id,coll.number,NCRS.code,family,growth.habit,duration,group
 2021eco_Fayette12_i_04,,,c3,Ambrosia psilostachya,AMPS,AMPS,Asteraceae,forb,perennial,dicot,no,c3_forb
 2021eco_Fayette12_i_05,,,c3,Ambrosia psilostachya,AMPS,AMPS,Asteraceae,forb,perennial,dicot,no,c3_forb
 2021eco_Fayette12_i_06,,,c3,Ambrosia psilostachya,AMPS,AMPS,Asteraceae,forb,perennial,dicot,no,c3_forb
-2021eco_Fayette12_i_07,,,c3,Prosopis glandulosa,PRGL2,PRGL2,Fabaceae,tree,perennial,dicot,yes,c3_tree
-2021eco_Fayette12_i_08,,,c3,Prosopis glandulosa,PRGL3,PRGL3,Fabaceae,tree,perennial,dicot,yes,c3_tree
-2021eco_Fayette12_i_09,,,c3,Prosopis glandulosa,PRGL4,PRGL4,Fabaceae,tree,perennial,dicot,yes,c3_tree
+2021eco_Fayette12_i_07,,,c3,Prosopis glandulosa,PRGL2,PRGL2,Fabaceae,tree,perennial,dicot,yes,legume
+2021eco_Fayette12_i_08,,,c3,Prosopis glandulosa,PRGL3,PRGL3,Fabaceae,tree,perennial,dicot,yes,legume
+2021eco_Fayette12_i_09,,,c3,Prosopis glandulosa,PRGL4,PRGL4,Fabaceae,tree,perennial,dicot,yes,legume
 2021eco_Fayette12_i_12,,,c4,Sorghum halepense,SOHA,SOHA,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
 2021eco_Harris_i_01,,,c3,Ambrosia psilostachya,AMPS,AMPS,Asteraceae,forb,perennial,dicot,no,c3_forb
 2021eco_Harris_i_02,,,c3,Ambrosia psilostachya,AMPS,AMPS,Asteraceae,forb,perennial,dicot,no,c3_forb
@@ -471,35 +471,35 @@ site,d13C,d15n,photo,id,coll.number,NCRS.code,family,growth.habit,duration,group
 2021eco_Harris_i_04,,,c4,Sorghum halepense,SOHA,SOHA,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
 2021eco_Harris_i_05,,,c4,Sorghum halepense,SOHA,SOHA,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
 2021eco_Harris_i_06,,,c4,Sorghum halepense,SOHA,SOHA,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
-2021eco_Harris_i_07,,,,Cynodon dactylon,CYDA,CYDA,Poaceae,graminoid,perennial,monocot,no,_graminoid
-2021eco_Harris_i_08,,,,Cynodon dactylon,CYDA,CYDA,Poaceae,graminoid,perennial,monocot,no,_graminoid
-2021eco_Harris_i_09,,,,Cynodon dactylon,CYDA,CYDA,Poaceae,graminoid,perennial,monocot,no,_graminoid
-2021eco_Harris_i_10,,,c3,Mimosa spp.,MIQU2,MIQU2,Fabaceae,forb,perennial,dicot,yes,c3_forb
-2021eco_Harris_i_11,,,c3,Mimosa spp.,MIQU2,MIQU2,Fabaceae,forb,perennial,dicot,yes,c3_forb
-2021eco_Harris_i_12,,,c3,Mimosa spp.,MIQU2,MIQU2,Fabaceae,forb,perennial,dicot,yes,c3_forb
-2021eco_Harris_i_13,,,c3,Prosopis glandulosa,PRGL5,PRGL5,Fabaceae,tree,perennial,dicot,yes,c3_tree
-2021eco_Harris_i_14,,,c3,Prosopis glandulosa,PRGL6,PRGL6,Fabaceae,tree,perennial,dicot,yes,c3_tree
+2021eco_Harris_i_07,,,,Cynodon dactylon,CYDA,CYDA,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
+2021eco_Harris_i_08,,,,Cynodon dactylon,CYDA,CYDA,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
+2021eco_Harris_i_09,,,,Cynodon dactylon,CYDA,CYDA,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
+2021eco_Harris_i_10,,,c3,Mimosa spp.,MIQU2,MIQU2,Fabaceae,forb,perennial,dicot,yes,legume
+2021eco_Harris_i_11,,,c3,Mimosa spp.,MIQU2,MIQU2,Fabaceae,forb,perennial,dicot,yes,legume
+2021eco_Harris_i_12,,,c3,Mimosa spp.,MIQU2,MIQU2,Fabaceae,forb,perennial,dicot,yes,legume
+2021eco_Harris_i_13,,,c3,Prosopis glandulosa,PRGL5,PRGL5,Fabaceae,tree,perennial,dicot,yes,legume
+2021eco_Harris_i_14,,,c3,Prosopis glandulosa,PRGL6,PRGL6,Fabaceae,tree,perennial,dicot,yes,legume
 2021eco_Harris_p_1a,,,c4,Cynodon dactylon,CYDA,CYDA,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
 2021eco_Harris_p_2a,,,c4,Cynodon dactylon,CYDA,CYDA,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
 2021eco_Harris_p_2b,,,c3,,,,,forb,annual,dicot,no,c3_forb
 2021eco_Harris_p_2c,,,c4,Sorghum halepense,SOHA,SOHA,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
 2021eco_Harris_p_3a,,,c4,Sorghum halepense,SOHA,SOHA,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
 2021eco_Harris_p_3b,,,c3,Cynodon dactylon,CYDA,CYDA,Poaceae,graminoid,perennial,monocot,no,c3_graminoid
-2021eco_Harris_p_3c,,,c3,Mimosa spp.,MIQU2,MIQU2,Fabaceae,forb,perennial,dicot,yes,c3_forb
+2021eco_Harris_p_3c,,,c3,Mimosa spp.,MIQU2,MIQU2,Fabaceae,forb,perennial,dicot,yes,legume
 2021eco_Harris_p_4a,,,c4,Sorghum halepense,SOHA,SOHA,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
 2021eco_Harris_p_4b,,,c3,Cynodon dactylon,CYDA,CYDA,Poaceae,graminoid,perennial,monocot,no,c3_graminoid
 2021eco_Harris_p_5a,,,c3,Cynodon dactylon,CYDA,CYDA,Poaceae,graminoid,perennial,monocot,no,c3_graminoid
-2021eco_Harri_p_5b,,,c3,Mimosa spp.,MIQU2,MIQU2,Fabaceae,forb,perennial,dicot,yes,c3_forb
-2021eco_Harris_p_5c,,,c3,Rhynchosia americana,RHAM,RHAM,Fabaceae,forb,perennial,dicot,yes,c3_forb
+2021eco_Harri_p_5b,,,c3,Mimosa spp.,MIQU2,MIQU2,Fabaceae,forb,perennial,dicot,yes,legume
+2021eco_Harris_p_5c,,,c3,Rhynchosia americana,RHAM,RHAM,Fabaceae,forb,perennial,dicot,yes,legume
 2021eco_Harris_p_5d,,,c4,Sorghum halepense,SOHA,SOHA,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
 2021eco_Hays_i_01,,,c3,Solanum elaeagnifolium,SOEL,SOEL,Solanaceae,forb,perennial,dicot,no,c3_forb
 2021eco_Hays_i_02,,,c3,Solanum elaeagnifolium,SOEL,SOEL,Solanaceae,forb,perennial,dicot,no,c3_forb
 2021eco_Hays_i_03,,,c3,Solanum elaeagnifolium,SOEL,SOEL,Solanaceae,forb,perennial,dicot,no,c3_forb
 2021eco_Hays_i_04,,,c3,Ratibida columnifera,RACO3,RACO3,Asteraceae,forb,perennial,dicot,no,c3_forb
 2021eco_Hays_i_05,,,c3,Ratibida columnifera,RACO3,RACO3,Asteraceae,forb,perennial,dicot,no,c3_forb
-2021eco_Hays_i_07,,,c3,Prosopis glandulosa,PRGL7,PRGL7,Fabaceae,tree,perennial,dicot,yes,c3_tree
-2021eco_Hays_i_08,,,c3,Prosopis glandulosa,PRGL8,PRGL8,Fabaceae,tree,perennial,dicot,yes,c3_tree
-2021eco_Hays_i_09,,,c3,Prosopis glandulosa,PRGL9,PRGL9,Fabaceae,tree,perennial,dicot,yes,c3_tree
+2021eco_Hays_i_07,,,c3,Prosopis glandulosa,PRGL7,PRGL7,Fabaceae,tree,perennial,dicot,yes,legume
+2021eco_Hays_i_08,,,c3,Prosopis glandulosa,PRGL8,PRGL8,Fabaceae,tree,perennial,dicot,yes,legume
+2021eco_Hays_i_09,,,c3,Prosopis glandulosa,PRGL9,PRGL9,Fabaceae,tree,perennial,dicot,yes,legume
 2021eco_Hays_i_10,,,c4,,,,,graminoid,perennial,dicot,no,c4_graminoid
 2021eco_Hays_i_11,,,c4,,,,,graminoid,perennial,dicot,no,c4_graminoid
 2021eco_Hays_i_12,,,c4,,,,,graminoid,perennial,dicot,no,c4_graminoid
@@ -563,9 +563,9 @@ site,d13C,d15n,photo,id,coll.number,NCRS.code,family,growth.habit,duration,group
 2021eco_Washington_i_07,,,c3,Asclepias syriaca,ASSY,ASSY,Asclepiadaceae,forb,perennial,dicot,no,c3_forb
 2021eco_Washington_i_08,,,c3,Asclepias syriaca,ASSY,ASSY,Asclepiadaceae,forb,perennial,dicot,no,c3_forb
 2021eco_Washington_i_09,,,c3,Asclepias syriaca,ASSY,ASSY,Asclepiadaceae,forb,perennial,dicot,no,c3_forb
-2021eco_Washington_i_10,,,c3,Acaciella angustissima,ACAN11,ACAN11,Fabaceae,forb,perennial,dicot,yes,c3_forb
-2021eco_Washington_i_11,,,c3,Acaciella angustissima,ACAN12,ACAN12,Fabaceae,forb,perennial,dicot,yes,c3_forb
-2021eco_Washington_i_12,,,c3,Acaciella angustissima,ACAN13,ACAN13,Fabaceae,forb,perennial,dicot,yes,c3_forb
+2021eco_Washington_i_10,,,c3,Acaciella angustissima,ACAN11,ACAN11,Fabaceae,forb,perennial,dicot,yes,legume
+2021eco_Washington_i_11,,,c3,Acaciella angustissima,ACAN12,ACAN12,Fabaceae,forb,perennial,dicot,yes,legume
+2021eco_Washington_i_12,,,c3,Acaciella angustissima,ACAN13,ACAN13,Fabaceae,forb,perennial,dicot,yes,legume
 2021eco_Washington_i_13,,,c3,,,,,forb,,dicot,,c3_forb
 2021eco_Washington_i_14,,,c3,,,,,forb,,dicot,,c3_forb
 2021eco_Washington_i_15,,,c3,,,,,forb,,dicot,,c3_forb

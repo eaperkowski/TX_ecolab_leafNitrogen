@@ -32,12 +32,16 @@ test <- leaf %>%
   dplyr::mutate(sampling.year = ifelse(sampling.year == "2020eco", 
                                 as.numeric("2020"), as.numeric("2021"))) %>%
   unite("id", county:rep, remove = FALSE) %>%
-  dplyr::select(site = property, id, sampling.year, visit.type, soil.pH:soil.potassium,
-                total.leaf.area:pft) %>%
+  dplyr::select(site = property, id, sampling.year, visit.type, 
+                soil.pH:soil.potassium, total.leaf.area:pft) %>%
   merge(spei, by = c("site", "sampling.year", "visit.type")) %>%
-  group_by(site, sampling.year, id, visit.type, photo, pft, NCRS.code) %>%
-  summarize_if(is.numeric, mean, na.rm = TRUE)
+  group_by(site, sampling.year, id, visit.type, pft, photo, duration, n.fixer, 
+           NCRS.code) %>%
+  summarize_if(is.numeric, mean, na.rm = TRUE) %>%
+  filter(pft != "c3_tree")
 
+## Add chi column
 test$chi <- calc_chi(test$d13C, type = test$photo)
+
 
 write.csv(test, "../data_sheets/TXeco_compiled_datasheet.csv")
