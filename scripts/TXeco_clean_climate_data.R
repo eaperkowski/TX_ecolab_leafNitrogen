@@ -12,7 +12,7 @@ library(weathermetrics)
 # central .csv and export to "data_sheets" folder
 ##########################################################################
 ## Import mesowest files
-file.list.mesowest <- list.files(path = "../climate_data/new_mesowest",
+file.list.mesowest <- list.files(path = "../climate_data/mesowest",
                         recursive = TRUE,
                         pattern = "\\.csv$",
                         full.names = TRUE)
@@ -35,7 +35,7 @@ for(i in seq_along(df.mesowest)) {
            local.datetime = with_tz(mdy_hm(date.time), tz = "America/Chicago"),
            local.date = date(local.datetime),
            local.hour = hour(local.datetime)) %>%
-    group_by(local.date, local.hour, site, visit.type) %>%
+    group_by(local.date, local.hour, site, sampling.year) %>%
     dplyr::summarize(temp = mean(air.temp, na.rm = TRUE),
                      relative.humidity = mean(relative.humidity, na.rm = TRUE),
                      incremental.precip = sum(incremental.precip, na.rm = TRUE),
@@ -56,7 +56,6 @@ for(i in seq_along(df.mesowest)) {
 
   }
 
-
 ##########################################################################
 # For-loop to calculate daily mean, min, and max temps, precip totals,
 # relative humidity, and pressure data from hourly data. This file will
@@ -68,7 +67,7 @@ daily.mesowest <- df.mesowest
 
 for(i in seq_along(daily.mesowest)) {
   daily.mesowest[[i]] <- daily.mesowest[[i]] %>%
-    group_by(local.date, site, visit.type) %>%
+    group_by(local.date, site, sampling.year) %>%
     dplyr::summarize(t.mean = mean(temp, na.rm = TRUE),
                      t.max = max(temp, na.rm = TRUE),
                      t.min = min(temp, na.rm = TRUE),
@@ -93,14 +92,19 @@ write.csv(daily.mesowest, "../data_sheets/TXeco_climate_dailymesowest.csv", row.
 monthly.mesowest <- daily.mesowest %>%
   mutate(year = year(local.date),
          month = month(local.date)) %>%
-  group_by(property, visit.type, year, month) %>%
+  group_by(property, sampling.year, year, month) %>%
   dplyr::summarize(month.tmean = mean(t.mean, na.rm = TRUE),
                    month.tmax = mean(t.max, na.rm = TRUE),
                    month.tmin = mean(t.min, na.rm = TRUE),
                    month.rh = mean(relative.humidity, na.rm = TRUE),
                    month.precip = sum(daily.precip, na.rm = TRUE),
                    month.sea.pressure = mean(sea.level.pressure, na.rm = TRUE),
-                   month.atm.pressure = mean(atm.pressure, na.rm = TRUE))
+                   month.atm.pressure = mean(atm.pressure, na.rm = TRUE)) %>%
+  mutate(month.tmax = ifelse(month.tmax == "-Inf", NA, month.tmax),
+         month.tmin = ifelse(month.tmin == "Inf", NA, month.tmin),
+         month.sea.pressure = ifelse(month.sea.pressure == "NaN", NA, month.sea.pressure),
+         month.atm.pressure = ifelse(month.atm.pressure == "NaN", NA, month.atm.pressure))
+
 write.csv(monthly.mesowest, "../data_sheets/TXeco_climate_monthlymesowest.csv", row.names = FALSE)
 
 
