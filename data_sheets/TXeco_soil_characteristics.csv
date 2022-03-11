@@ -1,4 +1,4 @@
-id,soil.pH,soil.cec,soil.no3n,soil.phos,soil.potassium,soil.calcium,soil.magnesium,soil.sulfur,soil.sodium
+site,soil.pH,soil.cec,soil.no3n,soil.phos,soil.potassium,soil.calcium,soil.magnesium,soil.sulfur,soil.sodium
 2021eco_Austin_i,5.6,73,1,18,55,354,89,9,13
 2021eco_Bandera_i,6.3,184,9,4,362,6895,360,9,33
 2021eco_Bandera_p,6.6,127,5,14,417,5156,343,9,18

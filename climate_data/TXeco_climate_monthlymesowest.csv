@@ -1,4 +1,4 @@
-site,sampling.year,year,month,month.tmean,month.tmax,month.tmin,month.rh,month.precip,month.sea.pressure,month.atm.pressure
+property,sampling.year,year,month,month.tmean,month.tmax,month.tmin,month.rh,month.precip,month.sea.pressure,month.atm.pressure
 Austin_2020_03,2021,2020,6,28.811625,31.29583333,27.085,83.0125,0,101152.6312,100527.1795
 Austin_2020_03,2021,2020,7,28.65227128,33.73354839,24.71274194,79.58469982,34.29,101386.8267,100759.5255
 Austin_2020_03,2021,2020,8,28.87936927,35.0852957,23.51913978,74.33097595,51.562,101339.0579,100712.4581

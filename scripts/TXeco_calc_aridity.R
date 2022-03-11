@@ -28,9 +28,9 @@ pubtheme <- theme_bw() +
 # Import daily weather means, 2006-2020 Normals csv files,
 # and site coordinates
 ################################################################
-monthly.mean <- read.csv("../data_sheets/TXeco_climate_monthlymesowest.csv",
+monthly.mean <- read.csv("../climate_data/TXeco_climate_monthlymesowest.csv",
                         na.strings = "NA", stringsAsFactors = FALSE)
-normals <- read.csv("../data_sheets/TXeco_climate_normals.csv",
+normals <- read.csv("../climate_data/TXeco_climate_normals.csv",
                     na.strings = "NA", stringsAsFactors = FALSE)
 site.coords <- read.csv("../data_sheets/TXeco_sitecoords.csv",
                         na.strings = "NA", stringsAsFactors = FALSE)
@@ -130,14 +130,34 @@ ggplot(data = subset(monthly.mean, sampling.year == "2020"),
         strip.text = element_text(size = 11))
 
 ## 2020 site spei during month of initial sampling
-ggplot(data = subset(monthly.mean, 
-                     sampling.year == "2020" & month == "6" & year == "2020"), 
-       aes(x = reorder(site, spei), y = spei)) +
-  geom_bar(stat = "identity") +
-  labs(x = "Site", 
-       y = "Standardized Precipitation-Evapotranspiration Index") +
+initial.2020 <- ggplot(data = subset(monthly.mean, 
+                                     sampling.year == "2020" & month == "6" & year == "2020"), 
+                       aes(x = reorder(site, spei), y = spei)) +
+  geom_bar(data = subset(normals, month == 6 & sampling.year == 2020), 
+    stat = "identity", fill = "yellow", alpha = 0.75) +
+  geom_bar(stat = "identity", fill = "black") +
+  scale_y_continuous(limits = c(-2, 2.5), breaks = seq(-2, 2, 1)) +
+  labs(x = NULL, 
+       y = "SPEI") +
   pubtheme +
-  theme(axis.text.x = element_text(angle = 45, size = 12, hjust = 1))
+  theme(axis.text.x = element_text(angle = 45, size = 10, hjust = 1))
+
+
+## 2020 site spei during month of primary sampling
+primary.2020 <- ggplot(data = subset(monthly.mean, 
+                                     sampling.year == "2020" & month == "7" & year == "2020"), 
+                       aes(x = reorder(site, spei), y = spei)) +
+  geom_bar(data = subset(normals, month == 7 & sampling.year == 2020 & ( 
+    site == "Harris_2020_03" | site == "Williamson_2019_10" |
+      site == "Menard_2020_01" | site == "Bexar_2019_13" |
+      site == "Uvalde_2020_02")), 
+    stat = "identity", fill = "yellow", alpha = 0.75) +
+  geom_bar(stat = "identity", fill = "black") +
+  scale_y_continuous(limits = c(-2, 2.5), breaks = seq(-2, 2, 1)) +
+  labs(x = NULL, 
+       y = NULL) +
+  pubtheme +
+  theme(axis.text.x = element_text(angle = 45, size = 10, hjust = 1))
 
 ## 2021 site spei over time
 ggplot(data = subset(monthly.mean, sampling.year == "2021"), 
@@ -146,20 +166,43 @@ ggplot(data = subset(monthly.mean, sampling.year == "2021"),
   geom_hline(yintercept = 0, linetype = "dotted", size = 1) +
   facet_wrap(~reorder(site, longitude)) +
   guides(color = "none") +
-  labs(x = "Date", y = "Standardized Precipitation-Evapotranspiration Index") +
+  labs(x = "Date", y = "SPEI") +
   pubtheme +
   theme(axis.text.x = element_text(angle = 75, hjust = 1, vjust = 1, size = 12),
         strip.text = element_text(size = 11))
 
 ## 2021 site spei during month of initial sampling
-ggplot(data = subset(monthly.mean, 
-                     sampling.year == "2021" & month == "5" & year == "2021"), 
-       aes(x = reorder(site, spei), y = spei)) +
-  geom_bar(stat = "identity") +
+initial.2021 <- ggplot(data = subset(monthly.mean, 
+                                     sampling.year == "2021" & month == "5" & year == "2021"), 
+                       aes(x = reorder(site, spei), y = spei)) +
+  geom_bar(stat = "identity", fill = "black") +
+  geom_bar(data = subset(normals, month == 5 & sampling.year == 2021), 
+    stat = "identity", fill = "yellow", alpha = 0.75) +
+  scale_y_continuous(limits = c(-2, 2.5), breaks = seq(-2, 2, 1)) +
   labs(x = "Site", 
-       y = "Standardized Precipitation-Evapotranspiration Index") +
+       y = "SPEI") +
   pubtheme +
-  theme(axis.text.x = element_text(angle = 45, size = 12, hjust = 1))
+  theme(axis.text.x = element_text(angle = 45, size = 10, hjust = 1))
+
+## 2021 site spei during month of primary sampling
+primary.2021 <- ggplot(data = subset(monthly.mean, 
+                                     sampling.year == "2021" & month == "6" & year == "2021"), 
+                       aes(x = reorder(site, spei), y = spei)) +
+  geom_bar(data = subset(normals, month == 6 & sampling.year == 2021 & ( 
+                           site == "Harris_2020_03" | site == "Bandera_2020_03" |
+                           site == "Bell_2021_08" | site == "Burnet_2020_12" |
+                           site == "Uvalde_2020_02")), 
+                         stat = "identity", fill = "yellow", alpha = 0.75) +
+  geom_bar(stat = "identity", fill = "black") +
+  scale_y_continuous(limits = c(-2, 2.5), breaks = seq(-2, 2, 1)) +
+  labs(x = "Site", 
+       y = NULL) +
+  pubtheme +
+  theme(axis.text.x = element_text(angle = 50, size = 10, hjust = 1))
+
+## 2020 and 2021 30-day SPEI
+ggarrange(initial.2020, primary.2020, initial.2021, primary.2021,
+          ncol = 2, nrow = 2, common.legend = TRUE)
 
 
 ################################################################

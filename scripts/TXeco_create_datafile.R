@@ -83,12 +83,12 @@ leaf <- biomass %>%
 
 # Separate site in leaf data.frame, merge with site.coords to get property name
 test <- leaf %>%
-  left_join(spp.info) %>%
-  separate(site, c("year", "site", "visit.type", "rep")) %>%
+  full_join(spp.info) %>%
+  separate(id, c("year", "site", "visit.type", "rep")) %>%
   unite("site", year:site) %>%
   full_join(site.coords) %>%
   unite("site", site:visit.type) %>%
-  left_join(soil) %>%
+  full_join(soil) %>%
   separate(site, c("sampling.year", "county", "visit.type")) %>%
   dplyr::mutate(sampling.year = ifelse(sampling.year == "2020eco", 
                                 as.numeric("2020"), as.numeric("2021"))) %>%
@@ -104,5 +104,5 @@ test <- leaf %>%
 ## Add chi column
 test$chi <- calc_chi(test$d13C, type = test$photo)
 
-
+test
 write.csv(test, "../data_sheets/TXeco_compiled_datasheet.csv")
