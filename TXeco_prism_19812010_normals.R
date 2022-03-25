@@ -9,7 +9,6 @@ library(ggplot2)
 library(ggpubr)
 library(patchwork)
 library(terra)
-library(BIOMEplot)
 library(plotbiomes)
 library(viridis)
 
@@ -42,13 +41,6 @@ pubtheme <- theme_bw() +
 ###############################################################################
 # Get temperature and precipitation normal data (only need to do this once-
 # imports data files into central file)
-get_prism_normals(type = "tmean", resolution = "800m", mon = 1:12, annual = TRUE)
-get_prism_normals(type = "ppt", resolution = "800m", mon = 1:12, annual = TRUE)
-get_prism_normals(type = "tmin", resolution = "800m", mon = 1:12, annual = TRUE)
-get_prism_normals(type = "tmax", resolution = "800m", mon = 1:12, annual = TRUE)
-get_prism_normals(type = "tdmean", resolution = "800m", mon = 1:12, annual = TRUE)
-get_prism_normals(type = "vpdmin", resolution = "800m", mon = 1:12, annual = TRUE)
-get_prism_normals(type = "vpdmax", resolution = "800m", mon = 1:12, annual = TRUE)
 
 ## Workaround to not having PRISM 1991-2020 climate norms (download monthly
 ## and then calculate mean across years)
@@ -97,6 +89,13 @@ df.sites.precip <- as.data.frame(terra::extract(precip.masked,
 df.sites.precip$latitude = eco.coords$y
 df.sites.precip$longitude = eco.coords$x
 df.sites.precip$site = ecosites$property
+
+names(df.sites.precip[4:363]) <- gsub("PRISM_ppt_stable_4kmM3_", "prcp_", 
+                                      x = names(df.sites.precip[4:363]))
+
+
+
+
 
 # Temperature
 df.sites.temp <- as.data.frame(terra::extract(temp.masked,
