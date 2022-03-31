@@ -10,11 +10,17 @@ library(prism)
 library(ggplot2)
 library(ggpubr)
 library(terra)
-library(plotbiomes)
+library(suncalc)
 
 # Load Ecolab site coords
 ecosites <- read.csv("../data_sheets/TXeco_sitecoords.csv") # add path to site coords file here
 eco.coords <- dplyr::select(ecosites, x = longitude, y = latitude) # select only lat/long data, code as xy
+
+# Change visit dates to mdy format
+ecosites$initial.2020 <- mdy(ecosites$initial.2020)
+ecosites$primary.2020 <- mdy(ecosites$primary.2020)
+ecosites$initial.2021 <- mdy(ecosites$initial.2021)
+ecosites$primary.2021 <- mdy(ecosites$primary.2021)
 
 ###############################################################################
 ###############################################################################
@@ -304,21 +310,6 @@ write.csv(annual.normals, "../climate_data/TXeco_PRISM_19912020_annualNorms.csv"
 write.csv(monthly.normals, "../climate_data/TXeco_PRISM_19912020_monthlyNorms.csv",
           row.names = FALSE)
 
-## Plot map/mat and whittaker biomes together
-ggplot(data = annual.normals, aes(x = mat, y = map / 10)) +
-  geom_polygon(data = Whittaker_biomes,
-               aes(x = temp_c, y = precp_cm, fill = factor(biome)),
-               color = "gray98", size = 0.5) +
-  geom_point(size = 3, shape = 21, color = "black", alpha = 0.75) +
-  scale_fill_brewer(palette = "Spectral") +
-  #scale_y_continuous(limits = c(50, 150), breaks = seq(50, 150, 25)) +
-  #scale_x_continuous(limits = c(18, 22), breaks = seq(18, 22, 1)) +
-  labs(x = expression(bold("Mean annual temperature ("~degree~"C)")),
-       y = "Mean annual precipitation (cm)",
-       fill = "Biome type") +
-  pubtheme +
-  theme(legend.text = element_text(size = 10))
-
 ###############################################################################
 ###############################################################################
 ## Daily PRISM climate by site
@@ -332,7 +323,7 @@ prism_set_dl_dir("../climate_data/prism/prism_daily/")
 ## Stack raster files, select grid cells by site
 ###############################################################################
 # Note: pd_stack stacks all monthly climate data into single RasterStack, 
-# terra:extract extracts all data from single grid cell for each EcoLab site
+# terra:extract extracts all data from single grid cell for each Ecolab site
 
 
 ################
@@ -549,7 +540,39 @@ daily.clim <- sites.daily.prcp %>%
   full_join(sites.daily.vpdmax) %>%
   full_join(sites.daily.vpdmin)
 
-## Write climate normals .csv
+###############################################################################
+## Determine sunrise/sunset using 'suncalc' package, then calculate fraction
+## of sunlight hours
+###############################################################################
+
+## Change latitude/longitude colnames to "lat" and "long" to make easier
+## data loading into "getSunlightTimes" function
+names(daily.clim)[2:3] <- c("lat", "lon")
+
+## Visualize dataset
+head(daily.clim)
+
+## Obtain sunrise/sunset times given lat/long and date
+sunlight <- getSunlightTimes(data = daily.clim, tz = "America/Chicago")
+
+## Merge sunlight df with daily.clim, select sunrise and sunset data from
+## sunlight call, then calculate the time difference between sunset and
+## sunrise. Then, calculate fraction of sunlight given 24 hours in day.
+
+## NOTE: Using sunriseEnd and sunsetStart instead of sunset because SPLASH model uses fraction
+## of "bright" sunshine hours
+daily.clim <- daily.clim %>%
+  coalesce(sunlight) %>%
+  dplyr::select(site:daily.vpdmin, sunriseEnd, sunsetStart) %>%
+  mutate(sun.hours = as.double(difftime(sunsetStart, sunriseEnd, units = "hours")),
+         sf = sun.hours/24,
+         m = month(date),
+         i = day(date),
+         year = year(date)) %>%
+  full_join(ecosites) %>%
+  dplyr::select(site:date, m:year, elevation.m, initial.2020:primary.2021, 
+                daily.prcp:daily.vpdmin, sun.hours, sf)
+
+## Write daily climate .csv
 write.csv(daily.clim, "../climate_data/TXeco_PRISM_daily.csv",
           row.names = FALSE)
-
