@@ -7,6 +7,7 @@ library(data.table)
 library(stringr)
 library(ggplot2)
 
+
 ###############################################################################
 ## Prepare and run SPLASH v1.0 model for 2019 data
 ###############################################################################
@@ -58,12 +59,13 @@ for (i in seq_along(splash.total.2019)) {
 }
 
 
+
 ## Convert list of lists to data.frame (for run_one_day), revise column names
 splash.water.2019 <- map(splash.total.2019, as.data.table)
 splash.water.2019 <- rbindlist(splash.water.2019, fill = TRUE, idcol = TRUE)
 splash.water.2019$year <- 2019
 splash.water.2019$site <- str_extract(splash.water.2019$.id, 
-                                 "[0-9]{4}eco_[A-Za-z0-9]*")
+                                      "[A-Za-z]{4,}_[0-9]{4}_[0-9]{2}")
 
 splash.water.2019 <- splash.water.2019 %>%
   dplyr::select(site, lat_deg, elv_m, year, month = m, 
@@ -85,7 +87,8 @@ splash.oneday.2019 <- run_one_day(lat = splash.water.2019$lat_deg,
                                   wn = splash.water.2019$soil.moisture,
                                   sf = splash.water.2019$sf,
                                   tc = splash.water.2019$tair,
-                                  pn = splash.water.2019$pn)
+                                  pn = splash.water.2019$pn,
+                                  kWm = 500)
 splash.oneday.2019 <- map(splash.oneday.2019, as.data.table)
 
 ## Change list column names
@@ -168,7 +171,7 @@ splash.water.2020 <- map(splash.total.2020, as.data.table)
 splash.water.2020 <- rbindlist(splash.water.2020, fill = TRUE, idcol = TRUE)
 splash.water.2020$year <- 2020
 splash.water.2020$site <- str_extract(splash.water.2020$.id, 
-                                      "[0-9]{4}eco_[A-Za-z0-9]*")
+                                      "[A-Za-z]{4,}_[0-9]{4}_[0-9]{2}")
 
 splash.water.2020 <- splash.water.2020 %>%
   dplyr::select(site, lat_deg, elv_m, year, month = m, 
@@ -191,7 +194,7 @@ splash.oneday.2020 <- run_one_day(lat = splash.water.2020$lat_deg,
                                   sf = splash.water.2020$sf,
                                   tc = splash.water.2020$tair,
                                   pn = splash.water.2020$pn,
-                                  kWm = 150)
+                                  kWm = 500)
 splash.oneday.2020 <- map(splash.oneday.2020, as.data.table)
 
 ## Change list column names
@@ -274,7 +277,7 @@ splash.water.2021 <- map(splash.total.2021, as.data.table)
 splash.water.2021 <- rbindlist(splash.water.2021, fill = TRUE, idcol = TRUE)
 splash.water.2021$year <- 2021
 splash.water.2021$site <- str_extract(splash.water.2021$.id, 
-                                      "[0-9]{4}eco_[A-Za-z0-9]*")
+                                      "[A-Za-z]{4,}_[0-9]{4}_[0-9]{2}")
 
 splash.water.2021 <- splash.water.2021 %>%
   dplyr::select(site, lat_deg, elv_m, year, month = m, 
@@ -296,7 +299,8 @@ splash.oneday.2021 <- run_one_day(lat = splash.water.2021$lat_deg,
                                   wn = splash.water.2021$soil.moisture,
                                   sf = splash.water.2021$sf,
                                   tc = splash.water.2021$tair,
-                                  pn = splash.water.2021$pn)
+                                  pn = splash.water.2021$pn,
+                                  kWm = 500)
 splash.oneday.2021 <- map(splash.oneday.2021, as.data.table)
 
 ## Change list column names
@@ -335,7 +339,7 @@ daily.clim <- sites.daily.2019 %>%
 splash.monthly <- daily.clim %>%
   tidyr::unite("month.year", month:year, sep = "/", remove = FALSE) %>%
   mutate(month.year = lubridate::my(month.year)) %>%
-  group_by(site, year, month) %>%
+  group_by(site, month.year, month, year) %>%
   summarize(month.prcp = sum(pn, na.rm = TRUE),
             month.aet = sum(aet, na.rm = TRUE),
             month.pet = sum(pet, na.rm = TRUE),
@@ -344,7 +348,23 @@ splash.monthly <- daily.clim %>%
          alpha.stand = (alpha - min(alpha)) / (max(alpha) - min(alpha)),
          aridity = month.prcp / month.pet) %>%
   right_join(daily.clim, by = c("site", "year", "month")) %>%
-  select(site, lat_deg:date, month, day, year, sf:aet, month.prcp:aridity)
+  mutate(soil.moisture.perc = (soil.moisture / 150) * 100) %>%
+  dplyr::select(site, lat_deg:date, month.year, sf:soil.moisture, soil.moisture.perc,
+         ho:aet, month.prcp:aridity)
+
+ggplot(data = splash.monthly, aes(x = month.year, y = alpha, fill = site)) +
+  geom_line() +
+  scale_fill_brewer() +
+  facet_wrap(~site) +
+  labs(x = "Date", y = "Priestley-Taylor coefficient") +
+  theme_bw() +
+  theme(axis.text = element_text(angle = 45, hjust = 1))
 
 
-
+ggplot(data = splash.monthly, aes(x = month.year, y = aridity, fill = site)) +
+  geom_line() +
+  scale_fill_brewer() +
+  facet_wrap(~site) +
+  labs(x = "Date", y = "Priestley-Taylor coefficient") +
+  theme_bw() +
+  theme(axis.text = element_text(angle = 45, hjust = 1))

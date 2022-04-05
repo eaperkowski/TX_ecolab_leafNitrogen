@@ -13,14 +13,14 @@ library(terra)
 library(suncalc)
 
 # Load Ecolab site coords
-ecosites <- read.csv("../data_sheets/TXeco_sitecoords.csv") # add path to site coords file here
-eco.coords <- dplyr::select(ecosites, x = longitude, y = latitude) # select only lat/long data, code as xy
+site.coords <- read.csv("../data_sheets/TXeco_sitecoords.csv") %>%
+  dplyr::select(site = property, property = site, latitude:elevation.m)
 
-# Change visit dates to mdy format
-ecosites$initial.2020 <- mdy(ecosites$initial.2020)
-ecosites$primary.2020 <- mdy(ecosites$primary.2020)
-ecosites$initial.2021 <- mdy(ecosites$initial.2021)
-ecosites$primary.2021 <- mdy(ecosites$primary.2021)
+ecosites <- site.coords %>%
+  dplyr::select(site, latitude, longitude) %>%
+  dplyr::distinct()
+
+eco.coords <- dplyr::select(ecosites, x = longitude, y = latitude) # select only lat/long data, code as xy
 
 ###############################################################################
 ###############################################################################
@@ -47,8 +47,8 @@ norm.sites.prcp <- as.data.frame(terra::extract(pd.precip,
                                                 sp = F))
 
 # Add precipitation site, latitude, longitude data
-norm.sites.prcp$latitude = eco.coords$y
-norm.sites.prcp$longitude = eco.coords$x
+norm.sites.prcp$latitude <- eco.coords$y
+norm.sites.prcp$longitude <- eco.coords$x
 norm.sites.prcp$site <- ecosites$site
 
 norm.sites.prcp <- norm.sites.prcp %>%
@@ -565,7 +565,7 @@ daily.clim <- daily.clim %>%
          m = month(date),
          i = day(date),
          year = year(date)) %>%
-  full_join(ecosites) %>%
+  full_join(site.coords) %>%
   dplyr::select(site:date, m:year, elevation.m, 
                 daily.prcp:daily.vpdmin, sun.hours, sf)
 
