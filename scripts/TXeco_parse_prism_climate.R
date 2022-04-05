@@ -351,8 +351,7 @@ names(sites.daily.prcp) <- c("site", "latitude", "longitude",
                                    str_extract(names(sites.daily.prcp[4:794]),
                                                "[0-9]{8}")))
 
-# Pivot to long data format and summarize precipitation by month (1991-2020)
-# to simulate 1991-2020 climate normals
+# Pivot to long data format
 sites.daily.prcp <- sites.daily.prcp %>%
   tidyr::pivot_longer(cols = prcp_20190601:prcp_20210730,
                       names_to = "date", values_to = "daily.prcp") %>%
@@ -385,8 +384,7 @@ names(sites.daily.tmean) <- c("site", "latitude", "longitude",
                                                 "[0-9]{8}")))
 
 
-# Pivot to long data format and summarize precipitation by month (1991-2020)
-# to simulate 1991-2020 climate normals
+# Pivot to long data format
 sites.daily.tmean <- sites.daily.tmean %>%
   tidyr::pivot_longer(cols = tmean_20190601:tmean_20210730,
                       names_to = "date", values_to = "daily.tmean") %>%
@@ -420,9 +418,7 @@ names(sites.daily.tmax) <- c("site", "latitude", "longitude",
                                                "[0-9]{8}")))
 
 
-
-# Pivot to long data format and summarize precipitation by month (1991-2020)
-# to simulate 1991-2020 climate normals
+# Pivot to long data format
 sites.daily.tmax <- sites.daily.tmax %>%
   tidyr::pivot_longer(cols = tmax_20190601:tmax_20210730,
                       names_to = "date", values_to = "daily.tmax") %>%
@@ -570,9 +566,60 @@ daily.clim <- daily.clim %>%
          i = day(date),
          year = year(date)) %>%
   full_join(ecosites) %>%
-  dplyr::select(site:date, m:year, elevation.m, initial.2020:primary.2021, 
+  dplyr::select(site:date, m:year, elevation.m, 
                 daily.prcp:daily.vpdmin, sun.hours, sf)
+
+## Create 2019 files for for splash prep
+test.splash2019 <- daily.clim %>%
+  filter(year == 2019) %>%
+  dplyr::select(site, lat_deg = lat, elv_m = elevation.m, date, m, i, year,
+                sf, tair = daily.tmean, pn = daily.prcp)
+
+test.splash2019 <- lapply(split(test.splash2019, test.splash2019$site, 
+                                drop = TRUE), as.list)
+
+mapply(write.table,
+       x = test.splash2019, 
+       file = paste(paste("../climate_data/splash_2019/", 
+                          names(test.splash2019), sep = ""),
+                    "2019splash", "csv", sep="."),
+       MoreArgs = list(row.names = FALSE, sep = ","))
+
+
+## Create 2020 files for for splash prep
+test.splash2020 <- daily.clim %>%
+  filter(year == 2020) %>%
+  dplyr::select(site, lat_deg = lat, elv_m = elevation.m, date, m, i, year,
+                sf, tair = daily.tmean, pn = daily.prcp)
+
+test.splash2020 <- lapply(split(test.splash2020, test.splash2020$site, 
+                                drop = TRUE), as.list)
+
+mapply(write.table,
+       x = test.splash2020, 
+       file = paste(paste("../climate_data/splash_2020/", 
+                          names(test.splash2019), sep = ""),
+                    "2020splash", "csv", sep="."),
+       MoreArgs = list(row.names = FALSE, sep = ","))
+
+## Create 2021 files for for splash prep
+test.splash2021 <- daily.clim %>%
+  filter(year == 2021) %>%
+  dplyr::select(site, lat_deg = lat, elv_m = elevation.m, date, m, i, year,
+                sf, tair = daily.tmean, pn = daily.prcp)
+
+test.splash2021 <- lapply(split(test.splash2021, test.splash2021$site, 
+                                drop = TRUE), as.list)
+
+mapply(write.table,
+       x = test.splash2021, 
+       file = paste(paste("../climate_data/splash_2021/", 
+                          names(test.splash2021), sep = ""),
+                    "2021splash", "csv", sep="."),
+       MoreArgs = list(row.names = FALSE, sep = ","))
+
 
 ## Write daily climate .csv
 write.csv(daily.clim, "../climate_data/TXeco_PRISM_daily.csv",
           row.names = FALSE)
+
