@@ -37,13 +37,13 @@ source("/Users/eaperkowski/git/r_functions/calc_chi.R")
 ##########################################################################
 ## Import raw costech files
 ##########################################################################
-file.list <- list.files(path = "/Users/eaperkowski/OneDrive - Texas Tech University/TXeco_leafnitrogen/cn_results/",
+file.list <- list.files(path = "../cn_results",
                         recursive = TRUE,
-                        pattern = "\\.xlsx$",
+                        pattern = "\\.csv$",
                         full.names = TRUE)
 
 file.list <- setNames(file.list, file.list)
-cn.plates <- lapply(file.list, read_xlsx)
+cn.plates <- lapply(file.list, read.csv, na.strings = "NA")
 
 ##########################################################################
 ## Merge raw costech files, remove QC and standards, and include only
@@ -75,7 +75,8 @@ leaf <- biomass %>%
   full_join(leaf.area) %>%
   full_join(cn.plates) %>%
   mutate(sla = (total.leaf.area / dry.wgt),
-         narea = (n.leaf / sla) * 10000)
+         narea = (n.leaf/100) /sla * 10000,
+         leaf.cn = c.leaf / n.leaf)
 
 ## Stopped here 03/10/2022 ##
 
