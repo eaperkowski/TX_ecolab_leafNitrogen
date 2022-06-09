@@ -1,4 +1,6 @@
+###############################################################################
 ## Load libraries
+###############################################################################
 library(splash)
 library(dplyr)
 library(jsonlite)
@@ -7,6 +9,12 @@ library(data.table)
 library(stringr)
 library(ggplot2)
 
+###############################################################################
+## Load site name file with visit date info
+###############################################################################
+sites <- read.csv("../data_sheets/TXeco_sitecoords.csv") %>%
+  select(-site) %>%
+  select(site = property, everything())
 
 ###############################################################################
 ## Prepare and run SPLASH v1.0 model for 2019 data
@@ -77,18 +85,17 @@ splash.water.2019$date <- lubridate::ymd(as.Date(splash.water.2019$date))
 splash.water.2019$doy <- lubridate::yday(splash.water.2019$date)
   
 
-
-
 ## Run run_one_day given equilibrated soil moisture
 splash.oneday.2019 <- run_one_day(lat = splash.water.2019$lat_deg,
                                   elv = splash.water.2019$elv_m,
                                   n = splash.water.2019$doy,
-                                  y = splash.water.2019$year,
+                                  y = 2019,
                                   wn = splash.water.2019$soil.moisture,
                                   sf = splash.water.2019$sf,
                                   tc = splash.water.2019$tair,
                                   pn = splash.water.2019$pn,
                                   kWm = 500)
+
 splash.oneday.2019 <- map(splash.oneday.2019, as.data.table)
 
 ## Change list column names
@@ -288,9 +295,6 @@ splash.water.2021 <- tidyr::unite(splash.water.2021, "date", year:day, sep = "-"
 splash.water.2021$date <- lubridate::ymd(as.Date(splash.water.2021$date))
 splash.water.2021$doy <- lubridate::yday(splash.water.2021$date)
 
-
-
-
 ## Run run_one_day given equilibrated soil moisture
 splash.oneday.2021 <- run_one_day(lat = splash.water.2021$lat_deg,
                                   elv = splash.water.2021$elv_m,
@@ -327,44 +331,136 @@ sites.daily.2021 <- splash.oneday.2021$ho %>%
   coalesce(splash.water.2021) %>% 
   dplyr::select(site:soil.moisture, ho:aet)
 
-
 ###############################################################################
-## Merge SPLASHv1.0 2019, 2020, and 2021 data into central data.frame,
-## calculate monthly alpha and aridity values
+## Merge SPLASHv1.0 2019, 2020, and 2021 data into central data.frame, merge
+## site visit dates to then calculate 30, 60, 90 day moisture index means
 ###############################################################################
 daily.clim <- sites.daily.2019 %>%
   full_join(sites.daily.2020) %>%
-  full_join(sites.daily.2021)
+  full_join(sites.daily.2021) %>%
+  full_join(sites) %>%
+  select(site, date, year, month, day, latitude, longitude, elv_m,
+         sampling.year:primary.2021, sf:aet) %>%
+  mutate(initial.2020 = ymd(initial.2020),
+         primary.2020 = ymd(primary.2020),
+         initial.2021 = ymd(initial.2021),
+         primary.2021 = ymd(primary.2021))
 
-splash.monthly <- daily.clim %>%
-  tidyr::unite("month.year", month:year, sep = "/", remove = FALSE) %>%
-  mutate(month.year = lubridate::my(month.year)) %>%
-  group_by(site, month.year, month, year) %>%
-  summarize(month.prcp = sum(pn, na.rm = TRUE),
-            month.aet = sum(aet, na.rm = TRUE),
-            month.pet = sum(pet, na.rm = TRUE),
-            month.eet = sum(eet, na.rm = TRUE)) %>%
-  mutate(alpha = month.aet / month.eet,
-         alpha.stand = (alpha - min(alpha)) / (max(alpha) - min(alpha)),
-         aridity = month.prcp / month.pet) %>%
-  right_join(daily.clim, by = c("site", "year", "month")) %>%
-  mutate(soil.moisture.perc = (soil.moisture / 150) * 100) %>%
-  dplyr::select(site, lat_deg:date, month.year, sf:soil.moisture, soil.moisture.perc,
-         ho:aet, month.prcp:aridity)
+###############################################################################
+## Calculate 30-day, 60-day, 90-day aridity index means (PT coef, P/PET)
+###############################################################################
+# 2020 initial site visits
+initial.2020eco <- daily.clim %>%
+  dplyr::filter(site == "Bell_2020_05" | site == "Bexar_2019_13" | 
+                  site == "Blanco_2019_16" | site == "Brazos_2020_18" | 
+                  site == "Comal_2020_21" | site == "Edwards_2019_17" |
+                  site == "Fayette_2019_04" | site == "Harris_2020_03" | 
+                  site == "Menard_2020_01" | site == "Russel_2020_01" | 
+                  site == "Sansaba_2020_01" | site == "Uvalde_2020_02" |
+                  site == "Williamson_2019_09" | site == "Williamson_2019_10") %>%
+  dplyr::filter(sampling.year == 2020) %>%
+  mutate(date = ymd(date),
+         sampling.date = initial.2020,
+         visit.type = "initial") %>%
+  group_by(site, date) %>%
+  distinct() %>%
+  select(site, latitude:elv_m, sampling.date, sampling.year, visit.type, date, sf:aet) %>%
+  ungroup(date) %>%
+  filter(date > sampling.date - 90 & date <= sampling.date)
 
-ggplot(data = splash.monthly, aes(x = month.year, y = alpha, fill = site)) +
-  geom_line() +
-  scale_fill_brewer() +
-  facet_wrap(~site) +
-  labs(x = "Date", y = "Priestley-Taylor coefficient") +
-  theme_bw() +
-  theme(axis.text = element_text(angle = 45, hjust = 1))
+# 2020 primary site visits
+primary.2020eco <- daily.clim %>%
+  dplyr::filter(site == "Bexar_2019_13" | site == "Harris_2020_03" |
+                  site == "Menard_2020_01" | site == "Uvalde_2020_02" |
+                  site == "Williamson_2019_10") %>%
+  dplyr::filter(sampling.year == 2020) %>%
+  mutate(date = ymd(date),
+         sampling.date = primary.2020,
+         visit.type = "primary") %>%
+  group_by(site, date) %>%
+  distinct() %>%  ## Note duplicate values for Harris, two rows of single dates
+  select(site, latitude:elv_m, sampling.date, sampling.year, visit.type, date, sf:aet) %>%
+  ungroup(date) %>%
+  filter(date > sampling.date - 90 & date <= sampling.date)
 
 
-ggplot(data = splash.monthly, aes(x = month.year, y = aridity, fill = site)) +
-  geom_line() +
-  scale_fill_brewer() +
-  facet_wrap(~site) +
-  labs(x = "Date", y = "Priestley-Taylor coefficient") +
-  theme_bw() +
-  theme(axis.text = element_text(angle = 45, hjust = 1))
+# 2021 initial site visits
+initial.2021eco <- daily.clim %>%
+  dplyr::filter(site == "Austin_2020_03" | site == "Bandera_2020_03" |
+                  site == "Bell_2021_08" | site == "Brazos_2020_16" |
+                  site == "Brazos_2020_18" | site == "Burnet_2020_12" |
+                  site == "Burnet_2020_14" | site == "Comal_2020_19" |
+                  site == "Fayette_2020_09" | site == "Fayette_2021_12" |
+                  site == "Harris_2020_03" | site == "Hays_2021_54" |
+                  site == "Kerr_2020_03" | site == "Uvalde_2020_02" |
+                  site == "Washington_2020_08") %>%
+  dplyr::filter(sampling.year == 2021) %>%
+  mutate(date = ymd(date),
+         sampling.date = initial.2021,
+         visit.type = "initial") %>%
+  group_by(site, date) %>%
+  distinct() %>%  ## Note duplicate values for Harris, two rows of single dates
+  select(site, latitude:elv_m, sampling.date, sampling.year, visit.type, date, sf:aet) %>%
+  ungroup(date) %>%
+  filter(date > sampling.date - 90 & date <= sampling.date)
+
+# 2021 primary site visits
+primary.2021eco <- daily.clim %>%
+  dplyr::filter(site == "Bandera_2020_03" | site == "Bell_2021_08" | 
+                  site == "Burnet_2020_12" | site == "Harris_2020_03" | 
+                  site == "Uvalde_2020_02") %>%
+  dplyr::filter(sampling.year == 2021) %>%
+  mutate(date = ymd(date),
+         sampling.date = primary.2021,
+         visit.type = "primary") %>%
+  group_by(site, date) %>%
+  distinct() %>%  ## Note duplicate values for Harris, two rows of single dates
+  select(site, latitude:elv_m, sampling.date, sampling.year, visit.type, date, sf:aet) %>%
+  ungroup(date) %>%
+  filter(date > sampling.date - 90 & date <= sampling.date)
+
+###############################################################################
+## Merge initial and primary site 90-day SPLASH runs into single dataframe
+###############################################################################
+concat.clim <- initial.2020eco %>%
+  full_join(initial.2021eco) %>%
+  full_join(primary.2020eco) %>%
+  full_join(primary.2021eco)
+
+###############################################################################
+## Load sampling date logs, append to initial.2020eco object, subset data further
+## by 90 days leading up to site visit
+###############################################################################
+txeco.splash.90day <- concat.clim %>%
+  group_by(site, sampling.year, visit.type) %>%
+  summarize(pt.90 = mean(aet/eet, na.rm = TRUE),
+            ai.90 = sum(pn)/sum(pet))
+
+txeco.splash.60day <- concat.clim %>%
+  group_by(site, sampling.year, visit.type) %>%
+  filter(date > sampling.date - 60) %>%
+  summarize(pt.60 = mean(aet/eet, na.rm = TRUE),
+            ai.60 = sum(pn)/sum(pet))
+
+txeco.splash.30day <- concat.clim %>%
+  group_by(site, sampling.year, visit.type) %>%
+  filter(date > sampling.date - 30) %>%
+  summarize(pt.30 = mean(aet/eet, na.rm = TRUE),
+            ai.30 = sum(pn)/sum(pet))
+
+## Merge files
+sites.aridity.indices <- txeco.splash.30day %>%
+  full_join(txeco.splash.60day) %>%
+  full_join(txeco.splash.90day)
+
+
+## Write 30, 60, 90 day aridity index mean file
+write.csv(sites.aridity.indices, "../climate_data/TXeco_gsSiteAridity_SPLASH.csv",
+          row.names = FALSE)
+
+
+
+
+
+
+
