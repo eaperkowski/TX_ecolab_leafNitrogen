@@ -282,6 +282,10 @@ daily.clim <- daily.clim %>%
   dplyr::select(site:date, m:year, elevation.m, 
                 daily.prcp:daily.vpdmin, sun.hours, sf)
 
+## Write daily climate .csv
+write.csv(daily.clim, "../climate_data/TXeco_PRISM_daily.csv",
+          row.names = FALSE)
+
 ###############################################################################
 ## SPLASH file prep
 ###############################################################################
@@ -744,7 +748,7 @@ test.splash2019 <- lapply(split(test.splash2019, test.splash2019$site,
 
 mapply(write.table,
        x = test.splash2019, 
-       file = paste(paste("../climate_data/splash_2019/", 
+       file = paste(paste("../climate_data/splash_prep_files/splash_2019/", 
                           names(test.splash2019), sep = ""),
                     "2019splash", "csv", sep="."),
        MoreArgs = list(row.names = FALSE, sep = ","))
@@ -761,7 +765,7 @@ test.splash2020 <- lapply(split(test.splash2020, test.splash2020$site,
 
 mapply(write.table,
        x = test.splash2020, 
-       file = paste(paste("../climate_data/splash_2020/", 
+       file = paste(paste("../climate_data/splash_prep_files/splash_2020/", 
                           names(test.splash2019), sep = ""),
                     "2020splash", "csv", sep="."),
        MoreArgs = list(row.names = FALSE, sep = ","))
@@ -777,13 +781,7 @@ test.splash2021 <- lapply(split(test.splash2021, test.splash2021$site,
 
 mapply(write.table,
        x = test.splash2021, 
-       file = paste(paste("../climate_data/splash_2021/", 
+       file = paste(paste("../climate_data/splash_prep_files/splash_2021/", 
                           names(test.splash2021), sep = ""),
                     "2021splash", "csv", sep="."),
        MoreArgs = list(row.names = FALSE, sep = ","))
-
-
-## Write daily climate .csv
-write.csv(daily.clim, "../climate_data/TXeco_PRISM_daily.csv",
-          row.names = FALSE)
-
