@@ -8,6 +8,7 @@ library(purrr)
 library(data.table)
 library(stringr)
 library(ggplot2)
+library(lubridate)
 
 ###############################################################################
 ## Load site name file with visit date info
@@ -138,7 +139,7 @@ splash.oneday.1991 <- run_one_day(lat = splash.water.1991$lat_deg,
                                   sf = splash.water.1991$sf,
                                   tc = splash.water.1991$tair,
                                   pn = splash.water.1991$pn,
-                                  kWm = 150)
+                                  kWm = 500)
 
 splash.oneday.1991 <- map(splash.oneday.1991, as.data.table)
 
@@ -288,7 +289,7 @@ splash.oneday.1992 <- run_one_day(lat = splash.water.1992$lat_deg,
                                   sf = splash.water.1992$sf,
                                   tc = splash.water.1992$tair,
                                   pn = splash.water.1992$pn,
-                                  kWm = 150)
+                                  kWm = 500)
 
 splash.oneday.1992 <- map(splash.oneday.1992, as.data.table)
 
@@ -437,7 +438,7 @@ splash.oneday.1993 <- run_one_day(lat = splash.water.1993$lat_deg,
                                   sf = splash.water.1993$sf,
                                   tc = splash.water.1993$tair,
                                   pn = splash.water.1993$pn,
-                                  kWm = 150)
+                                  kWm = 500)
 
 splash.oneday.1993 <- map(splash.oneday.1993, as.data.table)
 
@@ -585,7 +586,7 @@ splash.oneday.1994 <- run_one_day(lat = splash.water.1994$lat_deg,
                                   sf = splash.water.1994$sf,
                                   tc = splash.water.1994$tair,
                                   pn = splash.water.1994$pn,
-                                  kWm = 150)
+                                  kWm = 500)
 
 splash.oneday.1994 <- map(splash.oneday.1994, as.data.table)
 
@@ -734,7 +735,7 @@ splash.oneday.1995 <- run_one_day(lat = splash.water.1995$lat_deg,
                                   sf = splash.water.1995$sf,
                                   tc = splash.water.1995$tair,
                                   pn = splash.water.1995$pn,
-                                  kWm = 150)
+                                  kWm = 500)
 
 splash.oneday.1995 <- map(splash.oneday.1995, as.data.table)
 
@@ -883,7 +884,7 @@ splash.oneday.1996 <- run_one_day(lat = splash.water.1996$lat_deg,
                                   sf = splash.water.1996$sf,
                                   tc = splash.water.1996$tair,
                                   pn = splash.water.1996$pn,
-                                  kWm = 150)
+                                  kWm = 500)
 
 splash.oneday.1996 <- map(splash.oneday.1996, as.data.table)
 
@@ -1032,7 +1033,7 @@ splash.oneday.1997 <- run_one_day(lat = splash.water.1997$lat_deg,
                                   sf = splash.water.1997$sf,
                                   tc = splash.water.1997$tair,
                                   pn = splash.water.1997$pn,
-                                  kWm = 150)
+                                  kWm = 500)
 
 splash.oneday.1997 <- map(splash.oneday.1997, as.data.table)
 
@@ -1181,7 +1182,7 @@ splash.oneday.1998 <- run_one_day(lat = splash.water.1998$lat_deg,
                                   sf = splash.water.1998$sf,
                                   tc = splash.water.1998$tair,
                                   pn = splash.water.1998$pn,
-                                  kWm = 150)
+                                  kWm = 500)
 
 splash.oneday.1998 <- map(splash.oneday.1998, as.data.table)
 
@@ -1330,7 +1331,7 @@ splash.oneday.1999 <- run_one_day(lat = splash.water.1999$lat_deg,
                                   sf = splash.water.1999$sf,
                                   tc = splash.water.1999$tair,
                                   pn = splash.water.1999$pn,
-                                  kWm = 150)
+                                  kWm = 500)
 
 splash.oneday.1999 <- map(splash.oneday.1999, as.data.table)
 
@@ -1479,7 +1480,7 @@ splash.oneday.2000 <- run_one_day(lat = splash.water.2000$lat_deg,
                                   sf = splash.water.2000$sf,
                                   tc = splash.water.2000$tair,
                                   pn = splash.water.2000$pn,
-                                  kWm = 150)
+                                  kWm = 500)
 
 splash.oneday.2000 <- map(splash.oneday.2000, as.data.table)
 
@@ -1628,7 +1629,7 @@ splash.oneday.2001 <- run_one_day(lat = splash.water.2001$lat_deg,
                                   sf = splash.water.2001$sf,
                                   tc = splash.water.2001$tair,
                                   pn = splash.water.2001$pn,
-                                  kWm = 150)
+                                  kWm = 500)
 
 splash.oneday.2001 <- map(splash.oneday.2001, as.data.table)
 
@@ -1777,7 +1778,7 @@ splash.oneday.2002 <- run_one_day(lat = splash.water.2002$lat_deg,
                                   sf = splash.water.2002$sf,
                                   tc = splash.water.2002$tair,
                                   pn = splash.water.2002$pn,
-                                  kWm = 150)
+                                  kWm = 500)
 
 splash.oneday.2002 <- map(splash.oneday.2002, as.data.table)
 
@@ -1926,7 +1927,7 @@ splash.oneday.2003 <- run_one_day(lat = splash.water.2003$lat_deg,
                                   sf = splash.water.2003$sf,
                                   tc = splash.water.2003$tair,
                                   pn = splash.water.2003$pn,
-                                  kWm = 150)
+                                  kWm = 500)
 
 splash.oneday.2003 <- map(splash.oneday.2003, as.data.table)
 
@@ -2075,7 +2076,7 @@ splash.oneday.2004 <- run_one_day(lat = splash.water.2004$lat_deg,
                                   sf = splash.water.2004$sf,
                                   tc = splash.water.2004$tair,
                                   pn = splash.water.2004$pn,
-                                  kWm = 150)
+                                  kWm = 500)
 
 splash.oneday.2004 <- map(splash.oneday.2004, as.data.table)
 
@@ -2224,7 +2225,7 @@ splash.oneday.2005 <- run_one_day(lat = splash.water.2005$lat_deg,
                                   sf = splash.water.2005$sf,
                                   tc = splash.water.2005$tair,
                                   pn = splash.water.2005$pn,
-                                  kWm = 150)
+                                  kWm = 500)
 
 splash.oneday.2005 <- map(splash.oneday.2005, as.data.table)
 
@@ -2373,7 +2374,7 @@ splash.oneday.2006 <- run_one_day(lat = splash.water.2006$lat_deg,
                                   sf = splash.water.2006$sf,
                                   tc = splash.water.2006$tair,
                                   pn = splash.water.2006$pn,
-                                  kWm = 150)
+                                  kWm = 500)
 
 splash.oneday.2006 <- map(splash.oneday.2006, as.data.table)
 
@@ -2522,7 +2523,7 @@ splash.oneday.2007 <- run_one_day(lat = splash.water.2007$lat_deg,
                                   sf = splash.water.2007$sf,
                                   tc = splash.water.2007$tair,
                                   pn = splash.water.2007$pn,
-                                  kWm = 150)
+                                  kWm = 500)
 
 splash.oneday.2007 <- map(splash.oneday.2007, as.data.table)
 
@@ -2671,7 +2672,7 @@ splash.oneday.2008 <- run_one_day(lat = splash.water.2008$lat_deg,
                                   sf = splash.water.2008$sf,
                                   tc = splash.water.2008$tair,
                                   pn = splash.water.2008$pn,
-                                  kWm = 150)
+                                  kWm = 500)
 
 splash.oneday.2008 <- map(splash.oneday.2008, as.data.table)
 
@@ -2820,7 +2821,7 @@ splash.oneday.2009 <- run_one_day(lat = splash.water.2009$lat_deg,
                                   sf = splash.water.2009$sf,
                                   tc = splash.water.2009$tair,
                                   pn = splash.water.2009$pn,
-                                  kWm = 150)
+                                  kWm = 500)
 
 splash.oneday.2009 <- map(splash.oneday.2009, as.data.table)
 
@@ -2969,7 +2970,7 @@ splash.oneday.2010 <- run_one_day(lat = splash.water.2010$lat_deg,
                                   sf = splash.water.2010$sf,
                                   tc = splash.water.2010$tair,
                                   pn = splash.water.2010$pn,
-                                  kWm = 150)
+                                  kWm = 500)
 
 splash.oneday.2010 <- map(splash.oneday.2010, as.data.table)
 
@@ -3118,7 +3119,7 @@ splash.oneday.2011 <- run_one_day(lat = splash.water.2011$lat_deg,
                                   sf = splash.water.2011$sf,
                                   tc = splash.water.2011$tair,
                                   pn = splash.water.2011$pn,
-                                  kWm = 150)
+                                  kWm = 500)
 
 splash.oneday.2011 <- map(splash.oneday.2011, as.data.table)
 
@@ -3267,7 +3268,7 @@ splash.oneday.2012 <- run_one_day(lat = splash.water.2012$lat_deg,
                                   sf = splash.water.2012$sf,
                                   tc = splash.water.2012$tair,
                                   pn = splash.water.2012$pn,
-                                  kWm = 150)
+                                  kWm = 500)
 
 splash.oneday.2012 <- map(splash.oneday.2012, as.data.table)
 
@@ -3416,7 +3417,7 @@ splash.oneday.2013 <- run_one_day(lat = splash.water.2013$lat_deg,
                                   sf = splash.water.2013$sf,
                                   tc = splash.water.2013$tair,
                                   pn = splash.water.2013$pn,
-                                  kWm = 150)
+                                  kWm = 500)
 
 splash.oneday.2013 <- map(splash.oneday.2013, as.data.table)
 
@@ -3566,7 +3567,7 @@ splash.oneday.2014 <- run_one_day(lat = splash.water.2014$lat_deg,
                                   sf = splash.water.2014$sf,
                                   tc = splash.water.2014$tair,
                                   pn = splash.water.2014$pn,
-                                  kWm = 150)
+                                  kWm = 500)
 
 splash.oneday.2014 <- map(splash.oneday.2014, as.data.table)
 
@@ -3715,7 +3716,7 @@ splash.oneday.2015 <- run_one_day(lat = splash.water.2015$lat_deg,
                                   sf = splash.water.2015$sf,
                                   tc = splash.water.2015$tair,
                                   pn = splash.water.2015$pn,
-                                  kWm = 150)
+                                  kWm = 500)
 
 splash.oneday.2015 <- map(splash.oneday.2015, as.data.table)
 
@@ -3864,7 +3865,7 @@ splash.oneday.2016 <- run_one_day(lat = splash.water.2016$lat_deg,
                                   sf = splash.water.2016$sf,
                                   tc = splash.water.2016$tair,
                                   pn = splash.water.2016$pn,
-                                  kWm = 150)
+                                  kWm = 500)
 
 splash.oneday.2016 <- map(splash.oneday.2016, as.data.table)
 
@@ -4013,7 +4014,7 @@ splash.oneday.2017 <- run_one_day(lat = splash.water.2017$lat_deg,
                                   sf = splash.water.2017$sf,
                                   tc = splash.water.2017$tair,
                                   pn = splash.water.2017$pn,
-                                  kWm = 150)
+                                  kWm = 500)
 
 splash.oneday.2017 <- map(splash.oneday.2017, as.data.table)
 
@@ -4162,7 +4163,7 @@ splash.oneday.2018 <- run_one_day(lat = splash.water.2018$lat_deg,
                                   sf = splash.water.2018$sf,
                                   tc = splash.water.2018$tair,
                                   pn = splash.water.2018$pn,
-                                  kWm = 150)
+                                  kWm = 500)
 
 splash.oneday.2018 <- map(splash.oneday.2018, as.data.table)
 
@@ -4205,156 +4206,143 @@ file.list.2019 <- setNames(file.list.2019,
 ## Read files based on 'splash' read_csv function
 splash.readin.2019 <- lapply(file.list.2019, read_csv)
 
-
-#############stopped here
-
 ## Remove duplicate rows in sites that received more than one site visit
 # Brazos 2020-18
-splash.readin.2018$Brazos_2020_18.2018splash$sf <- splash.readin.2018$Brazos_2020_18.2018splash$sf[seq_along(splash.readin.2018$Brazos_2020_18.2018splash$sf) %% 2 > 0]
-splash.readin.2018$Brazos_2020_18.2018splash$tair <- splash.readin.2018$Brazos_2020_18.2018splash$tair[seq_along(splash.readin.2018$Brazos_2020_18.2018splash$tair) %% 2 > 0]
-splash.readin.2018$Brazos_2020_18.2018splash$pn <- splash.readin.2018$Brazos_2020_18.2018splash$pn[seq_along(splash.readin.2018$Brazos_2020_18.2018splash$pn) %% 2 > 0]
-splash.readin.2018$Brazos_2020_18.2018splash$num_lines <- 365
+splash.readin.2019$Brazos_2020_18.2019splash$sf <- splash.readin.2019$Brazos_2020_18.2019splash$sf[seq_along(splash.readin.2019$Brazos_2020_18.2019splash$sf) %% 2 > 0]
+splash.readin.2019$Brazos_2020_18.2019splash$tair <- splash.readin.2019$Brazos_2020_18.2019splash$tair[seq_along(splash.readin.2019$Brazos_2020_18.2019splash$tair) %% 2 > 0]
+splash.readin.2019$Brazos_2020_18.2019splash$pn <- splash.readin.2019$Brazos_2020_18.2019splash$pn[seq_along(splash.readin.2019$Brazos_2020_18.2019splash$pn) %% 2 > 0]
+splash.readin.2019$Brazos_2020_18.2019splash$num_lines <- 365
 
 # Harris 2020-03
-splash.readin.2018$Harris_2020_03.2018splash$sf <- splash.readin.2018$Harris_2020_03.2018splash$sf[seq_along(splash.readin.2018$Harris_2020_03.2018splash$sf) %% 2 > 0]
-splash.readin.2018$Harris_2020_03.2018splash$tair <- splash.readin.2018$Harris_2020_03.2018splash$tair[seq_along(splash.readin.2018$Harris_2020_03.2018splash$tair) %% 2 > 0]
-splash.readin.2018$Harris_2020_03.2018splash$pn <- splash.readin.2018$Harris_2020_03.2018splash$pn[seq_along(splash.readin.2018$Harris_2020_03.2018splash$pn) %% 2 > 0]
-splash.readin.2018$Harris_2020_03.2018splash$num_lines <- 365
+splash.readin.2019$Harris_2020_03.2019splash$sf <- splash.readin.2019$Harris_2020_03.2019splash$sf[seq_along(splash.readin.2019$Harris_2020_03.2019splash$sf) %% 2 > 0]
+splash.readin.2019$Harris_2020_03.2019splash$tair <- splash.readin.2019$Harris_2020_03.2019splash$tair[seq_along(splash.readin.2019$Harris_2020_03.2019splash$tair) %% 2 > 0]
+splash.readin.2019$Harris_2020_03.2019splash$pn <- splash.readin.2019$Harris_2020_03.2019splash$pn[seq_along(splash.readin.2019$Harris_2020_03.2019splash$pn) %% 2 > 0]
+splash.readin.2019$Harris_2020_03.2019splash$num_lines <- 365
 
 # Menard 2020-01
-splash.readin.2018$Menard_2020_01.2018splash$sf <- splash.readin.2018$Menard_2020_01.2018splash$sf[seq_along(splash.readin.2018$Menard_2020_01.2018splash$sf) %% 2 > 0]
-splash.readin.2018$Menard_2020_01.2018splash$tair <- splash.readin.2018$Menard_2020_01.2018splash$tair[seq_along(splash.readin.2018$Menard_2020_01.2018splash$tair) %% 2 > 0]
-splash.readin.2018$Menard_2020_01.2018splash$pn <- splash.readin.2018$Menard_2020_01.2018splash$pn[seq_along(splash.readin.2018$Menard_2020_01.2018splash$pn) %% 2 > 0]
-splash.readin.2018$Menard_2020_01.2018splash$num_lines <- 365
+splash.readin.2019$Menard_2020_01.2019splash$sf <- splash.readin.2019$Menard_2020_01.2019splash$sf[seq_along(splash.readin.2019$Menard_2020_01.2019splash$sf) %% 2 > 0]
+splash.readin.2019$Menard_2020_01.2019splash$tair <- splash.readin.2019$Menard_2020_01.2019splash$tair[seq_along(splash.readin.2019$Menard_2020_01.2019splash$tair) %% 2 > 0]
+splash.readin.2019$Menard_2020_01.2019splash$pn <- splash.readin.2019$Menard_2020_01.2019splash$pn[seq_along(splash.readin.2019$Menard_2020_01.2019splash$pn) %% 2 > 0]
+splash.readin.2019$Menard_2020_01.2019splash$num_lines <- 365
 
 # Uvalde 2020-02
-splash.readin.2018$Uvalde_2020_02.2018splash$sf <- splash.readin.2018$Uvalde_2020_02.2018splash$sf[seq_along(splash.readin.2018$Uvalde_2020_02.2018splash$sf) %% 2 > 0]
-splash.readin.2018$Uvalde_2020_02.2018splash$tair <- splash.readin.2018$Uvalde_2020_02.2018splash$tair[seq_along(splash.readin.2018$Uvalde_2020_02.2018splash$tair) %% 2 > 0]
-splash.readin.2018$Uvalde_2020_02.2018splash$pn <- splash.readin.2018$Uvalde_2020_02.2018splash$pn[seq_along(splash.readin.2018$Uvalde_2020_02.2018splash$pn) %% 2 > 0]
-splash.readin.2018$Uvalde_2020_02.2018splash$num_lines <- 365
+splash.readin.2019$Uvalde_2020_02.2019splash$sf <- splash.readin.2019$Uvalde_2020_02.2019splash$sf[seq_along(splash.readin.2019$Uvalde_2020_02.2019splash$sf) %% 2 > 0]
+splash.readin.2019$Uvalde_2020_02.2019splash$tair <- splash.readin.2019$Uvalde_2020_02.2019splash$tair[seq_along(splash.readin.2019$Uvalde_2020_02.2019splash$tair) %% 2 > 0]
+splash.readin.2019$Uvalde_2020_02.2019splash$pn <- splash.readin.2019$Uvalde_2020_02.2019splash$pn[seq_along(splash.readin.2019$Uvalde_2020_02.2019splash$pn) %% 2 > 0]
+splash.readin.2019$Uvalde_2020_02.2019splash$num_lines <- 365
 
 
 ## Load ancillary details needed to run 'spin_up" and 'run_one_day'
-splash.month.2018 <- lapply(file.list.2018, read.csv)
+splash.month.2019 <- lapply(file.list.2019, read.csv)
 
 ## Remove multiple dates for sites visited more than one growing season
 # Brazos 2020-18
-splash.month.2018[["Brazos_2020_18.2018splash"]] <- splash.month.2018[["Brazos_2020_18.2018splash"]] %>%
+splash.month.2019[["Brazos_2020_18.2019splash"]] <- splash.month.2019[["Brazos_2020_18.2019splash"]] %>%
   slice(which(row_number() %% 2 == 1))
 
 # Harris 2020-03
-splash.month.2018[["Harris_2020_03.2018splash"]] <- splash.month.2018[["Harris_2020_03.2018splash"]] %>%
+splash.month.2019[["Harris_2020_03.2019splash"]] <- splash.month.2019[["Harris_2020_03.2019splash"]] %>%
   slice(which(row_number() %% 2 == 1))
 
 # Menard 2020-01
-splash.month.2018[["Menard_2020_01.2018splash"]] <- splash.month.2018[["Menard_2020_01.2018splash"]] %>%
+splash.month.2019[["Menard_2020_01.2019splash"]] <- splash.month.2019[["Menard_2020_01.2019splash"]] %>%
   slice(which(row_number() %% 2 == 1))
 
 # Uvalde 2020-02
-splash.month.2018[["Uvalde_2020_02.2018splash"]] <- splash.month.2018[["Uvalde_2020_02.2018splash"]] %>%
+splash.month.2019[["Uvalde_2020_02.2019splash"]] <- splash.month.2019[["Uvalde_2020_02.2019splash"]] %>%
   slice(which(row_number() %% 2 == 1))
 
 
 ## Loop to select only month and day
-for (i in seq_along(splash.month.2018)) {
-  splash.month.2018[[i]] <- splash.month.2018[[i]] %>%
+for (i in seq_along(splash.month.2019)) {
+  splash.month.2019[[i]] <- splash.month.2019[[i]] %>%
     dplyr::select(m, i)
 }
 
 ## Extract latitude and elevation of each site
-splash.ancillary.2018 <- lapply(file.list.2018, read.csv) %>%
+splash.ancillary.2019 <- lapply(file.list.2019, read.csv) %>%
   map(., ~ (.x %>% group_by(site) %>%
               summarize(lat_deg = unique(lat_deg),
                         elv_m = unique(elv_m)) %>%
               dplyr::select(lat_deg, elv_m)))
 
 ## Merge test.ancillary with test
-splash.total.2018 <- mapply(c, splash.readin.2018, splash.month.2018, 
-                            splash.ancillary.2018, SIMPLIFY = FALSE)
+splash.total.2019 <- mapply(c, splash.readin.2019, splash.month.2019, 
+                            splash.ancillary.2019, SIMPLIFY = FALSE)
 
 ## Loop for adding daily_totals blank data.frame, run spin up for daily soil
 ## moisture
-for (i in seq_along(splash.total.2018)) {
+for (i in seq_along(splash.total.2019)) {
   
-  splash.total.2018[[i]][["daily_totals"]] <- matrix(data = rep(0, 
-                                                                splash.total.2018[[i]][["num_lines"]]), 
-                                                     nrow = splash.total.2018[[i]][["num_lines"]])
-  splash.total.2018[[i]][["daily_totals"]] <- as.data.frame(splash.total.2018[[i]][["daily_totals"]])
-  names(splash.total.2018[[i]][["daily_totals"]]) <- c("wn")
+  splash.total.2019[[i]][["daily_totals"]] <- matrix(data = rep(0, 
+                                                                splash.total.2019[[i]][["num_lines"]]), 
+                                                     nrow = splash.total.2019[[i]][["num_lines"]])
+  splash.total.2019[[i]][["daily_totals"]] <- as.data.frame(splash.total.2019[[i]][["daily_totals"]])
+  names(splash.total.2019[[i]][["daily_totals"]]) <- c("wn")
   
-  splash.total.2018[[i]][["daily_totals"]] <- spin_up(mdat = splash.total.2018[[i]],
-                                                      dtot = splash.total.2018[[i]]$daily_totals)
+  splash.total.2019[[i]][["daily_totals"]] <- spin_up(mdat = splash.total.2019[[i]],
+                                                      dtot = splash.total.2019[[i]]$daily_totals)
 }
 
 
 
 ## Convert list of lists to data.frame (for run_one_day), revise column names
-splash.water.2018 <- map(splash.total.2018, as.data.table)
-splash.water.2018 <- rbindlist(splash.water.2018, fill = TRUE, idcol = TRUE)
-splash.water.2018$year <- 2018
-splash.water.2018$site <- str_extract(splash.water.2018$.id, 
+splash.water.2019 <- map(splash.total.2019, as.data.table)
+splash.water.2019 <- rbindlist(splash.water.2019, fill = TRUE, idcol = TRUE)
+splash.water.2019$year <- 2019
+splash.water.2019$site <- str_extract(splash.water.2019$.id, 
                                       "[A-Za-z]{4,}_[0-9]{4}_[0-9]{2}")
 
-splash.water.2018 <- splash.water.2018 %>%
+splash.water.2019 <- splash.water.2019 %>%
   dplyr::select(site, lat_deg, elv_m, year, month = m, 
                 day = i, sf:pn, soil.moisture = daily_totals) %>%
   as.data.frame()
 
-splash.water.2018 <- tidyr::unite(splash.water.2018, "date", year:day, sep = "-", remove = FALSE)
-splash.water.2018$date <- lubridate::ymd(as.Date(splash.water.2018$date))
-splash.water.2018$doy <- lubridate::yday(splash.water.2018$date)
+splash.water.2019 <- tidyr::unite(splash.water.2019, "date", year:day, sep = "-", remove = FALSE)
+splash.water.2019$date <- lubridate::ymd(as.Date(splash.water.2019$date))
+splash.water.2019$doy <- lubridate::yday(splash.water.2019$date)
 
 
 ## Run run_one_day given equilibrated soil moisture
-splash.oneday.2018 <- run_one_day(lat = splash.water.2018$lat_deg,
-                                  elv = splash.water.2018$elv_m,
-                                  n = splash.water.2018$doy,
-                                  y = 2018,
-                                  wn = splash.water.2018$soil.moisture,
-                                  sf = splash.water.2018$sf,
-                                  tc = splash.water.2018$tair,
-                                  pn = splash.water.2018$pn,
-                                  kWm = 150)
+splash.oneday.2019 <- run_one_day(lat = splash.water.2019$lat_deg,
+                                  elv = splash.water.2019$elv_m,
+                                  n = splash.water.2019$doy,
+                                  y = 2019,
+                                  wn = splash.water.2019$soil.moisture,
+                                  sf = splash.water.2019$sf,
+                                  tc = splash.water.2019$tair,
+                                  pn = splash.water.2019$pn,
+                                  kWm = 500)
 
-splash.oneday.2018 <- map(splash.oneday.2018, as.data.table)
+splash.oneday.2019 <- map(splash.oneday.2019, as.data.table)
 
 ## Change list column names
-names(splash.oneday.2018[[1]]) <- "ho"
-names(splash.oneday.2018[[2]]) <- "hn"
-names(splash.oneday.2018[[3]]) <- "ppfd"
-names(splash.oneday.2018[[4]]) <- "cond"
-names(splash.oneday.2018[[5]]) <- "eet"
-names(splash.oneday.2018[[6]]) <- "pet"
-names(splash.oneday.2018[[7]]) <- "aet"
-names(splash.oneday.2018[[8]]) <- "wn"
-names(splash.oneday.2018[[9]]) <- "ro"
+names(splash.oneday.2019[[1]]) <- "ho"
+names(splash.oneday.2019[[2]]) <- "hn"
+names(splash.oneday.2019[[3]]) <- "ppfd"
+names(splash.oneday.2019[[4]]) <- "cond"
+names(splash.oneday.2019[[5]]) <- "eet"
+names(splash.oneday.2019[[6]]) <- "pet"
+names(splash.oneday.2019[[7]]) <- "aet"
+names(splash.oneday.2019[[8]]) <- "wn"
+names(splash.oneday.2019[[9]]) <- "ro"
 
-sites.daily.2018 <- splash.oneday.2018$ho %>%
-  coalesce(splash.oneday.2018$hn) %>%
-  coalesce(splash.oneday.2018$ppfd) %>%
-  coalesce(splash.oneday.2018$cond) %>%
-  coalesce(splash.oneday.2018$eet) %>%
-  coalesce(splash.oneday.2018$pet) %>%
-  coalesce(splash.oneday.2018$aet) %>%
-  coalesce(splash.oneday.2018$wn) %>%
-  coalesce(splash.oneday.2018$ro) %>%
+sites.daily.2019 <- splash.oneday.2019$ho %>%
+  coalesce(splash.oneday.2019$hn) %>%
+  coalesce(splash.oneday.2019$ppfd) %>%
+  coalesce(splash.oneday.2019$cond) %>%
+  coalesce(splash.oneday.2019$eet) %>%
+  coalesce(splash.oneday.2019$pet) %>%
+  coalesce(splash.oneday.2019$aet) %>%
+  coalesce(splash.oneday.2019$wn) %>%
+  coalesce(splash.oneday.2019$ro) %>%
   as.data.frame() %>%
-  coalesce(splash.water.2018) %>% 
+  coalesce(splash.water.2019) %>% 
   dplyr::select(site:soil.moisture, ho:aet)
 
-
-
-
-
-
-
-
-
 ###############################################################################
-## Prepare and run SPLASH v1.0 model for 2020 data
+## Run SPLASH model with 2020 data
 ###############################################################################
-
-## List files
 file.list.2020 <- list.files("../climate_data/splash_prep_files/splash_2020",
                              recursive = TRUE,
                              pattern = "\\.csv$",
@@ -4367,15 +4355,60 @@ file.list.2020 <- setNames(file.list.2020,
 ## Read files based on 'splash' read_csv function
 splash.readin.2020 <- lapply(file.list.2020, read_csv)
 
+## Remove duplicate rows in sites that received more than one site visit
+# Brazos 2020-18
+splash.readin.2020$Brazos_2020_18.2020splash$sf <- splash.readin.2020$Brazos_2020_18.2020splash$sf[seq_along(splash.readin.2020$Brazos_2020_18.2020splash$sf) %% 2 > 0]
+splash.readin.2020$Brazos_2020_18.2020splash$tair <- splash.readin.2020$Brazos_2020_18.2020splash$tair[seq_along(splash.readin.2020$Brazos_2020_18.2020splash$tair) %% 2 > 0]
+splash.readin.2020$Brazos_2020_18.2020splash$pn <- splash.readin.2020$Brazos_2020_18.2020splash$pn[seq_along(splash.readin.2020$Brazos_2020_18.2020splash$pn) %% 2 > 0]
+splash.readin.2020$Brazos_2020_18.2020splash$num_lines <- 365
+
+# Harris 2020-03
+splash.readin.2020$Harris_2020_03.2020splash$sf <- splash.readin.2020$Harris_2020_03.2020splash$sf[seq_along(splash.readin.2020$Harris_2020_03.2020splash$sf) %% 2 > 0]
+splash.readin.2020$Harris_2020_03.2020splash$tair <- splash.readin.2020$Harris_2020_03.2020splash$tair[seq_along(splash.readin.2020$Harris_2020_03.2020splash$tair) %% 2 > 0]
+splash.readin.2020$Harris_2020_03.2020splash$pn <- splash.readin.2020$Harris_2020_03.2020splash$pn[seq_along(splash.readin.2020$Harris_2020_03.2020splash$pn) %% 2 > 0]
+splash.readin.2020$Harris_2020_03.2020splash$num_lines <- 365
+
+# Menard 2020-01
+splash.readin.2020$Menard_2020_01.2020splash$sf <- splash.readin.2020$Menard_2020_01.2020splash$sf[seq_along(splash.readin.2020$Menard_2020_01.2020splash$sf) %% 2 > 0]
+splash.readin.2020$Menard_2020_01.2020splash$tair <- splash.readin.2020$Menard_2020_01.2020splash$tair[seq_along(splash.readin.2020$Menard_2020_01.2020splash$tair) %% 2 > 0]
+splash.readin.2020$Menard_2020_01.2020splash$pn <- splash.readin.2020$Menard_2020_01.2020splash$pn[seq_along(splash.readin.2020$Menard_2020_01.2020splash$pn) %% 2 > 0]
+splash.readin.2020$Menard_2020_01.2020splash$num_lines <- 365
+
+# Uvalde 2020-02
+splash.readin.2020$Uvalde_2020_02.2020splash$sf <- splash.readin.2020$Uvalde_2020_02.2020splash$sf[seq_along(splash.readin.2020$Uvalde_2020_02.2020splash$sf) %% 2 > 0]
+splash.readin.2020$Uvalde_2020_02.2020splash$tair <- splash.readin.2020$Uvalde_2020_02.2020splash$tair[seq_along(splash.readin.2020$Uvalde_2020_02.2020splash$tair) %% 2 > 0]
+splash.readin.2020$Uvalde_2020_02.2020splash$pn <- splash.readin.2020$Uvalde_2020_02.2020splash$pn[seq_along(splash.readin.2020$Uvalde_2020_02.2020splash$pn) %% 2 > 0]
+splash.readin.2020$Uvalde_2020_02.2020splash$num_lines <- 365
+
 
 ## Load ancillary details needed to run 'spin_up" and 'run_one_day'
 splash.month.2020 <- lapply(file.list.2020, read.csv)
 
+## Remove multiple dates for sites visited more than one growing season
+# Brazos 2020-18
+splash.month.2020[["Brazos_2020_18.2020splash"]] <- splash.month.2020[["Brazos_2020_18.2020splash"]] %>%
+  slice(which(row_number() %% 2 == 1))
+
+# Harris 2020-03
+splash.month.2020[["Harris_2020_03.2020splash"]] <- splash.month.2020[["Harris_2020_03.2020splash"]] %>%
+  slice(which(row_number() %% 2 == 1))
+
+# Menard 2020-01
+splash.month.2020[["Menard_2020_01.2020splash"]] <- splash.month.2020[["Menard_2020_01.2020splash"]] %>%
+  slice(which(row_number() %% 2 == 1))
+
+# Uvalde 2020-02
+splash.month.2020[["Uvalde_2020_02.2020splash"]] <- splash.month.2020[["Uvalde_2020_02.2020splash"]] %>%
+  slice(which(row_number() %% 2 == 1))
+
+
+## Loop to select only month and day
 for (i in seq_along(splash.month.2020)) {
   splash.month.2020[[i]] <- splash.month.2020[[i]] %>%
     dplyr::select(m, i)
 }
 
+## Extract latitude and elevation of each site
 splash.ancillary.2020 <- lapply(file.list.2020, read.csv) %>%
   map(., ~ (.x %>% group_by(site) %>%
               summarize(lat_deg = unique(lat_deg),
@@ -4401,6 +4434,7 @@ for (i in seq_along(splash.total.2020)) {
 }
 
 
+
 ## Convert list of lists to data.frame (for run_one_day), revise column names
 splash.water.2020 <- map(splash.total.2020, as.data.table)
 splash.water.2020 <- rbindlist(splash.water.2020, fill = TRUE, idcol = TRUE)
@@ -4418,18 +4452,17 @@ splash.water.2020$date <- lubridate::ymd(as.Date(splash.water.2020$date))
 splash.water.2020$doy <- lubridate::yday(splash.water.2020$date)
 
 
-
-
 ## Run run_one_day given equilibrated soil moisture
 splash.oneday.2020 <- run_one_day(lat = splash.water.2020$lat_deg,
                                   elv = splash.water.2020$elv_m,
                                   n = splash.water.2020$doy,
-                                  y = splash.water.2020$year,
+                                  y = 2020,
                                   wn = splash.water.2020$soil.moisture,
                                   sf = splash.water.2020$sf,
                                   tc = splash.water.2020$tair,
                                   pn = splash.water.2020$pn,
                                   kWm = 500)
+
 splash.oneday.2020 <- map(splash.oneday.2020, as.data.table)
 
 ## Change list column names
@@ -4457,11 +4490,9 @@ sites.daily.2020 <- splash.oneday.2020$ho %>%
   dplyr::select(site:soil.moisture, ho:aet)
 
 ###############################################################################
-## Prepare and run SPLASH v1.0 model for 2021 data
+## Run SPLASH model with 2021 data
 ###############################################################################
-
-## List files
-file.list.2021 <- list.files("../climate_data/splash_2021",
+file.list.2021 <- list.files("../climate_data/splash_prep_files/splash_2021",
                              recursive = TRUE,
                              pattern = "\\.csv$",
                              full.names = TRUE)
@@ -4473,15 +4504,60 @@ file.list.2021 <- setNames(file.list.2021,
 ## Read files based on 'splash' read_csv function
 splash.readin.2021 <- lapply(file.list.2021, read_csv)
 
+## Remove duplicate rows in sites that received more than one site visit
+# Brazos 2020-18
+splash.readin.2021$Brazos_2020_18.2021splash$sf <- splash.readin.2021$Brazos_2020_18.2021splash$sf[seq_along(splash.readin.2021$Brazos_2020_18.2021splash$sf) %% 2 > 0]
+splash.readin.2021$Brazos_2020_18.2021splash$tair <- splash.readin.2021$Brazos_2020_18.2021splash$tair[seq_along(splash.readin.2021$Brazos_2020_18.2021splash$tair) %% 2 > 0]
+splash.readin.2021$Brazos_2020_18.2021splash$pn <- splash.readin.2021$Brazos_2020_18.2021splash$pn[seq_along(splash.readin.2021$Brazos_2020_18.2021splash$pn) %% 2 > 0]
+splash.readin.2021$Brazos_2020_18.2021splash$num_lines <- 365
+
+# Harris 2020-03
+splash.readin.2021$Harris_2020_03.2021splash$sf <- splash.readin.2021$Harris_2020_03.2021splash$sf[seq_along(splash.readin.2021$Harris_2020_03.2021splash$sf) %% 2 > 0]
+splash.readin.2021$Harris_2020_03.2021splash$tair <- splash.readin.2021$Harris_2020_03.2021splash$tair[seq_along(splash.readin.2021$Harris_2020_03.2021splash$tair) %% 2 > 0]
+splash.readin.2021$Harris_2020_03.2021splash$pn <- splash.readin.2021$Harris_2020_03.2021splash$pn[seq_along(splash.readin.2021$Harris_2020_03.2021splash$pn) %% 2 > 0]
+splash.readin.2021$Harris_2020_03.2021splash$num_lines <- 365
+
+# Menard 2020-01
+splash.readin.2021$Menard_2020_01.2021splash$sf <- splash.readin.2021$Menard_2020_01.2021splash$sf[seq_along(splash.readin.2021$Menard_2020_01.2021splash$sf) %% 2 > 0]
+splash.readin.2021$Menard_2020_01.2021splash$tair <- splash.readin.2021$Menard_2020_01.2021splash$tair[seq_along(splash.readin.2021$Menard_2020_01.2021splash$tair) %% 2 > 0]
+splash.readin.2021$Menard_2020_01.2021splash$pn <- splash.readin.2021$Menard_2020_01.2021splash$pn[seq_along(splash.readin.2021$Menard_2020_01.2021splash$pn) %% 2 > 0]
+splash.readin.2021$Menard_2020_01.2021splash$num_lines <- 365
+
+# Uvalde 2020-02
+splash.readin.2021$Uvalde_2020_02.2021splash$sf <- splash.readin.2021$Uvalde_2020_02.2021splash$sf[seq_along(splash.readin.2021$Uvalde_2020_02.2021splash$sf) %% 2 > 0]
+splash.readin.2021$Uvalde_2020_02.2021splash$tair <- splash.readin.2021$Uvalde_2020_02.2021splash$tair[seq_along(splash.readin.2021$Uvalde_2020_02.2021splash$tair) %% 2 > 0]
+splash.readin.2021$Uvalde_2020_02.2021splash$pn <- splash.readin.2021$Uvalde_2020_02.2021splash$pn[seq_along(splash.readin.2021$Uvalde_2020_02.2021splash$pn) %% 2 > 0]
+splash.readin.2021$Uvalde_2020_02.2021splash$num_lines <- 365
+
 
 ## Load ancillary details needed to run 'spin_up" and 'run_one_day'
 splash.month.2021 <- lapply(file.list.2021, read.csv)
 
+## Remove multiple dates for sites visited more than one growing season
+# Brazos 2020-18
+splash.month.2021[["Brazos_2020_18.2021splash"]] <- splash.month.2021[["Brazos_2020_18.2021splash"]] %>%
+  slice(which(row_number() %% 2 == 1))
+
+# Harris 2020-03
+splash.month.2021[["Harris_2020_03.2021splash"]] <- splash.month.2021[["Harris_2020_03.2021splash"]] %>%
+  slice(which(row_number() %% 2 == 1))
+
+# Menard 2020-01
+splash.month.2021[["Menard_2020_01.2021splash"]] <- splash.month.2021[["Menard_2020_01.2021splash"]] %>%
+  slice(which(row_number() %% 2 == 1))
+
+# Uvalde 2020-02
+splash.month.2021[["Uvalde_2020_02.2021splash"]] <- splash.month.2021[["Uvalde_2020_02.2021splash"]] %>%
+  slice(which(row_number() %% 2 == 1))
+
+
+## Loop to select only month and day
 for (i in seq_along(splash.month.2021)) {
   splash.month.2021[[i]] <- splash.month.2021[[i]] %>%
     dplyr::select(m, i)
 }
 
+## Extract latitude and elevation of each site
 splash.ancillary.2021 <- lapply(file.list.2021, read.csv) %>%
   map(., ~ (.x %>% group_by(site) %>%
               summarize(lat_deg = unique(lat_deg),
@@ -4507,6 +4583,7 @@ for (i in seq_along(splash.total.2021)) {
 }
 
 
+
 ## Convert list of lists to data.frame (for run_one_day), revise column names
 splash.water.2021 <- map(splash.total.2021, as.data.table)
 splash.water.2021 <- rbindlist(splash.water.2021, fill = TRUE, idcol = TRUE)
@@ -4523,16 +4600,18 @@ splash.water.2021 <- tidyr::unite(splash.water.2021, "date", year:day, sep = "-"
 splash.water.2021$date <- lubridate::ymd(as.Date(splash.water.2021$date))
 splash.water.2021$doy <- lubridate::yday(splash.water.2021$date)
 
+
 ## Run run_one_day given equilibrated soil moisture
 splash.oneday.2021 <- run_one_day(lat = splash.water.2021$lat_deg,
                                   elv = splash.water.2021$elv_m,
                                   n = splash.water.2021$doy,
-                                  y = splash.water.2021$year,
+                                  y = 2021,
                                   wn = splash.water.2021$soil.moisture,
                                   sf = splash.water.2021$sf,
                                   tc = splash.water.2021$tair,
                                   pn = splash.water.2021$pn,
                                   kWm = 500)
+
 splash.oneday.2021 <- map(splash.oneday.2021, as.data.table)
 
 ## Change list column names
@@ -4563,11 +4642,24 @@ sites.daily.2021 <- splash.oneday.2021$ho %>%
 ## Merge SPLASHv1.0 2019, 2020, and 2021 data into central data.frame, merge
 ## site visit dates to then calculate 30, 60, 90 day moisture index means
 ###############################################################################
-daily.clim <- sites.daily.2019 %>%
-  full_join(sites.daily.2020) %>%
-  full_join(sites.daily.2021) %>%
+daily.clim <- sites.daily.1991 %>%
+  full_join(sites.daily.1992) %>% full_join(sites.daily.1993) %>%
+  full_join(sites.daily.1994) %>% full_join(sites.daily.1995) %>%
+  full_join(sites.daily.1996) %>% full_join(sites.daily.1997) %>%
+  full_join(sites.daily.1998) %>% full_join(sites.daily.1999) %>%
+  full_join(sites.daily.2000) %>% full_join(sites.daily.2001) %>%
+  full_join(sites.daily.2002) %>% full_join(sites.daily.2003) %>%
+  full_join(sites.daily.2004) %>% full_join(sites.daily.2005) %>%
+  full_join(sites.daily.2006) %>% full_join(sites.daily.2007) %>%
+  full_join(sites.daily.2008) %>% full_join(sites.daily.2009) %>%
+  full_join(sites.daily.2010) %>% full_join(sites.daily.2011) %>%
+  full_join(sites.daily.2012) %>% full_join(sites.daily.2013) %>%
+  full_join(sites.daily.2014) %>% full_join(sites.daily.2015) %>%
+  full_join(sites.daily.2016) %>% full_join(sites.daily.2017) %>%
+  full_join(sites.daily.2018) %>% full_join(sites.daily.2019) %>%
+  full_join(sites.daily.2020) %>% full_join(sites.daily.2021) %>%
   full_join(sites) %>%
-  select(site, date, year, month, day, latitude, longitude, elv_m,
+  dplyr::select(site, date, year, month, day, latitude, longitude, elv_m,
          sampling.year:primary.2021, sf:aet) %>%
   mutate(initial.2020 = ymd(initial.2020),
          primary.2020 = ymd(primary.2020),
@@ -4588,13 +4680,16 @@ initial.2020eco <- daily.clim %>%
                   site == "Williamson_2019_09" | site == "Williamson_2019_10") %>%
   dplyr::filter(sampling.year == 2020) %>%
   mutate(date = ymd(date),
+         month = month(date),
+         year = year(date),
          sampling.date = initial.2020,
          visit.type = "initial") %>%
   group_by(site, date) %>%
   distinct() %>%
-  select(site, latitude:elv_m, sampling.date, sampling.year, visit.type, date, sf:aet) %>%
-  ungroup(date) %>%
-  filter(date > sampling.date - 90 & date <= sampling.date)
+  dplyr::select(site, latitude:elv_m, sampling.date, sampling.year, visit.type, 
+                date, month, year, sf:aet)
+
+
 
 # 2020 primary site visits
 primary.2020eco <- daily.clim %>%
@@ -4603,13 +4698,14 @@ primary.2020eco <- daily.clim %>%
                   site == "Williamson_2019_10") %>%
   dplyr::filter(sampling.year == 2020) %>%
   mutate(date = ymd(date),
+         month = month(date),
+         year = year(date),
          sampling.date = primary.2020,
          visit.type = "primary") %>%
   group_by(site, date) %>%
   distinct() %>%  ## Note duplicate values for Harris, two rows of single dates
-  select(site, latitude:elv_m, sampling.date, sampling.year, visit.type, date, sf:aet) %>%
-  ungroup(date) %>%
-  filter(date > sampling.date - 90 & date <= sampling.date)
+  dplyr::select(site, latitude:elv_m, sampling.date, sampling.year, visit.type, 
+                date, month, year, sf:aet)
 
 
 # 2021 initial site visits
@@ -4624,13 +4720,14 @@ initial.2021eco <- daily.clim %>%
                   site == "Washington_2020_08") %>%
   dplyr::filter(sampling.year == 2021) %>%
   mutate(date = ymd(date),
+         month = month(date),
+         year = year(date),
          sampling.date = initial.2021,
          visit.type = "initial") %>%
   group_by(site, date) %>%
   distinct() %>%  ## Note duplicate values for Harris, two rows of single dates
-  select(site, latitude:elv_m, sampling.date, sampling.year, visit.type, date, sf:aet) %>%
-  ungroup(date) %>%
-  filter(date > sampling.date - 90 & date <= sampling.date)
+  dplyr::select(site, latitude:elv_m, sampling.date, sampling.year, visit.type, 
+                date, month, year, sf:aet)
 
 # 2021 primary site visits
 primary.2021eco <- daily.clim %>%
@@ -4639,13 +4736,14 @@ primary.2021eco <- daily.clim %>%
                   site == "Uvalde_2020_02") %>%
   dplyr::filter(sampling.year == 2021) %>%
   mutate(date = ymd(date),
+         month = month(date),
+         year = year(date),
          sampling.date = primary.2021,
          visit.type = "primary") %>%
   group_by(site, date) %>%
   distinct() %>%  ## Note duplicate values for Harris, two rows of single dates
-  select(site, latitude:elv_m, sampling.date, sampling.year, visit.type, date, sf:aet) %>%
-  ungroup(date) %>%
-  filter(date > sampling.date - 90 & date <= sampling.date)
+  dplyr::select(site, latitude:elv_m, sampling.date, sampling.year, visit.type,
+                date, month, year, sf:aet)
 
 ###############################################################################
 ## Merge initial and primary site 90-day SPLASH runs into single dataframe
@@ -4656,11 +4754,12 @@ concat.clim <- initial.2020eco %>%
   full_join(primary.2021eco)
 
 ###############################################################################
-## Load sampling date logs, append to initial.2020eco object, subset data further
-## by 90 days leading up to site visit
+## Calculate 30, 60, 90 day site Priestley-Taylor coefficient and aridity
+## index (P/PET)
 ###############################################################################
 txeco.splash.90day <- concat.clim %>%
   group_by(site, sampling.year, visit.type) %>%
+  filter(date > sampling.date - 90) %>%
   summarize(pt.90 = mean(aet/eet, na.rm = TRUE),
             ai.90 = sum(pn)/sum(pet))
 
@@ -4686,7 +4785,57 @@ sites.aridity.indices <- txeco.splash.30day %>%
 write.csv(sites.aridity.indices, "../climate_data/TXeco_gsSiteAridity_SPLASH.csv",
           row.names = FALSE)
 
+###############################################################################
+## Calculate normal site Priestley-Taylor coefficient and aridity
+## index (P/PET)
+###############################################################################
+txeco.splash.monthlyClim <- concat.clim %>%
+  group_by(site, sampling.year, month, year) %>%
+  summarize(total.aet = sum(aet, na.rm = TRUE),
+            total.eet = sum(eet, na.rm = TRUE),
+            total.pet = sum(pet, na.rm = TRUE),
+            total.pn = sum(pn, na.rm = TRUE))
 
+## NOTE: calculating monthly evapotranspiration indices and precipitation
+## because Priestley-Taylor coefficient is recommended to be run with monthly
+## means
+txeco.splash.30yr.monthlyAridityNorm <- txeco.splash.monthlyClim %>%
+  filter(year != 2021) %>%
+  group_by(site, sampling.year, month) %>%
+  summarize(monthlyNorm.aet = mean(total.aet, na.rm = TRUE),
+            monthlyNorm.aet.se = sd(total.aet, na.rm = TRUE)/sqrt(30),
+            monthlyNorm.eet = mean(total.eet, na.rm = TRUE),
+            monthlyNorm.eet.se = sd(total.eet, na.rm = TRUE)/sqrt(30),
+            monthlyNorm.pet = mean(total.pet, na.rm = TRUE),
+            monthlyNorm.pet.se = sd(total.pet, na.rm = TRUE)/sqrt(30),
+            monthlyNorm.pn = mean(total.pn, na.rm = TRUE),
+            monthlyNorm.pn.se = sd(total.pn, na.rm = TRUE)/sqrt(30),
+            ptNorm.coef = mean(total.aet / total.eet),
+            ptNorm.se = sd(total.aet / total.eet) / sqrt(30),
+            aiNorm.coef = mean(total.pn / total.pet),
+            aiNorm.se = sd(total.pn / total.pet) / sqrt(30))
+
+txeco.splash.30yr.yearlyAridity <- txeco.splash.monthlyClim %>%
+  filter(year != 2021) %>%
+  group_by(site, sampling.year, year) %>%
+  summarize(yearly.aet = sum(total.aet),
+            yearly.eet = sum(total.eet),
+            yearly.pet = sum(total.pet),
+            yearly.pn = sum(total.pn),
+            pt.year = yearly.aet / yearly.eet,
+            ai.year = yearly.pn / yearly.pet)
+
+## Merge files
+sites.aridity.indices <- txeco.splash.30day %>%
+  full_join(txeco.splash.60day) %>%
+  full_join(txeco.splash.90day) %>%
+  full_join(txeco.splash.30yr.monthlyAridityNorm)
+  
+
+
+## Write 30, 60, 90 day aridity index mean file
+write.csv(sites.aridity.indices, "../climate_data/TXeco_siteAridity_SPLASH.csv",
+          row.names = FALSE)
 
 
 

@@ -37,6 +37,7 @@ prism_set_dl_dir("../climate_data/prism/prism_daily/")
 # Note: pd_stack stacks all daily climate data into single RasterStack, 
 # terra:extract extracts all data from single grid cell for each Ecolab site
 
+
 ################
 # Precipitation
 ################
@@ -285,6 +286,8 @@ daily.clim <- daily.clim %>%
 ## Write daily climate .csv
 write.csv(daily.clim, "../climate_data/TXeco_PRISM_daily.csv",
           row.names = FALSE)
+
+daily.clim <- read.csv("../climate_data/TXeco_PRISM_daily.csv")
 
 ###############################################################################
 ## SPLASH file prep
@@ -766,7 +769,7 @@ test.splash2020 <- lapply(split(test.splash2020, test.splash2020$site,
 mapply(write.table,
        x = test.splash2020, 
        file = paste(paste("../climate_data/splash_prep_files/splash_2020/", 
-                          names(test.splash2019), sep = ""),
+                          names(test.splash2020), sep = ""),
                     "2020splash", "csv", sep="."),
        MoreArgs = list(row.names = FALSE, sep = ","))
 
