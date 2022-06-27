@@ -138,7 +138,7 @@ splash.oneday.1991 <- run_one_day(lat = splash.water.1991$lat_deg,
                                   sf = splash.water.1991$sf,
                                   tc = splash.water.1991$tair,
                                   pn = splash.water.1991$pn,
-                                  kWm = 300)
+                                  kWm = 150)
 
 splash.oneday.1991 <- map(splash.oneday.1991, as.data.table)
 
@@ -288,7 +288,7 @@ splash.oneday.1992 <- run_one_day(lat = splash.water.1992$lat_deg,
                                   sf = splash.water.1992$sf,
                                   tc = splash.water.1992$tair,
                                   pn = splash.water.1992$pn,
-                                  kWm = 300)
+                                  kWm = 150)
 
 splash.oneday.1992 <- map(splash.oneday.1992, as.data.table)
 
@@ -437,7 +437,7 @@ splash.oneday.1993 <- run_one_day(lat = splash.water.1993$lat_deg,
                                   sf = splash.water.1993$sf,
                                   tc = splash.water.1993$tair,
                                   pn = splash.water.1993$pn,
-                                  kWm = 300)
+                                  kWm = 150)
 
 splash.oneday.1993 <- map(splash.oneday.1993, as.data.table)
 
@@ -585,7 +585,7 @@ splash.oneday.1994 <- run_one_day(lat = splash.water.1994$lat_deg,
                                   sf = splash.water.1994$sf,
                                   tc = splash.water.1994$tair,
                                   pn = splash.water.1994$pn,
-                                  kWm = 300)
+                                  kWm = 150)
 
 splash.oneday.1994 <- map(splash.oneday.1994, as.data.table)
 
@@ -734,7 +734,7 @@ splash.oneday.1995 <- run_one_day(lat = splash.water.1995$lat_deg,
                                   sf = splash.water.1995$sf,
                                   tc = splash.water.1995$tair,
                                   pn = splash.water.1995$pn,
-                                  kWm = 300)
+                                  kWm = 150)
 
 splash.oneday.1995 <- map(splash.oneday.1995, as.data.table)
 
@@ -883,7 +883,7 @@ splash.oneday.1996 <- run_one_day(lat = splash.water.1996$lat_deg,
                                   sf = splash.water.1996$sf,
                                   tc = splash.water.1996$tair,
                                   pn = splash.water.1996$pn,
-                                  kWm = 300)
+                                  kWm = 150)
 
 splash.oneday.1996 <- map(splash.oneday.1996, as.data.table)
 
@@ -1032,7 +1032,7 @@ splash.oneday.1997 <- run_one_day(lat = splash.water.1997$lat_deg,
                                   sf = splash.water.1997$sf,
                                   tc = splash.water.1997$tair,
                                   pn = splash.water.1997$pn,
-                                  kWm = 300)
+                                  kWm = 150)
 
 splash.oneday.1997 <- map(splash.oneday.1997, as.data.table)
 
@@ -1181,7 +1181,7 @@ splash.oneday.1998 <- run_one_day(lat = splash.water.1998$lat_deg,
                                   sf = splash.water.1998$sf,
                                   tc = splash.water.1998$tair,
                                   pn = splash.water.1998$pn,
-                                  kWm = 300)
+                                  kWm = 150)
 
 splash.oneday.1998 <- map(splash.oneday.1998, as.data.table)
 
@@ -1330,7 +1330,7 @@ splash.oneday.1999 <- run_one_day(lat = splash.water.1999$lat_deg,
                                   sf = splash.water.1999$sf,
                                   tc = splash.water.1999$tair,
                                   pn = splash.water.1999$pn,
-                                  kWm = 300)
+                                  kWm = 150)
 
 splash.oneday.1999 <- map(splash.oneday.1999, as.data.table)
 
@@ -1479,7 +1479,7 @@ splash.oneday.2000 <- run_one_day(lat = splash.water.2000$lat_deg,
                                   sf = splash.water.2000$sf,
                                   tc = splash.water.2000$tair,
                                   pn = splash.water.2000$pn,
-                                  kWm = 300)
+                                  kWm = 150)
 
 splash.oneday.2000 <- map(splash.oneday.2000, as.data.table)
 
@@ -1628,7 +1628,7 @@ splash.oneday.2001 <- run_one_day(lat = splash.water.2001$lat_deg,
                                   sf = splash.water.2001$sf,
                                   tc = splash.water.2001$tair,
                                   pn = splash.water.2001$pn,
-                                  kWm = 300)
+                                  kWm = 150)
 
 splash.oneday.2001 <- map(splash.oneday.2001, as.data.table)
 
@@ -1777,7 +1777,7 @@ splash.oneday.2002 <- run_one_day(lat = splash.water.2002$lat_deg,
                                   sf = splash.water.2002$sf,
                                   tc = splash.water.2002$tair,
                                   pn = splash.water.2002$pn,
-                                  kWm = 300)
+                                  kWm = 150)
 
 splash.oneday.2002 <- map(splash.oneday.2002, as.data.table)
 
@@ -1926,7 +1926,7 @@ splash.oneday.2003 <- run_one_day(lat = splash.water.2003$lat_deg,
                                   sf = splash.water.2003$sf,
                                   tc = splash.water.2003$tair,
                                   pn = splash.water.2003$pn,
-                                  kWm = 300)
+                                  kWm = 150)
 
 splash.oneday.2003 <- map(splash.oneday.2003, as.data.table)
 
@@ -2075,7 +2075,7 @@ splash.oneday.2004 <- run_one_day(lat = splash.water.2004$lat_deg,
                                   sf = splash.water.2004$sf,
                                   tc = splash.water.2004$tair,
                                   pn = splash.water.2004$pn,
-                                  kWm = 300)
+                                  kWm = 150)
 
 splash.oneday.2004 <- map(splash.oneday.2004, as.data.table)
 
@@ -2224,7 +2224,7 @@ splash.oneday.2005 <- run_one_day(lat = splash.water.2005$lat_deg,
                                   sf = splash.water.2005$sf,
                                   tc = splash.water.2005$tair,
                                   pn = splash.water.2005$pn,
-                                  kWm = 300)
+                                  kWm = 150)
 
 splash.oneday.2005 <- map(splash.oneday.2005, as.data.table)
 
@@ -2373,7 +2373,7 @@ splash.oneday.2006 <- run_one_day(lat = splash.water.2006$lat_deg,
                                   sf = splash.water.2006$sf,
                                   tc = splash.water.2006$tair,
                                   pn = splash.water.2006$pn,
-                                  kWm = 300)
+                                  kWm = 150)
 
 splash.oneday.2006 <- map(splash.oneday.2006, as.data.table)
 
@@ -2522,7 +2522,7 @@ splash.oneday.2007 <- run_one_day(lat = splash.water.2007$lat_deg,
                                   sf = splash.water.2007$sf,
                                   tc = splash.water.2007$tair,
                                   pn = splash.water.2007$pn,
-                                  kWm = 300)
+                                  kWm = 150)
 
 splash.oneday.2007 <- map(splash.oneday.2007, as.data.table)
 
@@ -2671,7 +2671,7 @@ splash.oneday.2008 <- run_one_day(lat = splash.water.2008$lat_deg,
                                   sf = splash.water.2008$sf,
                                   tc = splash.water.2008$tair,
                                   pn = splash.water.2008$pn,
-                                  kWm = 300)
+                                  kWm = 150)
 
 splash.oneday.2008 <- map(splash.oneday.2008, as.data.table)
 
@@ -2820,7 +2820,7 @@ splash.oneday.2009 <- run_one_day(lat = splash.water.2009$lat_deg,
                                   sf = splash.water.2009$sf,
                                   tc = splash.water.2009$tair,
                                   pn = splash.water.2009$pn,
-                                  kWm = 300)
+                                  kWm = 150)
 
 splash.oneday.2009 <- map(splash.oneday.2009, as.data.table)
 
@@ -2969,7 +2969,7 @@ splash.oneday.2010 <- run_one_day(lat = splash.water.2010$lat_deg,
                                   sf = splash.water.2010$sf,
                                   tc = splash.water.2010$tair,
                                   pn = splash.water.2010$pn,
-                                  kWm = 300)
+                                  kWm = 150)
 
 splash.oneday.2010 <- map(splash.oneday.2010, as.data.table)
 
@@ -3118,7 +3118,7 @@ splash.oneday.2011 <- run_one_day(lat = splash.water.2011$lat_deg,
                                   sf = splash.water.2011$sf,
                                   tc = splash.water.2011$tair,
                                   pn = splash.water.2011$pn,
-                                  kWm = 300)
+                                  kWm = 150)
 
 splash.oneday.2011 <- map(splash.oneday.2011, as.data.table)
 
@@ -3267,7 +3267,7 @@ splash.oneday.2012 <- run_one_day(lat = splash.water.2012$lat_deg,
                                   sf = splash.water.2012$sf,
                                   tc = splash.water.2012$tair,
                                   pn = splash.water.2012$pn,
-                                  kWm = 300)
+                                  kWm = 150)
 
 splash.oneday.2012 <- map(splash.oneday.2012, as.data.table)
 
@@ -3416,7 +3416,7 @@ splash.oneday.2013 <- run_one_day(lat = splash.water.2013$lat_deg,
                                   sf = splash.water.2013$sf,
                                   tc = splash.water.2013$tair,
                                   pn = splash.water.2013$pn,
-                                  kWm = 300)
+                                  kWm = 150)
 
 splash.oneday.2013 <- map(splash.oneday.2013, as.data.table)
 
@@ -3566,7 +3566,7 @@ splash.oneday.2014 <- run_one_day(lat = splash.water.2014$lat_deg,
                                   sf = splash.water.2014$sf,
                                   tc = splash.water.2014$tair,
                                   pn = splash.water.2014$pn,
-                                  kWm = 300)
+                                  kWm = 150)
 
 splash.oneday.2014 <- map(splash.oneday.2014, as.data.table)
 
@@ -3715,7 +3715,7 @@ splash.oneday.2015 <- run_one_day(lat = splash.water.2015$lat_deg,
                                   sf = splash.water.2015$sf,
                                   tc = splash.water.2015$tair,
                                   pn = splash.water.2015$pn,
-                                  kWm = 300)
+                                  kWm = 150)
 
 splash.oneday.2015 <- map(splash.oneday.2015, as.data.table)
 
@@ -3864,7 +3864,7 @@ splash.oneday.2016 <- run_one_day(lat = splash.water.2016$lat_deg,
                                   sf = splash.water.2016$sf,
                                   tc = splash.water.2016$tair,
                                   pn = splash.water.2016$pn,
-                                  kWm = 300)
+                                  kWm = 150)
 
 splash.oneday.2016 <- map(splash.oneday.2016, as.data.table)
 
@@ -4013,7 +4013,7 @@ splash.oneday.2017 <- run_one_day(lat = splash.water.2017$lat_deg,
                                   sf = splash.water.2017$sf,
                                   tc = splash.water.2017$tair,
                                   pn = splash.water.2017$pn,
-                                  kWm = 300)
+                                  kWm = 150)
 
 splash.oneday.2017 <- map(splash.oneday.2017, as.data.table)
 
@@ -4162,7 +4162,7 @@ splash.oneday.2018 <- run_one_day(lat = splash.water.2018$lat_deg,
                                   sf = splash.water.2018$sf,
                                   tc = splash.water.2018$tair,
                                   pn = splash.water.2018$pn,
-                                  kWm = 300)
+                                  kWm = 150)
 
 splash.oneday.2018 <- map(splash.oneday.2018, as.data.table)
 
@@ -4311,7 +4311,7 @@ splash.oneday.2019 <- run_one_day(lat = splash.water.2019$lat_deg,
                                   sf = splash.water.2019$sf,
                                   tc = splash.water.2019$tair,
                                   pn = splash.water.2019$pn,
-                                  kWm = 300)
+                                  kWm = 150)
 
 splash.oneday.2019 <- map(splash.oneday.2019, as.data.table)
 
@@ -4460,7 +4460,7 @@ splash.oneday.2020 <- run_one_day(lat = splash.water.2020$lat_deg,
                                   sf = splash.water.2020$sf,
                                   tc = splash.water.2020$tair,
                                   pn = splash.water.2020$pn,
-                                  kWm = 300)
+                                  kWm = 150)
 
 splash.oneday.2020 <- map(splash.oneday.2020, as.data.table)
 
@@ -4609,7 +4609,7 @@ splash.oneday.2021 <- run_one_day(lat = splash.water.2021$lat_deg,
                                   sf = splash.water.2021$sf,
                                   tc = splash.water.2021$tair,
                                   pn = splash.water.2021$pn,
-                                  kWm = 300)
+                                  kWm = 150)
 
 splash.oneday.2021 <- map(splash.oneday.2021, as.data.table)
 
@@ -4787,23 +4787,29 @@ write.csv(sites.aridity.indices, "../climate_data/TXeco_gsSiteAridity_SPLASH.csv
 ###############################################################################
 txeco.splash.30yr.aridity <- concat.clim %>%
   filter(year != 2021) %>%
-  dplyr::group_by(site) %>%
+  dplyr::group_by(site, year) %>%
   dplyr::summarize(total.aet = sum(aet, na.rm = TRUE),
                    total.eet = sum(eet, na.rm = TRUE),
                    total.pet = sum(pet, na.rm = TRUE),
                    total.pn = sum(pn, na.rm = TRUE),
-                   mean.annual.ai = total.pn / total.pet) %>%
-  dplyr::select(site, ai.30yr = mean.annual.ai)
+                   mean.annual.ai = total.pn / total.pet,
+                   mean.annual.pt = total.aet / total.eet) %>%
+  ungroup(year) %>%
+  summarize(ai.30yr = mean(mean.annual.ai),
+            pt.30yr = mean(mean.annual.pt))
 
 txeco.splash.15yr.aridity <- concat.clim %>%
   filter(year >= 2006 & year <= 2020) %>%
-  dplyr::group_by(site) %>%
+  dplyr::group_by(site, year) %>%
   dplyr::summarize(total.aet = sum(aet, na.rm = TRUE),
                    total.eet = sum(eet, na.rm = TRUE),
                    total.pet = sum(pet, na.rm = TRUE),
                    total.pn = sum(pn, na.rm = TRUE),
-                   mean.annual.ai = total.pn / total.pet) %>%
-  dplyr::select(site, ai.15yr = mean.annual.ai)
+                   mean.annual.ai = total.pn / total.pet,
+                   mean.annual.pt = total.aet / total.eet) %>%
+  ungroup(year) %>%
+  summarize(ai.15yr = mean(mean.annual.ai), 
+            pt.15yr = mean(mean.annual.pt))
 
 ## Merge files
 sites.aridity.indices <- txeco.splash.30day %>%
