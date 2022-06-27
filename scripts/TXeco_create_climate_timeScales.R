@@ -59,43 +59,39 @@ primary.2021eco <- read.csv("../climate_data/TXeco_PRISM_daily.csv") %>%
 ###############################################################################
 initial.2020eco <- read.csv("../data_sheets/TXeco_sitecoords.csv") %>%
   dplyr::filter(sampling.year == 2020) %>%
-  select(site = property, sampling.date = initial.2020) %>%
-  mutate(sampling.date = mdy(sampling.date),
+  dplyr::select(site = property, sampling.date = initial.2020) %>%
+  mutate(sampling.date = ymd(sampling.date),
          sampling.year = 2020,
          visit.type = "initial") %>%
   full_join(initial.2020eco) %>%
-  group_by(site) %>%
-  filter(date > sampling.date - 90 & date <= sampling.date)
+  group_by(site)
 
 primary.2020eco <- read.csv("../data_sheets/TXeco_sitecoords.csv") %>%
   dplyr::filter(sampling.year == 2020 & !is.na(primary.2020)) %>%
-  select(site = property, sampling.date = primary.2020) %>%
-  mutate(sampling.date = mdy(sampling.date),
+  dplyr::select(site = property, sampling.date = primary.2020) %>%
+  mutate(sampling.date = ymd(sampling.date),
          sampling.year = 2020,
          visit.type = "primary") %>%
   full_join(primary.2020eco) %>%
-  group_by(site) %>%
-  filter(date > sampling.date - 90 & date <= sampling.date)
+  group_by(site)
 
 initial.2021eco <- read.csv("../data_sheets/TXeco_sitecoords.csv") %>%
   dplyr::filter(sampling.year == 2021) %>%
-  select(site = property, sampling.date = initial.2021) %>%
-  mutate(sampling.date = mdy(sampling.date),
+  dplyr::select(site = property, sampling.date = initial.2021) %>%
+  mutate(sampling.date = ymd(sampling.date),
          sampling.year = 2021,
          visit.type = "initial") %>%
   full_join(initial.2021eco) %>%
-  group_by(site) %>%
-  filter(date > sampling.date - 90 & date <= sampling.date)
+  group_by(site)
 
 primary.2021eco <- read.csv("../data_sheets/TXeco_sitecoords.csv") %>%
   dplyr::filter(sampling.year == 2021 & !is.na(primary.2021)) %>%
-  select(site = property, sampling.date = primary.2021) %>%
-  mutate(sampling.date = mdy(sampling.date),
+  dplyr::select(site = property, sampling.date = primary.2021) %>%
+  mutate(sampling.date = ymd(sampling.date),
          sampling.year = 2021,
          visit.type = "primary") %>%
   full_join(primary.2021eco) %>%
-  group_by(site) %>%
-  filter(date > sampling.date - 90 & date <= sampling.date)
+  group_by(site)
 
 ###############################################################################
 ## Merge initial and primary site 90-day climate date into single datafile
@@ -105,8 +101,36 @@ concat.clim <- initial.2020eco %>%
   full_join(primary.2020eco) %>%
   full_join(primary.2021eco) %>%
   mutate(daily.vpdmean = (daily.vpdmax + daily.vpdmin)/2) %>%
-  select(-m, -i)
+  dplyr::select(-m, -i)
 
+###############################################################################
+## Calculate 15-year and 30-year climate normals. Will be later merged into
+## timescale dataframe
+###############################################################################
+norm.30yr <- concat.clim %>%
+  filter(year != 2021) %>%
+  group_by(site, sampling.year, visit.type, year) %>%
+  summarize(map = sum(daily.prcp, na.rm = TRUE),
+            mat = mean(daily.tmean, na.rm = TRUE),
+            matmin = mean(daily.tmin, na.rm = TRUE)) %>%
+  ungroup(year) %>%
+  summarize(map.30yr = mean(map),
+            mat.30yr = mean(mat))
+
+###############################################################################
+norm.15yr <- concat.clim %>%
+  filter(year >= 2006 & year <= 2020) %>%
+  group_by(site, sampling.year, visit.type, year) %>%
+  summarize(map = sum(daily.prcp, na.rm = TRUE),
+            mat = mean(daily.tmean, na.rm = TRUE),
+            matmin = mean(daily.tmin, na.rm = TRUE)) %>%
+  ungroup(year) %>%
+  summarize(map.15yr = mean(map),
+            mat.15yr = mean(mat))
+
+normals <- norm.15yr %>%
+  full_join(norm.30yr)
+  
 
 ###############################################################################
 ## Iteratively calculate mean temperature and precipitation totals from 1 day
@@ -116,8 +140,11 @@ d90 <- concat.clim %>%
   group_by(site, sampling.year, visit.type) %>%
   summarize(tavg90 = mean(daily.tmean),
             prcp90 = sum(daily.prcp),
-            vpd90 = mean(daily.vpdmean),
-            sf90 = mean(sf))
+            vpd90 = mean(daily.vpdmean, na.rm = TRUE),
+            sf90 = mean(sf)) %>%
+  na.omit()
+  
+
 d89 <- concat.clim %>%
   filter(date > sampling.date - 89) %>%
   group_by(site, sampling.year, visit.type) %>%
@@ -125,6 +152,7 @@ d89 <- concat.clim %>%
             prcp89 = sum(daily.prcp),
             vpd89 = mean(daily.vpdmean),
             sf89 = mean(sf))
+
 d88 <- concat.clim %>%
   filter(date > sampling.date - 88) %>%
   group_by(site, sampling.year, visit.type) %>%
@@ -746,8 +774,10 @@ d1 <- concat.clim %>% filter(date > sampling.date - 1) %>%
 
 
 
-## Merge all iterative climate means
-d <- d90 %>% full_join(d89) %>% full_join(d88) %>% full_join(d87) %>% 
+## Merge all iterative climate means with normals data frame
+## Also merge aridity index values for single climate data file
+d <- normals %>% full_join(d90) %>%
+  full_join(d89) %>% full_join(d88) %>% full_join(d87) %>% 
   full_join(d86) %>% full_join(d85) %>% full_join(d84) %>% full_join(d83) %>% 
   full_join(d82) %>% full_join(d81) %>% full_join(d80) %>% full_join(d79) %>% 
   full_join(d78) %>% full_join(d77) %>% full_join(d76) %>% full_join(d75) %>% 
@@ -771,18 +801,13 @@ d <- d90 %>% full_join(d89) %>% full_join(d88) %>% full_join(d87) %>%
   full_join(d6) %>% full_join(d5) %>% full_join(d4) %>% full_join(d3) %>% 
   full_join(d2) %>% full_join(d1) 
 
+## Read in climate aridity index values
+ai <- read.csv("../climate_data/TXeco_siteAridity_SPLASH.csv")
+
+d <- d %>% full_join(ai) %>% dplyr::select(site:mat.30yr, 
+                                           ai.30:ai.30yr,
+                                           everything())
+
 ## Write csv
-write.csv(d, "../climate_data/TXeco_climateMeans_iterative.csv",
+write.csv(d, "../climate_data/TXeco_climate_data.csv",
           row.names = FALSE)
-
-
-  
-  
-  
-  
-  
-
-
-
-
-
