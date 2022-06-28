@@ -262,6 +262,7 @@ names(daily.clim)[2:3] <- c("lat", "lon")
 ## Visualize dataset
 head(daily.clim)
 
+?suncalc::getSunlightTimes
 ## Obtain sunrise/sunset times given lat/long and date
 sunlight <- getSunlightTimes(data = daily.clim, tz = "America/Chicago")
 
