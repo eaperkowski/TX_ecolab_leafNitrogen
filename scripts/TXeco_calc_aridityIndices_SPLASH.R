@@ -133,7 +133,7 @@ splash.water.1991$doy <- lubridate::yday(splash.water.1991$date)
 splash.oneday.1991 <- run_one_day(lat = splash.water.1991$lat_deg,
                                   elv = splash.water.1991$elv_m,
                                   n = splash.water.1991$doy,
-                                  y = 1991,
+                                  y = splash.water.1991$year,
                                   wn = splash.water.1991$soil.moisture,
                                   sf = splash.water.1991$sf,
                                   tc = splash.water.1991$tair,
@@ -187,25 +187,25 @@ splash.readin.1992 <- lapply(file.list.1992, read_csv)
 splash.readin.1992$Brazos_2020_18.1992splash$sf <- splash.readin.1992$Brazos_2020_18.1992splash$sf[seq_along(splash.readin.1992$Brazos_2020_18.1992splash$sf) %% 2 > 0]
 splash.readin.1992$Brazos_2020_18.1992splash$tair <- splash.readin.1992$Brazos_2020_18.1992splash$tair[seq_along(splash.readin.1992$Brazos_2020_18.1992splash$tair) %% 2 > 0]
 splash.readin.1992$Brazos_2020_18.1992splash$pn <- splash.readin.1992$Brazos_2020_18.1992splash$pn[seq_along(splash.readin.1992$Brazos_2020_18.1992splash$pn) %% 2 > 0]
-splash.readin.1992$Brazos_2020_18.1992splash$num_lines <- 365
+splash.readin.1992$Brazos_2020_18.1992splash$num_lines <- 366
 
 # Harris 2020-03
 splash.readin.1992$Harris_2020_03.1992splash$sf <- splash.readin.1992$Harris_2020_03.1992splash$sf[seq_along(splash.readin.1992$Harris_2020_03.1992splash$sf) %% 2 > 0]
 splash.readin.1992$Harris_2020_03.1992splash$tair <- splash.readin.1992$Harris_2020_03.1992splash$tair[seq_along(splash.readin.1992$Harris_2020_03.1992splash$tair) %% 2 > 0]
 splash.readin.1992$Harris_2020_03.1992splash$pn <- splash.readin.1992$Harris_2020_03.1992splash$pn[seq_along(splash.readin.1992$Harris_2020_03.1992splash$pn) %% 2 > 0]
-splash.readin.1992$Harris_2020_03.1992splash$num_lines <- 365
+splash.readin.1992$Harris_2020_03.1992splash$num_lines <- 366
 
 # Menard 2020-01
 splash.readin.1992$Menard_2020_01.1992splash$sf <- splash.readin.1992$Menard_2020_01.1992splash$sf[seq_along(splash.readin.1992$Menard_2020_01.1992splash$sf) %% 2 > 0]
 splash.readin.1992$Menard_2020_01.1992splash$tair <- splash.readin.1992$Menard_2020_01.1992splash$tair[seq_along(splash.readin.1992$Menard_2020_01.1992splash$tair) %% 2 > 0]
 splash.readin.1992$Menard_2020_01.1992splash$pn <- splash.readin.1992$Menard_2020_01.1992splash$pn[seq_along(splash.readin.1992$Menard_2020_01.1992splash$pn) %% 2 > 0]
-splash.readin.1992$Menard_2020_01.1992splash$num_lines <- 365
+splash.readin.1992$Menard_2020_01.1992splash$num_lines <- 366
 
 # Uvalde 2020-02
 splash.readin.1992$Uvalde_2020_02.1992splash$sf <- splash.readin.1992$Uvalde_2020_02.1992splash$sf[seq_along(splash.readin.1992$Uvalde_2020_02.1992splash$sf) %% 2 > 0]
 splash.readin.1992$Uvalde_2020_02.1992splash$tair <- splash.readin.1992$Uvalde_2020_02.1992splash$tair[seq_along(splash.readin.1992$Uvalde_2020_02.1992splash$tair) %% 2 > 0]
 splash.readin.1992$Uvalde_2020_02.1992splash$pn <- splash.readin.1992$Uvalde_2020_02.1992splash$pn[seq_along(splash.readin.1992$Uvalde_2020_02.1992splash$pn) %% 2 > 0]
-splash.readin.1992$Uvalde_2020_02.1992splash$num_lines <- 365
+splash.readin.1992$Uvalde_2020_02.1992splash$num_lines <- 366
 
 
 ## Load ancillary details needed to run 'spin_up" and 'run_one_day'
@@ -283,7 +283,7 @@ splash.water.1992$doy <- lubridate::yday(splash.water.1992$date)
 splash.oneday.1992 <- run_one_day(lat = splash.water.1992$lat_deg,
                                   elv = splash.water.1992$elv_m,
                                   n = splash.water.1992$doy,
-                                  y = 1992,
+                                  y = splash.water.1992$year,
                                   wn = splash.water.1992$soil.moisture,
                                   sf = splash.water.1992$sf,
                                   tc = splash.water.1992$tair,
@@ -432,7 +432,7 @@ splash.water.1993$doy <- lubridate::yday(splash.water.1993$date)
 splash.oneday.1993 <- run_one_day(lat = splash.water.1993$lat_deg,
                                   elv = splash.water.1993$elv_m,
                                   n = splash.water.1993$doy,
-                                  y = 1993,
+                                  y = splash.water.1993$year,
                                   wn = splash.water.1993$soil.moisture,
                                   sf = splash.water.1993$sf,
                                   tc = splash.water.1993$tair,
@@ -580,7 +580,7 @@ splash.water.1994$doy <- lubridate::yday(splash.water.1994$date)
 splash.oneday.1994 <- run_one_day(lat = splash.water.1994$lat_deg,
                                   elv = splash.water.1994$elv_m,
                                   n = splash.water.1994$doy,
-                                  y = 1994,
+                                  y = splash.water.1994$year,
                                   wn = splash.water.1994$soil.moisture,
                                   sf = splash.water.1994$sf,
                                   tc = splash.water.1994$tair,
@@ -729,7 +729,7 @@ splash.water.1995$doy <- lubridate::yday(splash.water.1995$date)
 splash.oneday.1995 <- run_one_day(lat = splash.water.1995$lat_deg,
                                   elv = splash.water.1995$elv_m,
                                   n = splash.water.1995$doy,
-                                  y = 1995,
+                                  y = splash.water.1995$year,
                                   wn = splash.water.1995$soil.moisture,
                                   sf = splash.water.1995$sf,
                                   tc = splash.water.1995$tair,
@@ -782,25 +782,25 @@ splash.readin.1996 <- lapply(file.list.1996, read_csv)
 splash.readin.1996$Brazos_2020_18.1996splash$sf <- splash.readin.1996$Brazos_2020_18.1996splash$sf[seq_along(splash.readin.1996$Brazos_2020_18.1996splash$sf) %% 2 > 0]
 splash.readin.1996$Brazos_2020_18.1996splash$tair <- splash.readin.1996$Brazos_2020_18.1996splash$tair[seq_along(splash.readin.1996$Brazos_2020_18.1996splash$tair) %% 2 > 0]
 splash.readin.1996$Brazos_2020_18.1996splash$pn <- splash.readin.1996$Brazos_2020_18.1996splash$pn[seq_along(splash.readin.1996$Brazos_2020_18.1996splash$pn) %% 2 > 0]
-splash.readin.1996$Brazos_2020_18.1996splash$num_lines <- 365
+splash.readin.1996$Brazos_2020_18.1996splash$num_lines <- 366
 
 # Harris 2020-03
 splash.readin.1996$Harris_2020_03.1996splash$sf <- splash.readin.1996$Harris_2020_03.1996splash$sf[seq_along(splash.readin.1996$Harris_2020_03.1996splash$sf) %% 2 > 0]
 splash.readin.1996$Harris_2020_03.1996splash$tair <- splash.readin.1996$Harris_2020_03.1996splash$tair[seq_along(splash.readin.1996$Harris_2020_03.1996splash$tair) %% 2 > 0]
 splash.readin.1996$Harris_2020_03.1996splash$pn <- splash.readin.1996$Harris_2020_03.1996splash$pn[seq_along(splash.readin.1996$Harris_2020_03.1996splash$pn) %% 2 > 0]
-splash.readin.1996$Harris_2020_03.1996splash$num_lines <- 365
+splash.readin.1996$Harris_2020_03.1996splash$num_lines <- 366
 
 # Menard 2020-01
 splash.readin.1996$Menard_2020_01.1996splash$sf <- splash.readin.1996$Menard_2020_01.1996splash$sf[seq_along(splash.readin.1996$Menard_2020_01.1996splash$sf) %% 2 > 0]
 splash.readin.1996$Menard_2020_01.1996splash$tair <- splash.readin.1996$Menard_2020_01.1996splash$tair[seq_along(splash.readin.1996$Menard_2020_01.1996splash$tair) %% 2 > 0]
 splash.readin.1996$Menard_2020_01.1996splash$pn <- splash.readin.1996$Menard_2020_01.1996splash$pn[seq_along(splash.readin.1996$Menard_2020_01.1996splash$pn) %% 2 > 0]
-splash.readin.1996$Menard_2020_01.1996splash$num_lines <- 365
+splash.readin.1996$Menard_2020_01.1996splash$num_lines <- 366
 
 # Uvalde 2020-02
 splash.readin.1996$Uvalde_2020_02.1996splash$sf <- splash.readin.1996$Uvalde_2020_02.1996splash$sf[seq_along(splash.readin.1996$Uvalde_2020_02.1996splash$sf) %% 2 > 0]
 splash.readin.1996$Uvalde_2020_02.1996splash$tair <- splash.readin.1996$Uvalde_2020_02.1996splash$tair[seq_along(splash.readin.1996$Uvalde_2020_02.1996splash$tair) %% 2 > 0]
 splash.readin.1996$Uvalde_2020_02.1996splash$pn <- splash.readin.1996$Uvalde_2020_02.1996splash$pn[seq_along(splash.readin.1996$Uvalde_2020_02.1996splash$pn) %% 2 > 0]
-splash.readin.1996$Uvalde_2020_02.1996splash$num_lines <- 365
+splash.readin.1996$Uvalde_2020_02.1996splash$num_lines <- 366
 
 
 ## Load ancillary details needed to run 'spin_up" and 'run_one_day'
@@ -878,7 +878,7 @@ splash.water.1996$doy <- lubridate::yday(splash.water.1996$date)
 splash.oneday.1996 <- run_one_day(lat = splash.water.1996$lat_deg,
                                   elv = splash.water.1996$elv_m,
                                   n = splash.water.1996$doy,
-                                  y = 1996,
+                                  y = splash.water.1996$year,
                                   wn = splash.water.1996$soil.moisture,
                                   sf = splash.water.1996$sf,
                                   tc = splash.water.1996$tair,
@@ -1027,7 +1027,7 @@ splash.water.1997$doy <- lubridate::yday(splash.water.1997$date)
 splash.oneday.1997 <- run_one_day(lat = splash.water.1997$lat_deg,
                                   elv = splash.water.1997$elv_m,
                                   n = splash.water.1997$doy,
-                                  y = 1997,
+                                  y = splash.water.1997$year,
                                   wn = splash.water.1997$soil.moisture,
                                   sf = splash.water.1997$sf,
                                   tc = splash.water.1997$tair,
@@ -1176,7 +1176,7 @@ splash.water.1998$doy <- lubridate::yday(splash.water.1998$date)
 splash.oneday.1998 <- run_one_day(lat = splash.water.1998$lat_deg,
                                   elv = splash.water.1998$elv_m,
                                   n = splash.water.1998$doy,
-                                  y = 1998,
+                                  y = splash.water.1998$year,
                                   wn = splash.water.1998$soil.moisture,
                                   sf = splash.water.1998$sf,
                                   tc = splash.water.1998$tair,
@@ -1325,7 +1325,7 @@ splash.water.1999$doy <- lubridate::yday(splash.water.1999$date)
 splash.oneday.1999 <- run_one_day(lat = splash.water.1999$lat_deg,
                                   elv = splash.water.1999$elv_m,
                                   n = splash.water.1999$doy,
-                                  y = 1999,
+                                  y = splash.water.1999$year,
                                   wn = splash.water.1999$soil.moisture,
                                   sf = splash.water.1999$sf,
                                   tc = splash.water.1999$tair,
@@ -1378,25 +1378,25 @@ splash.readin.2000 <- lapply(file.list.2000, read_csv)
 splash.readin.2000$Brazos_2020_18.2000splash$sf <- splash.readin.2000$Brazos_2020_18.2000splash$sf[seq_along(splash.readin.2000$Brazos_2020_18.2000splash$sf) %% 2 > 0]
 splash.readin.2000$Brazos_2020_18.2000splash$tair <- splash.readin.2000$Brazos_2020_18.2000splash$tair[seq_along(splash.readin.2000$Brazos_2020_18.2000splash$tair) %% 2 > 0]
 splash.readin.2000$Brazos_2020_18.2000splash$pn <- splash.readin.2000$Brazos_2020_18.2000splash$pn[seq_along(splash.readin.2000$Brazos_2020_18.2000splash$pn) %% 2 > 0]
-splash.readin.2000$Brazos_2020_18.2000splash$num_lines <- 365
+splash.readin.2000$Brazos_2020_18.2000splash$num_lines <- 366
 
 # Harris 2020-03
 splash.readin.2000$Harris_2020_03.2000splash$sf <- splash.readin.2000$Harris_2020_03.2000splash$sf[seq_along(splash.readin.2000$Harris_2020_03.2000splash$sf) %% 2 > 0]
 splash.readin.2000$Harris_2020_03.2000splash$tair <- splash.readin.2000$Harris_2020_03.2000splash$tair[seq_along(splash.readin.2000$Harris_2020_03.2000splash$tair) %% 2 > 0]
 splash.readin.2000$Harris_2020_03.2000splash$pn <- splash.readin.2000$Harris_2020_03.2000splash$pn[seq_along(splash.readin.2000$Harris_2020_03.2000splash$pn) %% 2 > 0]
-splash.readin.2000$Harris_2020_03.2000splash$num_lines <- 365
+splash.readin.2000$Harris_2020_03.2000splash$num_lines <- 366
 
 # Menard 2020-01
 splash.readin.2000$Menard_2020_01.2000splash$sf <- splash.readin.2000$Menard_2020_01.2000splash$sf[seq_along(splash.readin.2000$Menard_2020_01.2000splash$sf) %% 2 > 0]
 splash.readin.2000$Menard_2020_01.2000splash$tair <- splash.readin.2000$Menard_2020_01.2000splash$tair[seq_along(splash.readin.2000$Menard_2020_01.2000splash$tair) %% 2 > 0]
 splash.readin.2000$Menard_2020_01.2000splash$pn <- splash.readin.2000$Menard_2020_01.2000splash$pn[seq_along(splash.readin.2000$Menard_2020_01.2000splash$pn) %% 2 > 0]
-splash.readin.2000$Menard_2020_01.2000splash$num_lines <- 365
+splash.readin.2000$Menard_2020_01.2000splash$num_lines <- 366
 
 # Uvalde 2020-02
 splash.readin.2000$Uvalde_2020_02.2000splash$sf <- splash.readin.2000$Uvalde_2020_02.2000splash$sf[seq_along(splash.readin.2000$Uvalde_2020_02.2000splash$sf) %% 2 > 0]
 splash.readin.2000$Uvalde_2020_02.2000splash$tair <- splash.readin.2000$Uvalde_2020_02.2000splash$tair[seq_along(splash.readin.2000$Uvalde_2020_02.2000splash$tair) %% 2 > 0]
 splash.readin.2000$Uvalde_2020_02.2000splash$pn <- splash.readin.2000$Uvalde_2020_02.2000splash$pn[seq_along(splash.readin.2000$Uvalde_2020_02.2000splash$pn) %% 2 > 0]
-splash.readin.2000$Uvalde_2020_02.2000splash$num_lines <- 365
+splash.readin.2000$Uvalde_2020_02.2000splash$num_lines <- 366
 
 
 ## Load ancillary details needed to run 'spin_up" and 'run_one_day'
@@ -1474,7 +1474,7 @@ splash.water.2000$doy <- lubridate::yday(splash.water.2000$date)
 splash.oneday.2000 <- run_one_day(lat = splash.water.2000$lat_deg,
                                   elv = splash.water.2000$elv_m,
                                   n = splash.water.2000$doy,
-                                  y = 2000,
+                                  y = splash.water.2000$year,
                                   wn = splash.water.2000$soil.moisture,
                                   sf = splash.water.2000$sf,
                                   tc = splash.water.2000$tair,
@@ -1623,7 +1623,7 @@ splash.water.2001$doy <- lubridate::yday(splash.water.2001$date)
 splash.oneday.2001 <- run_one_day(lat = splash.water.2001$lat_deg,
                                   elv = splash.water.2001$elv_m,
                                   n = splash.water.2001$doy,
-                                  y = 2001,
+                                  y = splash.water.2001$year,
                                   wn = splash.water.2001$soil.moisture,
                                   sf = splash.water.2001$sf,
                                   tc = splash.water.2001$tair,
@@ -1772,7 +1772,7 @@ splash.water.2002$doy <- lubridate::yday(splash.water.2002$date)
 splash.oneday.2002 <- run_one_day(lat = splash.water.2002$lat_deg,
                                   elv = splash.water.2002$elv_m,
                                   n = splash.water.2002$doy,
-                                  y = 2002,
+                                  y = splash.water.2002$year,
                                   wn = splash.water.2002$soil.moisture,
                                   sf = splash.water.2002$sf,
                                   tc = splash.water.2002$tair,
@@ -1921,7 +1921,7 @@ splash.water.2003$doy <- lubridate::yday(splash.water.2003$date)
 splash.oneday.2003 <- run_one_day(lat = splash.water.2003$lat_deg,
                                   elv = splash.water.2003$elv_m,
                                   n = splash.water.2003$doy,
-                                  y = 2003,
+                                  y = splash.water.2003$year,
                                   wn = splash.water.2003$soil.moisture,
                                   sf = splash.water.2003$sf,
                                   tc = splash.water.2003$tair,
@@ -1974,25 +1974,25 @@ splash.readin.2004 <- lapply(file.list.2004, read_csv)
 splash.readin.2004$Brazos_2020_18.2004splash$sf <- splash.readin.2004$Brazos_2020_18.2004splash$sf[seq_along(splash.readin.2004$Brazos_2020_18.2004splash$sf) %% 2 > 0]
 splash.readin.2004$Brazos_2020_18.2004splash$tair <- splash.readin.2004$Brazos_2020_18.2004splash$tair[seq_along(splash.readin.2004$Brazos_2020_18.2004splash$tair) %% 2 > 0]
 splash.readin.2004$Brazos_2020_18.2004splash$pn <- splash.readin.2004$Brazos_2020_18.2004splash$pn[seq_along(splash.readin.2004$Brazos_2020_18.2004splash$pn) %% 2 > 0]
-splash.readin.2004$Brazos_2020_18.2004splash$num_lines <- 365
+splash.readin.2004$Brazos_2020_18.2004splash$num_lines <- 366
 
 # Harris 2020-03
 splash.readin.2004$Harris_2020_03.2004splash$sf <- splash.readin.2004$Harris_2020_03.2004splash$sf[seq_along(splash.readin.2004$Harris_2020_03.2004splash$sf) %% 2 > 0]
 splash.readin.2004$Harris_2020_03.2004splash$tair <- splash.readin.2004$Harris_2020_03.2004splash$tair[seq_along(splash.readin.2004$Harris_2020_03.2004splash$tair) %% 2 > 0]
 splash.readin.2004$Harris_2020_03.2004splash$pn <- splash.readin.2004$Harris_2020_03.2004splash$pn[seq_along(splash.readin.2004$Harris_2020_03.2004splash$pn) %% 2 > 0]
-splash.readin.2004$Harris_2020_03.2004splash$num_lines <- 365
+splash.readin.2004$Harris_2020_03.2004splash$num_lines <- 366
 
 # Menard 2020-01
 splash.readin.2004$Menard_2020_01.2004splash$sf <- splash.readin.2004$Menard_2020_01.2004splash$sf[seq_along(splash.readin.2004$Menard_2020_01.2004splash$sf) %% 2 > 0]
 splash.readin.2004$Menard_2020_01.2004splash$tair <- splash.readin.2004$Menard_2020_01.2004splash$tair[seq_along(splash.readin.2004$Menard_2020_01.2004splash$tair) %% 2 > 0]
 splash.readin.2004$Menard_2020_01.2004splash$pn <- splash.readin.2004$Menard_2020_01.2004splash$pn[seq_along(splash.readin.2004$Menard_2020_01.2004splash$pn) %% 2 > 0]
-splash.readin.2004$Menard_2020_01.2004splash$num_lines <- 365
+splash.readin.2004$Menard_2020_01.2004splash$num_lines <- 366
 
 # Uvalde 2020-02
 splash.readin.2004$Uvalde_2020_02.2004splash$sf <- splash.readin.2004$Uvalde_2020_02.2004splash$sf[seq_along(splash.readin.2004$Uvalde_2020_02.2004splash$sf) %% 2 > 0]
 splash.readin.2004$Uvalde_2020_02.2004splash$tair <- splash.readin.2004$Uvalde_2020_02.2004splash$tair[seq_along(splash.readin.2004$Uvalde_2020_02.2004splash$tair) %% 2 > 0]
 splash.readin.2004$Uvalde_2020_02.2004splash$pn <- splash.readin.2004$Uvalde_2020_02.2004splash$pn[seq_along(splash.readin.2004$Uvalde_2020_02.2004splash$pn) %% 2 > 0]
-splash.readin.2004$Uvalde_2020_02.2004splash$num_lines <- 365
+splash.readin.2004$Uvalde_2020_02.2004splash$num_lines <- 366
 
 
 ## Load ancillary details needed to run 'spin_up" and 'run_one_day'
@@ -2070,7 +2070,7 @@ splash.water.2004$doy <- lubridate::yday(splash.water.2004$date)
 splash.oneday.2004 <- run_one_day(lat = splash.water.2004$lat_deg,
                                   elv = splash.water.2004$elv_m,
                                   n = splash.water.2004$doy,
-                                  y = 2004,
+                                  y = splash.water.2004$year,
                                   wn = splash.water.2004$soil.moisture,
                                   sf = splash.water.2004$sf,
                                   tc = splash.water.2004$tair,
@@ -2219,7 +2219,7 @@ splash.water.2005$doy <- lubridate::yday(splash.water.2005$date)
 splash.oneday.2005 <- run_one_day(lat = splash.water.2005$lat_deg,
                                   elv = splash.water.2005$elv_m,
                                   n = splash.water.2005$doy,
-                                  y = 2005,
+                                  y = splash.water.2005$year,
                                   wn = splash.water.2005$soil.moisture,
                                   sf = splash.water.2005$sf,
                                   tc = splash.water.2005$tair,
@@ -2368,7 +2368,7 @@ splash.water.2006$doy <- lubridate::yday(splash.water.2006$date)
 splash.oneday.2006 <- run_one_day(lat = splash.water.2006$lat_deg,
                                   elv = splash.water.2006$elv_m,
                                   n = splash.water.2006$doy,
-                                  y = 2006,
+                                  y = splash.water.2006$year,
                                   wn = splash.water.2006$soil.moisture,
                                   sf = splash.water.2006$sf,
                                   tc = splash.water.2006$tair,
@@ -2517,7 +2517,7 @@ splash.water.2007$doy <- lubridate::yday(splash.water.2007$date)
 splash.oneday.2007 <- run_one_day(lat = splash.water.2007$lat_deg,
                                   elv = splash.water.2007$elv_m,
                                   n = splash.water.2007$doy,
-                                  y = 2007,
+                                  y = splash.water.2007$year,
                                   wn = splash.water.2007$soil.moisture,
                                   sf = splash.water.2007$sf,
                                   tc = splash.water.2007$tair,
@@ -2570,25 +2570,25 @@ splash.readin.2008 <- lapply(file.list.2008, read_csv)
 splash.readin.2008$Brazos_2020_18.2008splash$sf <- splash.readin.2008$Brazos_2020_18.2008splash$sf[seq_along(splash.readin.2008$Brazos_2020_18.2008splash$sf) %% 2 > 0]
 splash.readin.2008$Brazos_2020_18.2008splash$tair <- splash.readin.2008$Brazos_2020_18.2008splash$tair[seq_along(splash.readin.2008$Brazos_2020_18.2008splash$tair) %% 2 > 0]
 splash.readin.2008$Brazos_2020_18.2008splash$pn <- splash.readin.2008$Brazos_2020_18.2008splash$pn[seq_along(splash.readin.2008$Brazos_2020_18.2008splash$pn) %% 2 > 0]
-splash.readin.2008$Brazos_2020_18.2008splash$num_lines <- 365
+splash.readin.2008$Brazos_2020_18.2008splash$num_lines <- 366
 
 # Harris 2020-03
 splash.readin.2008$Harris_2020_03.2008splash$sf <- splash.readin.2008$Harris_2020_03.2008splash$sf[seq_along(splash.readin.2008$Harris_2020_03.2008splash$sf) %% 2 > 0]
 splash.readin.2008$Harris_2020_03.2008splash$tair <- splash.readin.2008$Harris_2020_03.2008splash$tair[seq_along(splash.readin.2008$Harris_2020_03.2008splash$tair) %% 2 > 0]
 splash.readin.2008$Harris_2020_03.2008splash$pn <- splash.readin.2008$Harris_2020_03.2008splash$pn[seq_along(splash.readin.2008$Harris_2020_03.2008splash$pn) %% 2 > 0]
-splash.readin.2008$Harris_2020_03.2008splash$num_lines <- 365
+splash.readin.2008$Harris_2020_03.2008splash$num_lines <- 366
 
 # Menard 2020-01
 splash.readin.2008$Menard_2020_01.2008splash$sf <- splash.readin.2008$Menard_2020_01.2008splash$sf[seq_along(splash.readin.2008$Menard_2020_01.2008splash$sf) %% 2 > 0]
 splash.readin.2008$Menard_2020_01.2008splash$tair <- splash.readin.2008$Menard_2020_01.2008splash$tair[seq_along(splash.readin.2008$Menard_2020_01.2008splash$tair) %% 2 > 0]
 splash.readin.2008$Menard_2020_01.2008splash$pn <- splash.readin.2008$Menard_2020_01.2008splash$pn[seq_along(splash.readin.2008$Menard_2020_01.2008splash$pn) %% 2 > 0]
-splash.readin.2008$Menard_2020_01.2008splash$num_lines <- 365
+splash.readin.2008$Menard_2020_01.2008splash$num_lines <- 366
 
 # Uvalde 2020-02
 splash.readin.2008$Uvalde_2020_02.2008splash$sf <- splash.readin.2008$Uvalde_2020_02.2008splash$sf[seq_along(splash.readin.2008$Uvalde_2020_02.2008splash$sf) %% 2 > 0]
 splash.readin.2008$Uvalde_2020_02.2008splash$tair <- splash.readin.2008$Uvalde_2020_02.2008splash$tair[seq_along(splash.readin.2008$Uvalde_2020_02.2008splash$tair) %% 2 > 0]
 splash.readin.2008$Uvalde_2020_02.2008splash$pn <- splash.readin.2008$Uvalde_2020_02.2008splash$pn[seq_along(splash.readin.2008$Uvalde_2020_02.2008splash$pn) %% 2 > 0]
-splash.readin.2008$Uvalde_2020_02.2008splash$num_lines <- 365
+splash.readin.2008$Uvalde_2020_02.2008splash$num_lines <- 366
 
 
 ## Load ancillary details needed to run 'spin_up" and 'run_one_day'
@@ -2666,7 +2666,7 @@ splash.water.2008$doy <- lubridate::yday(splash.water.2008$date)
 splash.oneday.2008 <- run_one_day(lat = splash.water.2008$lat_deg,
                                   elv = splash.water.2008$elv_m,
                                   n = splash.water.2008$doy,
-                                  y = 2008,
+                                  y = splash.water.2008$year,
                                   wn = splash.water.2008$soil.moisture,
                                   sf = splash.water.2008$sf,
                                   tc = splash.water.2008$tair,
@@ -2815,7 +2815,7 @@ splash.water.2009$doy <- lubridate::yday(splash.water.2009$date)
 splash.oneday.2009 <- run_one_day(lat = splash.water.2009$lat_deg,
                                   elv = splash.water.2009$elv_m,
                                   n = splash.water.2009$doy,
-                                  y = 2009,
+                                  y = splash.water.2009$year,
                                   wn = splash.water.2009$soil.moisture,
                                   sf = splash.water.2009$sf,
                                   tc = splash.water.2009$tair,
@@ -2964,7 +2964,7 @@ splash.water.2010$doy <- lubridate::yday(splash.water.2010$date)
 splash.oneday.2010 <- run_one_day(lat = splash.water.2010$lat_deg,
                                   elv = splash.water.2010$elv_m,
                                   n = splash.water.2010$doy,
-                                  y = 2010,
+                                  y = splash.water.2010$year,
                                   wn = splash.water.2010$soil.moisture,
                                   sf = splash.water.2010$sf,
                                   tc = splash.water.2010$tair,
@@ -3113,7 +3113,7 @@ splash.water.2011$doy <- lubridate::yday(splash.water.2011$date)
 splash.oneday.2011 <- run_one_day(lat = splash.water.2011$lat_deg,
                                   elv = splash.water.2011$elv_m,
                                   n = splash.water.2011$doy,
-                                  y = 2011,
+                                  y = splash.water.2011$year,
                                   wn = splash.water.2011$soil.moisture,
                                   sf = splash.water.2011$sf,
                                   tc = splash.water.2011$tair,
@@ -3166,25 +3166,25 @@ splash.readin.2012 <- lapply(file.list.2012, read_csv)
 splash.readin.2012$Brazos_2020_18.2012splash$sf <- splash.readin.2012$Brazos_2020_18.2012splash$sf[seq_along(splash.readin.2012$Brazos_2020_18.2012splash$sf) %% 2 > 0]
 splash.readin.2012$Brazos_2020_18.2012splash$tair <- splash.readin.2012$Brazos_2020_18.2012splash$tair[seq_along(splash.readin.2012$Brazos_2020_18.2012splash$tair) %% 2 > 0]
 splash.readin.2012$Brazos_2020_18.2012splash$pn <- splash.readin.2012$Brazos_2020_18.2012splash$pn[seq_along(splash.readin.2012$Brazos_2020_18.2012splash$pn) %% 2 > 0]
-splash.readin.2012$Brazos_2020_18.2012splash$num_lines <- 365
+splash.readin.2012$Brazos_2020_18.2012splash$num_lines <- 366
 
 # Harris 2020-03
 splash.readin.2012$Harris_2020_03.2012splash$sf <- splash.readin.2012$Harris_2020_03.2012splash$sf[seq_along(splash.readin.2012$Harris_2020_03.2012splash$sf) %% 2 > 0]
 splash.readin.2012$Harris_2020_03.2012splash$tair <- splash.readin.2012$Harris_2020_03.2012splash$tair[seq_along(splash.readin.2012$Harris_2020_03.2012splash$tair) %% 2 > 0]
 splash.readin.2012$Harris_2020_03.2012splash$pn <- splash.readin.2012$Harris_2020_03.2012splash$pn[seq_along(splash.readin.2012$Harris_2020_03.2012splash$pn) %% 2 > 0]
-splash.readin.2012$Harris_2020_03.2012splash$num_lines <- 365
+splash.readin.2012$Harris_2020_03.2012splash$num_lines <- 366
 
 # Menard 2020-01
 splash.readin.2012$Menard_2020_01.2012splash$sf <- splash.readin.2012$Menard_2020_01.2012splash$sf[seq_along(splash.readin.2012$Menard_2020_01.2012splash$sf) %% 2 > 0]
 splash.readin.2012$Menard_2020_01.2012splash$tair <- splash.readin.2012$Menard_2020_01.2012splash$tair[seq_along(splash.readin.2012$Menard_2020_01.2012splash$tair) %% 2 > 0]
 splash.readin.2012$Menard_2020_01.2012splash$pn <- splash.readin.2012$Menard_2020_01.2012splash$pn[seq_along(splash.readin.2012$Menard_2020_01.2012splash$pn) %% 2 > 0]
-splash.readin.2012$Menard_2020_01.2012splash$num_lines <- 365
+splash.readin.2012$Menard_2020_01.2012splash$num_lines <- 366
 
 # Uvalde 2020-02
 splash.readin.2012$Uvalde_2020_02.2012splash$sf <- splash.readin.2012$Uvalde_2020_02.2012splash$sf[seq_along(splash.readin.2012$Uvalde_2020_02.2012splash$sf) %% 2 > 0]
 splash.readin.2012$Uvalde_2020_02.2012splash$tair <- splash.readin.2012$Uvalde_2020_02.2012splash$tair[seq_along(splash.readin.2012$Uvalde_2020_02.2012splash$tair) %% 2 > 0]
 splash.readin.2012$Uvalde_2020_02.2012splash$pn <- splash.readin.2012$Uvalde_2020_02.2012splash$pn[seq_along(splash.readin.2012$Uvalde_2020_02.2012splash$pn) %% 2 > 0]
-splash.readin.2012$Uvalde_2020_02.2012splash$num_lines <- 365
+splash.readin.2012$Uvalde_2020_02.2012splash$num_lines <- 366
 
 
 ## Load ancillary details needed to run 'spin_up" and 'run_one_day'
@@ -3262,7 +3262,7 @@ splash.water.2012$doy <- lubridate::yday(splash.water.2012$date)
 splash.oneday.2012 <- run_one_day(lat = splash.water.2012$lat_deg,
                                   elv = splash.water.2012$elv_m,
                                   n = splash.water.2012$doy,
-                                  y = 2012,
+                                  y = splash.water.2012$year,
                                   wn = splash.water.2012$soil.moisture,
                                   sf = splash.water.2012$sf,
                                   tc = splash.water.2012$tair,
@@ -3411,7 +3411,7 @@ splash.water.2013$doy <- lubridate::yday(splash.water.2013$date)
 splash.oneday.2013 <- run_one_day(lat = splash.water.2013$lat_deg,
                                   elv = splash.water.2013$elv_m,
                                   n = splash.water.2013$doy,
-                                  y = 2013,
+                                  y = splash.water.2013$year,
                                   wn = splash.water.2013$soil.moisture,
                                   sf = splash.water.2013$sf,
                                   tc = splash.water.2013$tair,
@@ -3561,7 +3561,7 @@ splash.water.2014$doy <- lubridate::yday(splash.water.2014$date)
 splash.oneday.2014 <- run_one_day(lat = splash.water.2014$lat_deg,
                                   elv = splash.water.2014$elv_m,
                                   n = splash.water.2014$doy,
-                                  y = 2014,
+                                  y = splash.water.2014$year,
                                   wn = splash.water.2014$soil.moisture,
                                   sf = splash.water.2014$sf,
                                   tc = splash.water.2014$tair,
@@ -3710,7 +3710,7 @@ splash.water.2015$doy <- lubridate::yday(splash.water.2015$date)
 splash.oneday.2015 <- run_one_day(lat = splash.water.2015$lat_deg,
                                   elv = splash.water.2015$elv_m,
                                   n = splash.water.2015$doy,
-                                  y = 2015,
+                                  y = splash.water.2015$year,
                                   wn = splash.water.2015$soil.moisture,
                                   sf = splash.water.2015$sf,
                                   tc = splash.water.2015$tair,
@@ -3763,25 +3763,25 @@ splash.readin.2016 <- lapply(file.list.2016, read_csv)
 splash.readin.2016$Brazos_2020_18.2016splash$sf <- splash.readin.2016$Brazos_2020_18.2016splash$sf[seq_along(splash.readin.2016$Brazos_2020_18.2016splash$sf) %% 2 > 0]
 splash.readin.2016$Brazos_2020_18.2016splash$tair <- splash.readin.2016$Brazos_2020_18.2016splash$tair[seq_along(splash.readin.2016$Brazos_2020_18.2016splash$tair) %% 2 > 0]
 splash.readin.2016$Brazos_2020_18.2016splash$pn <- splash.readin.2016$Brazos_2020_18.2016splash$pn[seq_along(splash.readin.2016$Brazos_2020_18.2016splash$pn) %% 2 > 0]
-splash.readin.2016$Brazos_2020_18.2016splash$num_lines <- 365
+splash.readin.2016$Brazos_2020_18.2016splash$num_lines <- 366
 
 # Harris 2020-03
 splash.readin.2016$Harris_2020_03.2016splash$sf <- splash.readin.2016$Harris_2020_03.2016splash$sf[seq_along(splash.readin.2016$Harris_2020_03.2016splash$sf) %% 2 > 0]
 splash.readin.2016$Harris_2020_03.2016splash$tair <- splash.readin.2016$Harris_2020_03.2016splash$tair[seq_along(splash.readin.2016$Harris_2020_03.2016splash$tair) %% 2 > 0]
 splash.readin.2016$Harris_2020_03.2016splash$pn <- splash.readin.2016$Harris_2020_03.2016splash$pn[seq_along(splash.readin.2016$Harris_2020_03.2016splash$pn) %% 2 > 0]
-splash.readin.2016$Harris_2020_03.2016splash$num_lines <- 365
+splash.readin.2016$Harris_2020_03.2016splash$num_lines <- 366
 
 # Menard 2020-01
 splash.readin.2016$Menard_2020_01.2016splash$sf <- splash.readin.2016$Menard_2020_01.2016splash$sf[seq_along(splash.readin.2016$Menard_2020_01.2016splash$sf) %% 2 > 0]
 splash.readin.2016$Menard_2020_01.2016splash$tair <- splash.readin.2016$Menard_2020_01.2016splash$tair[seq_along(splash.readin.2016$Menard_2020_01.2016splash$tair) %% 2 > 0]
 splash.readin.2016$Menard_2020_01.2016splash$pn <- splash.readin.2016$Menard_2020_01.2016splash$pn[seq_along(splash.readin.2016$Menard_2020_01.2016splash$pn) %% 2 > 0]
-splash.readin.2016$Menard_2020_01.2016splash$num_lines <- 365
+splash.readin.2016$Menard_2020_01.2016splash$num_lines <- 366
 
 # Uvalde 2020-02
 splash.readin.2016$Uvalde_2020_02.2016splash$sf <- splash.readin.2016$Uvalde_2020_02.2016splash$sf[seq_along(splash.readin.2016$Uvalde_2020_02.2016splash$sf) %% 2 > 0]
 splash.readin.2016$Uvalde_2020_02.2016splash$tair <- splash.readin.2016$Uvalde_2020_02.2016splash$tair[seq_along(splash.readin.2016$Uvalde_2020_02.2016splash$tair) %% 2 > 0]
 splash.readin.2016$Uvalde_2020_02.2016splash$pn <- splash.readin.2016$Uvalde_2020_02.2016splash$pn[seq_along(splash.readin.2016$Uvalde_2020_02.2016splash$pn) %% 2 > 0]
-splash.readin.2016$Uvalde_2020_02.2016splash$num_lines <- 365
+splash.readin.2016$Uvalde_2020_02.2016splash$num_lines <- 366
 
 
 ## Load ancillary details needed to run 'spin_up" and 'run_one_day'
@@ -3859,7 +3859,7 @@ splash.water.2016$doy <- lubridate::yday(splash.water.2016$date)
 splash.oneday.2016 <- run_one_day(lat = splash.water.2016$lat_deg,
                                   elv = splash.water.2016$elv_m,
                                   n = splash.water.2016$doy,
-                                  y = 2016,
+                                  y = splash.water.2016$year,
                                   wn = splash.water.2016$soil.moisture,
                                   sf = splash.water.2016$sf,
                                   tc = splash.water.2016$tair,
@@ -4008,7 +4008,7 @@ splash.water.2017$doy <- lubridate::yday(splash.water.2017$date)
 splash.oneday.2017 <- run_one_day(lat = splash.water.2017$lat_deg,
                                   elv = splash.water.2017$elv_m,
                                   n = splash.water.2017$doy,
-                                  y = 2017,
+                                  y = splash.water.2017$year,
                                   wn = splash.water.2017$soil.moisture,
                                   sf = splash.water.2017$sf,
                                   tc = splash.water.2017$tair,
@@ -4157,7 +4157,7 @@ splash.water.2018$doy <- lubridate::yday(splash.water.2018$date)
 splash.oneday.2018 <- run_one_day(lat = splash.water.2018$lat_deg,
                                   elv = splash.water.2018$elv_m,
                                   n = splash.water.2018$doy,
-                                  y = 2018,
+                                  y = splash.water.2018$year,
                                   wn = splash.water.2018$soil.moisture,
                                   sf = splash.water.2018$sf,
                                   tc = splash.water.2018$tair,
@@ -4306,7 +4306,7 @@ splash.water.2019$doy <- lubridate::yday(splash.water.2019$date)
 splash.oneday.2019 <- run_one_day(lat = splash.water.2019$lat_deg,
                                   elv = splash.water.2019$elv_m,
                                   n = splash.water.2019$doy,
-                                  y = 2019,
+                                  y = splash.water.2019$year,
                                   wn = splash.water.2019$soil.moisture,
                                   sf = splash.water.2019$sf,
                                   tc = splash.water.2019$tair,
@@ -4359,25 +4359,25 @@ splash.readin.2020 <- lapply(file.list.2020, read_csv)
 splash.readin.2020$Brazos_2020_18.2020splash$sf <- splash.readin.2020$Brazos_2020_18.2020splash$sf[seq_along(splash.readin.2020$Brazos_2020_18.2020splash$sf) %% 2 > 0]
 splash.readin.2020$Brazos_2020_18.2020splash$tair <- splash.readin.2020$Brazos_2020_18.2020splash$tair[seq_along(splash.readin.2020$Brazos_2020_18.2020splash$tair) %% 2 > 0]
 splash.readin.2020$Brazos_2020_18.2020splash$pn <- splash.readin.2020$Brazos_2020_18.2020splash$pn[seq_along(splash.readin.2020$Brazos_2020_18.2020splash$pn) %% 2 > 0]
-splash.readin.2020$Brazos_2020_18.2020splash$num_lines <- 365
+splash.readin.2020$Brazos_2020_18.2020splash$num_lines <- 366
 
 # Harris 2020-03
 splash.readin.2020$Harris_2020_03.2020splash$sf <- splash.readin.2020$Harris_2020_03.2020splash$sf[seq_along(splash.readin.2020$Harris_2020_03.2020splash$sf) %% 2 > 0]
 splash.readin.2020$Harris_2020_03.2020splash$tair <- splash.readin.2020$Harris_2020_03.2020splash$tair[seq_along(splash.readin.2020$Harris_2020_03.2020splash$tair) %% 2 > 0]
 splash.readin.2020$Harris_2020_03.2020splash$pn <- splash.readin.2020$Harris_2020_03.2020splash$pn[seq_along(splash.readin.2020$Harris_2020_03.2020splash$pn) %% 2 > 0]
-splash.readin.2020$Harris_2020_03.2020splash$num_lines <- 365
+splash.readin.2020$Harris_2020_03.2020splash$num_lines <- 366
 
 # Menard 2020-01
 splash.readin.2020$Menard_2020_01.2020splash$sf <- splash.readin.2020$Menard_2020_01.2020splash$sf[seq_along(splash.readin.2020$Menard_2020_01.2020splash$sf) %% 2 > 0]
 splash.readin.2020$Menard_2020_01.2020splash$tair <- splash.readin.2020$Menard_2020_01.2020splash$tair[seq_along(splash.readin.2020$Menard_2020_01.2020splash$tair) %% 2 > 0]
 splash.readin.2020$Menard_2020_01.2020splash$pn <- splash.readin.2020$Menard_2020_01.2020splash$pn[seq_along(splash.readin.2020$Menard_2020_01.2020splash$pn) %% 2 > 0]
-splash.readin.2020$Menard_2020_01.2020splash$num_lines <- 365
+splash.readin.2020$Menard_2020_01.2020splash$num_lines <- 366
 
 # Uvalde 2020-02
 splash.readin.2020$Uvalde_2020_02.2020splash$sf <- splash.readin.2020$Uvalde_2020_02.2020splash$sf[seq_along(splash.readin.2020$Uvalde_2020_02.2020splash$sf) %% 2 > 0]
 splash.readin.2020$Uvalde_2020_02.2020splash$tair <- splash.readin.2020$Uvalde_2020_02.2020splash$tair[seq_along(splash.readin.2020$Uvalde_2020_02.2020splash$tair) %% 2 > 0]
 splash.readin.2020$Uvalde_2020_02.2020splash$pn <- splash.readin.2020$Uvalde_2020_02.2020splash$pn[seq_along(splash.readin.2020$Uvalde_2020_02.2020splash$pn) %% 2 > 0]
-splash.readin.2020$Uvalde_2020_02.2020splash$num_lines <- 365
+splash.readin.2020$Uvalde_2020_02.2020splash$num_lines <- 366
 
 
 ## Load ancillary details needed to run 'spin_up" and 'run_one_day'
@@ -4455,7 +4455,7 @@ splash.water.2020$doy <- lubridate::yday(splash.water.2020$date)
 splash.oneday.2020 <- run_one_day(lat = splash.water.2020$lat_deg,
                                   elv = splash.water.2020$elv_m,
                                   n = splash.water.2020$doy,
-                                  y = 2020,
+                                  y = splash.water.2020$year,
                                   wn = splash.water.2020$soil.moisture,
                                   sf = splash.water.2020$sf,
                                   tc = splash.water.2020$tair,
@@ -4508,25 +4508,25 @@ splash.readin.2021 <- lapply(file.list.2021, read_csv)
 splash.readin.2021$Brazos_2020_18.2021splash$sf <- splash.readin.2021$Brazos_2020_18.2021splash$sf[seq_along(splash.readin.2021$Brazos_2020_18.2021splash$sf) %% 2 > 0]
 splash.readin.2021$Brazos_2020_18.2021splash$tair <- splash.readin.2021$Brazos_2020_18.2021splash$tair[seq_along(splash.readin.2021$Brazos_2020_18.2021splash$tair) %% 2 > 0]
 splash.readin.2021$Brazos_2020_18.2021splash$pn <- splash.readin.2021$Brazos_2020_18.2021splash$pn[seq_along(splash.readin.2021$Brazos_2020_18.2021splash$pn) %% 2 > 0]
-splash.readin.2021$Brazos_2020_18.2021splash$num_lines <- 365
+splash.readin.2021$Brazos_2020_18.2021splash$num_lines <- 211
 
 # Harris 2020-03
 splash.readin.2021$Harris_2020_03.2021splash$sf <- splash.readin.2021$Harris_2020_03.2021splash$sf[seq_along(splash.readin.2021$Harris_2020_03.2021splash$sf) %% 2 > 0]
 splash.readin.2021$Harris_2020_03.2021splash$tair <- splash.readin.2021$Harris_2020_03.2021splash$tair[seq_along(splash.readin.2021$Harris_2020_03.2021splash$tair) %% 2 > 0]
 splash.readin.2021$Harris_2020_03.2021splash$pn <- splash.readin.2021$Harris_2020_03.2021splash$pn[seq_along(splash.readin.2021$Harris_2020_03.2021splash$pn) %% 2 > 0]
-splash.readin.2021$Harris_2020_03.2021splash$num_lines <- 365
+splash.readin.2021$Harris_2020_03.2021splash$num_lines <- 211
 
 # Menard 2020-01
 splash.readin.2021$Menard_2020_01.2021splash$sf <- splash.readin.2021$Menard_2020_01.2021splash$sf[seq_along(splash.readin.2021$Menard_2020_01.2021splash$sf) %% 2 > 0]
 splash.readin.2021$Menard_2020_01.2021splash$tair <- splash.readin.2021$Menard_2020_01.2021splash$tair[seq_along(splash.readin.2021$Menard_2020_01.2021splash$tair) %% 2 > 0]
 splash.readin.2021$Menard_2020_01.2021splash$pn <- splash.readin.2021$Menard_2020_01.2021splash$pn[seq_along(splash.readin.2021$Menard_2020_01.2021splash$pn) %% 2 > 0]
-splash.readin.2021$Menard_2020_01.2021splash$num_lines <- 365
+splash.readin.2021$Menard_2020_01.2021splash$num_lines <- 211
 
 # Uvalde 2020-02
 splash.readin.2021$Uvalde_2020_02.2021splash$sf <- splash.readin.2021$Uvalde_2020_02.2021splash$sf[seq_along(splash.readin.2021$Uvalde_2020_02.2021splash$sf) %% 2 > 0]
 splash.readin.2021$Uvalde_2020_02.2021splash$tair <- splash.readin.2021$Uvalde_2020_02.2021splash$tair[seq_along(splash.readin.2021$Uvalde_2020_02.2021splash$tair) %% 2 > 0]
 splash.readin.2021$Uvalde_2020_02.2021splash$pn <- splash.readin.2021$Uvalde_2020_02.2021splash$pn[seq_along(splash.readin.2021$Uvalde_2020_02.2021splash$pn) %% 2 > 0]
-splash.readin.2021$Uvalde_2020_02.2021splash$num_lines <- 365
+splash.readin.2021$Uvalde_2020_02.2021splash$num_lines <- 211
 
 
 ## Load ancillary details needed to run 'spin_up" and 'run_one_day'
@@ -4604,7 +4604,7 @@ splash.water.2021$doy <- lubridate::yday(splash.water.2021$date)
 splash.oneday.2021 <- run_one_day(lat = splash.water.2021$lat_deg,
                                   elv = splash.water.2021$elv_m,
                                   n = splash.water.2021$doy,
-                                  y = 2021,
+                                  y = splash.water.2021$year,
                                   wn = splash.water.2021$soil.moisture,
                                   sf = splash.water.2021$sf,
                                   tc = splash.water.2021$tair,
@@ -4764,7 +4764,7 @@ txeco.splash.90day <- concat.clim %>%
 txeco.splash.60day <- concat.clim %>%
   group_by(site, sampling.year, visit.type) %>%
   filter(date > sampling.date - 60) %>%
-  summarize(ai.60 = sum(pn, na.rm = TRUE) /sum(pet, na.rm = TRUE))
+  summarize(ai.60 = sum(pn, na.rm = TRUE) / sum(pet, na.rm = TRUE))
 
 txeco.splash.30day <- concat.clim %>%
   group_by(site, sampling.year, visit.type) %>%
@@ -4772,14 +4772,9 @@ txeco.splash.30day <- concat.clim %>%
   summarize(ai.30 = sum(pn, na.rm = TRUE)/sum(pet, na.rm = TRUE))
 
 ## Merge files
-sites.aridity.indices <- txeco.splash.30day %>%
+site.gs.aridity <- txeco.splash.30day %>%
   full_join(txeco.splash.60day) %>%
   full_join(txeco.splash.90day)
-
-
-## Write 30, 60, 90 day aridity index mean file
-write.csv(sites.aridity.indices, "../climate_data/TXeco_gsSiteAridity_SPLASH.csv",
-          row.names = FALSE)
 
 ###############################################################################
 ## Calculate normal site Priestley-Taylor coefficient and aridity
