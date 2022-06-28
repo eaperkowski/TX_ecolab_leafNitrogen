@@ -16,11 +16,8 @@ biomass <- read.csv("../data_sheets/TXeco_drybiomass.csv", na.strings = "NA")
 ##########################################################################
 ## Import soil data, spei data, site coord data, and species id data
 ##########################################################################
-spei <- read.csv("../data_sheets/TXeco_spei_data.csv", 
+clim <- read.csv("../climate_data/TXeco_climate_data.csv", 
                  stringsAsFactors = FALSE, na.strings = "NA")
-
-spei <- dplyr::select(spei, site:visit.type, norm.precip, norm.spei, 
-                      norm.aridity, month.precip, spei, aridity)
 
 site.coords <- read.csv("../data_sheets/TXeco_sitecoords.csv")
 
@@ -80,30 +77,32 @@ leaf <- biomass %>%
 
 ## Stopped here 03/10/2022 ##
 
-
+?separate
 
 # Separate site in leaf data.frame, merge with site.coords to get property name
-test <- leaf %>%
+full.df <- leaf %>%
   full_join(spp.info) %>%
   separate(id, c("year", "site", "visit.type", "rep")) %>%
   unite("site", year:site) %>%
   full_join(site.coords) %>%
   unite("site", site:visit.type) %>%
+  dplyr::select(-(X:X.4)) %>%
   full_join(soil) %>%
-  separate(site, c("sampling.year", "county", "visit.type")) %>%
+  separate(col = site, into = c("sampling.year", "county", "visit.type"), sep = "_") %>%
   dplyr::mutate(sampling.year = ifelse(sampling.year == "2020eco", 
                                 as.numeric("2020"), as.numeric("2021"))) %>%
   unite("id", county:rep, remove = FALSE) %>%
+  dplyr::mutate(visit.type = ifelse(visit.type == "i",
+                                    "initial", "primary")) %>%
   dplyr::select(site = property, id, sampling.year, visit.type, 
                 soil.pH:soil.potassium, total.leaf.area:pft) %>%
-  merge(spei, by = c("site", "sampling.year", "visit.type")) %>%
+  merge(clim, by = c("site", "sampling.year", "visit.type")) %>%
   group_by(site, sampling.year, id, visit.type, pft, photo, duration, n.fixer, 
            NCRS.code) %>%
   summarize_if(is.numeric, mean, na.rm = TRUE) %>%
   filter(pft != "c3_tree")
 
 ## Add chi column
-test$chi <- calc_chi(test$d13C, type = test$photo)
+full.df$chi <- calc_chi(full.df$d13C, type = full.df$photo)
 
-test
-write.csv(test, "../data_sheets/TXeco_compiled_datasheet.csv")
+write.csv(full.df, "../data_sheets/TXeco_compiled_datasheet.csv")
