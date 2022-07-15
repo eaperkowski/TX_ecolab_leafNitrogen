@@ -188,7 +188,6 @@ id,d13C,d15n,photo,id,coll.number,NCRS.code,family,growth.habit,duration,group,n
 2020eco_Sansaba_i_02,-25.52,-0.43,c3,Prosopis glandulosa,PRGL2,PRGL2,Fabaceae,tree,perennial,dicot,yes,legume
 2020eco_Sansaba_i_03,-30.63,-0.91,c3,Heterotheca canescens,HECA8,HECA8,Asteraceae,forb,perennial,dicot,no,c3_forb
 2020eco_Sansaba_i_04,-30.77,-0.7,c3,Heterotheca canescens,HECA8,HECA8,Asteraceae,forb,perennial,dicot,no,c3_forb
-2020eco_Sansaba_i_05,-13.89,3.31,,,,,,,,,,
 2020eco_Sansaba_i_06,-29.52,-2.44,c3,Asclepias asperula,ASAS,ASAS,Asclepiadaceae,forb,perennial,dicot,no,c3_forb
 2020eco_Sansaba_i_07,-30.35,-2.78,c3,Asclepias asperula,ASAS,ASAS,Asclepiadaceae,forb,perennial,dicot,no,c3_forb
 2020eco_Sansaba_i_08,-29.74,-2.74,c3,Asclepias asperula,ASAS,ASAS,Asclepiadaceae,forb,perennial,dicot,no,c3_forb
@@ -224,7 +223,6 @@ id,d13C,d15n,photo,id,coll.number,NCRS.code,family,growth.habit,duration,group,n
 2020eco_Uvalde_p_4a,-29.87,1.74,c3,Lolium perenne,LOPE,LOPE,Poaceae,graminoid,perennial,monocot,no,c3_graminoid
 2020eco_Uvalde_p_4b,-30.94,1.89,c3,Croton spp.,CRGLL,CRGLL,Euphorbiaceae,forb,annual,dicot,no,c3_forb
 2020eco_Uvalde_p_4c,-31.61,0.04,c3,Solanum elaeagnifolium,SOEL,SOEL,Solanaceae,forb,perennial,dicot,no,c3_forb
-2020eco_Uvalde_p_4d,,,c3,,,,,forb,,dicot,no,c3_forb
 2020eco_Uvalde_p_4e,-30.71,-2.05,c3,,,,,forb,,dicot,no,c3_forb
 2020eco_Uvalde_p_5a,-14.65,0.96,c4,Panicum virgatum L.,PAVI2,PAVI2,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
 2020eco_Uvalde_p_5b,-29.02,3.67,c3,Ruellia nudiflora,RUNU,RUNU,Acanthaceae,forb,perennial,dicot,no,c3_forb
