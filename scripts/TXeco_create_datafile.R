@@ -49,7 +49,7 @@ cn.plates <- lapply(file.list, read.csv, na.strings = "NA")
 cn.plates <- cn.plates %>%
   merge_all() %>%
   filter(sample.type == "unknown" & sample.id != "QC") %>%
-  select(id = sample.id, n.leaf = nitrogen.weight.percent, 
+  dplyr::select(id = sample.id, n.leaf = nitrogen.weight.percent, 
          c.leaf = carbon.weight.percent)
 
 ##########################################################################
@@ -72,12 +72,9 @@ leaf <- biomass %>%
   full_join(leaf.area) %>%
   full_join(cn.plates) %>%
   mutate(sla = (total.leaf.area / dry.wgt),
+         marea = 1/sla*10000,
          narea = (n.leaf/100) /sla * 10000,
          leaf.cn = c.leaf / n.leaf)
-
-## Stopped here 03/10/2022 ##
-
-?separate
 
 # Separate site in leaf data.frame, merge with site.coords to get property name
 full.df <- leaf %>%
@@ -94,7 +91,7 @@ full.df <- leaf %>%
   unite("id", county:rep, remove = FALSE) %>%
   dplyr::mutate(visit.type = ifelse(visit.type == "i",
                                     "initial", "primary")) %>%
-  dplyr::select(site = property, id, sampling.year, visit.type, 
+  dplyr::select(site = property, id, sampling.year, visit.type, elevation.m,
                 soil.pH:soil.potassium, total.leaf.area:pft) %>%
   merge(clim, by = c("site", "sampling.year", "visit.type")) %>%
   group_by(site, sampling.year, id, visit.type, pft, photo, duration, n.fixer, 
@@ -103,6 +100,9 @@ full.df <- leaf %>%
   filter(pft != "c3_tree")
 
 ## Add chi column
-full.df$chi <- calc_chi(full.df$d13C, type = full.df$photo)
+full.df$chi <- ifelse(full.df$pft == "c4_graminoid", 
+                      calc_chi_c4(full.df$d13C),
+                      calc_chi_c3(full.df$d13C))
+full.df$chi[full.df$chi < 0.2 | full.df$chi > 0.95] <- NA
 
 write.csv(full.df, "../data_sheets/TXeco_compiled_datasheet.csv")
