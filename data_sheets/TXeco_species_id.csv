@@ -339,7 +339,7 @@ id,d13C,d15n,photo,id,coll.number,NCRS.code,family,growth.habit,duration,group,n
 2021eco_Bell_p_3a,-30.65,3.48,c3,Ratibida columnifera,RACO3,RACO3,Asteraceae,forb,perennial,dicot,no,c3_forb
 2021eco_Bell_p_3b,-32.08,1.1,c3,Croton spp.,CRGLL,CRGLL,Euphorbiaceae,forb,annual,dicot,,c3_forb
 2021eco_Bell_p_3c,-30.98,3.17,c3,Glandularia goodingii,GLGO,GLGO,Verbenaceae,forb,perennial,dicot,no,c3_forb
-2021eco_Bell_p_3d,-21.5,-0.57,c3,Nassella leucotricha,NALE3,NALE3,Poaceae,graminoid,perennial,monocot,no,c3_graminoid
+2021eco_Bell_p_3d,-21.5,-0.57,c4,Aristida purpurea,ARPU9,ARPU9,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
 2021eco_Bell_p_4a,-30.06,-0.81,c3,Asclepias syriaca,ASSY,ASSY,Asclepiadaceae,forb,perennial,dicot,no,c3_forb
 2021eco_Bell_p_4b,-30.95,0.08,c3,Ratibida columnifera,RACO3,RACO3,Asteraceae,forb,perennial,dicot,no,c3_forb
 2021eco_Bell_p_4c,,,c3,Croton spp.,CRGLL,CRGLL,Euphorbiaceae,forb,annual,dicot,,c3_forb
@@ -347,7 +347,7 @@ id,d13C,d15n,photo,id,coll.number,NCRS.code,family,growth.habit,duration,group,n
 2021eco_Bell_p_4e,-32.12,-1.71,,Nassella leucotricha,NALE3,NALE3,Poaceae,graminoid,perennial,monocot,no,c3_graminoid
 2021eco_Bell_p_5a,-28.48,0.78,c3,Asclepias syriaca,ASSY,ASSY,Asclepiadaceae,forb,perennial,dicot,no,c3_forb
 2021eco_Bell_p_5b,-31.81,0.83,c3,Croton spp.,CRGLL,CRGLL,Euphorbiaceae,forb,annual,dicot,,c3_forb
-2021eco_Bell_p_5c,-20.23,-0.19,c3,Nassella leucotricha,NALE3,NALE3,Poaceae,graminoid,perennial,monocot,no,c3_graminoid
+2021eco_Bell_p_5c,-20.23,-0.19,c4,Aristida purpurea,ARPU9,ARPU9,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
 2021eco_Bell_p_snight1,-29.84,3.77,c3,Solanum elaeagnifolium,SOEL,SOEL,Solanaceae,forb,perennial,dicot,no,c3_forb
 2021eco_Bell_p_snight2,-29.65,5.75,c3,Solanum elaeagnifolium,SOEL,SOEL,Solanaceae,forb,perennial,dicot,no,c3_forb
 2021eco_Bell_p_snight3,-30.01,5.73,c3,Solanum elaeagnifolium,SOEL,SOEL,Solanaceae,forb,perennial,dicot,no,c3_forb
@@ -465,6 +465,7 @@ id,d13C,d15n,photo,id,coll.number,NCRS.code,family,growth.habit,duration,group,n
 2021eco_Fayette12_i_08,-28.6,0.98,c3,Prosopis glandulosa,PRGL2,PRGL2,Fabaceae,tree,perennial,dicot,yes,legume
 2021eco_Fayette12_i_09,-27.89,2.62,c3,Prosopis glandulosa,PRGL2,PRGL2,Fabaceae,tree,perennial,dicot,yes,legume
 2021eco_Fayette12_i_12,-18.21,4.69,c4,Sorghum halepense,SOHA,SOHA,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
+2021eco_Harri_p_5b,-30.2,-1.45,c3,Mimosa spp.,MIQU2,MIQU2,Fabaceae,forb,perennial,dicot,yes,legume
 2021eco_Harris_i_01,-31.92,0.24,c3,Ambrosia psilostachya,AMPS,AMPS,Asteraceae,forb,perennial,dicot,no,c3_forb
 2021eco_Harris_i_02,-31.34,0.83,c3,Ambrosia psilostachya,AMPS,AMPS,Asteraceae,forb,perennial,dicot,no,c3_forb
 2021eco_Harris_i_03,-32.33,1.76,c3,Ambrosia psilostachya,AMPS,AMPS,Asteraceae,forb,perennial,dicot,no,c3_forb
@@ -489,7 +490,6 @@ id,d13C,d15n,photo,id,coll.number,NCRS.code,family,growth.habit,duration,group,n
 2021eco_Harris_p_4a,-12.4,1.17,c4,Sorghum halepense,SOHA,SOHA,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
 2021eco_Harris_p_4b,-13.05,2.09,c4,Cynodon dactylon,CYDA,CYDA,Poaceae,graminoid,perennial,monocot,no,c3_graminoid
 2021eco_Harris_p_5a,-13.44,5.92,c4,Cynodon dactylon,CYDA,CYDA,Poaceae,graminoid,perennial,monocot,no,c3_graminoid
-2021eco_Harri_p_5b,-30.2,-1.45,c3,Mimosa spp.,MIQU2,MIQU2,Fabaceae,forb,perennial,dicot,yes,legume
 2021eco_Harris_p_5c,-30.16,-2.1,c3,Rhynchosia americana,RHAM,RHAM,Fabaceae,forb,perennial,dicot,yes,legume
 2021eco_Harris_p_5d,-12.39,5.46,c4,Sorghum halepense,SOHA,SOHA,Poaceae,graminoid,perennial,monocot,no,c4_graminoid
 2021eco_Hays_i_01,-30.43,7,c3,Solanum elaeagnifolium,SOEL,SOEL,Solanaceae,forb,perennial,dicot,no,c3_forb
