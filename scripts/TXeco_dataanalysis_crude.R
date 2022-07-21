@@ -22,6 +22,11 @@ df$narea.chi <- df$narea / df$chi
 ## Add colorblind friendly palette
 cbbPalette <- c("#DDAA33", "#BB5566", "#004488", "#555555", "#FFFFFF")
 
+## Figure out sample sizes within each pft class
+length(df$pft[df$pft == "c3_graminoid"])
+length(df$pft[df$pft == "c4_graminoid"])
+length(df$pft[df$pft == "legume"])
+length(df$pft[df$pft == "c3_forb"])
 
 ##########################################################################
 ## Coarse lmer for Narea
@@ -95,14 +100,14 @@ narea.ai90 <- ggplot(data = subset(df, pft != "c3_shrub"),
                      labels = c(expression("C"[3]~"forb"),
                                 expression("C"[3]~"graminoid"),
                                 expression("C"[4]~"graminoid"),
-                                expression("legume"))) +
+                                expression("C"[3]~"legume"))) +
   scale_fill_manual(values = cbbPalette, 
                     labels = c(expression("C"[3]~"forb"),
                                expression("C"[3]~"graminoid"),
                                expression("C"[4]~"graminoid"),
-                               expression("legume"))) +
+                               expression("C"[3]~"legume"))) +
   labs(x = expression("AI"["90"]),
-       y = expression(log~"(N"[area]~")"),
+       y = expression(ln~"(N"[area]~")"),
        fill = "Plant functional type",
        shape = "Plant functional type") +
   theme_bw(base_size = 24) +
@@ -134,14 +139,14 @@ narea.ai15yr<- ggplot(data = subset(df, pft != "c3_shrub"),
                      labels = c(expression("C"[3]~"forb"),
                                 expression("C"[3]~"graminoid"),
                                 expression("C"[4]~"graminoid"),
-                                expression("legume"))) +
+                                expression("C"[3]~"legume"))) +
   scale_fill_manual(values = cbbPalette, 
                     labels = c(expression("C"[3]~"forb"),
                                expression("C"[3]~"graminoid"),
                                expression("C"[4]~"graminoid"),
-                               expression("legume"))) +
+                               expression("C"[3]~"legume"))) +
   labs(x = expression("AI"["2006_2020"]),
-       y = expression(log~"(N"[area]~")"),
+       y = expression(ln~"(N"[area]~")"),
        fill = "Plant functional type",
        shape = "Plant functional type") +
   theme_bw(base_size = 24) +
@@ -173,14 +178,14 @@ narea.soiln <- ggplot(data = subset(df, pft != "c3_shrub"),
                      labels = c(expression("C"[3]~"forb"),
                                 expression("C"[3]~"graminoid"),
                                 expression("C"[4]~"graminoid"),
-                                expression("legume"))) +
+                                expression("C"[3]~"legume"))) +
   scale_fill_manual(values = cbbPalette, 
                     labels = c(expression("C"[3]~"forb"),
                                expression("C"[3]~"graminoid"),
                                expression("C"[4]~"graminoid"),
-                               expression("legume"))) +
+                               expression("C"[3]~"legume"))) +
   labs(x = expression("Soil N (ppm NO"[3]~"- N)"),
-       y = expression(log~"(N"[area]~")"),
+       y = expression(ln~"(N"[area]~")"),
        fill = "Plant functional type",
        shape = "Plant functional type") +
   theme_bw(base_size = 24) +
@@ -220,10 +225,12 @@ r.squaredGLMM(nmass)
 # Pairwise comparisons
 # Individual effects
 test(emtrends(nmass, ~1, "ai.15yr"))
+emmeans(nmass, ~1, "ai.15yr", at = list(ai.15yr = 0))
+
 test(emtrends(nmass, ~1, "ai.90"))
+emmeans(nmass, ~1, "ai.90", at = list(ai.90 = 0))
+
 test(emtrends(nmass, ~1, "soil.no3n"))
-
-
 test(emtrends(nmass, ~pft, "ai.15yr"))
 
 # Two-way interaction between ai.90 and soil.no3n
@@ -232,115 +239,126 @@ test(emtrends(nmass, ~soil.no3n, "ai.90",
 emmeans(nmass, ~soil.no3n*pft, "ai.90", 
         at = list(soil.no3n = c(0, 10, 20, 40, 80), ai.90 = 0))
 
-## Test ai.90 trend within eaft pft, averaged across soil N levels
-test(emtrends(nmass, ~pft, "ai.90"))
-emmeans(nmass, ~pft, "ai.90", at = list(ai.90 = 0))
+## Test ai.15yr trend within eaft pft, averaged across soil N levels
+test(emtrends(nmass, ~pft, "ai.15yr"))
+emmeans(nmass, ~pft, "ai.15yr", at = list(ai.15yr = 0))
 
-
-## Narea plot for legume
-nmass.leg <- ggplot(data = subset(df, pft == "legume"),
-                    aes(x = ai.90, y = log(n.leaf))) +
-  geom_point(size = 3, shape = 21, fill = "grey", alpha = 0.7) +
-  # stat_function(fun = function(x) 0.070*x + 1.016,
-  #               lwd = 2, lty = 2) +
-  # stat_function(aes(color = "0"), fun = function(x) -0.050*x + 1.040,
-  #               lwd = 2, lty = 2, alpha = 0.5) +
-  # stat_function(aes(color = "10"), fun = function(x) 0.012*x + 1.028,
-  #               lwd = 2, lty = 2, alpha = 0.5) + 
-  # stat_function(aes(color = "20"), fun = function(x) 0.073*x + 1.015,
-  #               lwd = 2, lty = 2, alpha = 0.5) +
-  # stat_function(aes(color = "40"), fun = function(x) 0.197*x + 0.991,
-  #               lwd = 2, lty = 2, alpha = 0.5) +
-  # stat_function(aes(color = "80"), fun = function(x) 0.444*x + 0.943,
-  #               lwd = 2, lty = 2, alpha = 0.5) +
-  scale_y_continuous(limits = c(0, 3), breaks = seq(0, 3, 1)) +
-  scale_x_continuous(limits = c(0.25, 1.5), breaks = seq(0.25, 1.5, 0.25)) +
+# Plots
+nmass.ai90 <- ggplot(data = subset(df, pft != "c3_shrub"),
+                     aes(x = ai.90, y = log(n.leaf))) +
+  geom_jitter(aes(shape = pft, fill = pft), width = 0.02, size = 3, alpha = 0.7) +
+   stat_function(fun = function(x) 0.308*x + 0.425, lwd = 2,
+                 xlim = c(0.3, 1.5)) +  
+  # stat_function(aes(color = "c3_forb"), 
+  #               fun = function(x) *x +, lwd = 2, alpha = 0.7,
+  #               xlim = c(0.3, 1.5), lty = 2) +
+  # stat_function(aes(color = "c3_graminoid"), 
+  #               fun = function(x) *x +, lwd = 2, alpha = 0.7,
+  #               xlim = c(0.3, 1.5), lty = 2) +
+  # stat_function(aes(color = "c4_graminoid"), 
+  #               fun = function(x) *x -, lwd = 2, alpha = 0.7,
+  #               xlim = c(0.3, 1.5), lty = 2) +
+  # stat_function(aes(color = "legume"), 
+  #               fun = function(x) *x +, lwd = 2, alpha = 0.7,
+  #               xlim = c(0.3, 1.5)) +
+  scale_y_continuous(limits = c(-1, 3), breaks = seq(-1, 3, 1)) +
+  scale_x_continuous(limits = c(0.3, 1.5), breaks = seq(0.3, 1.5, 0.3)) +
   scale_color_manual(values = cbbPalette) +
-  labs(title = expression(bold("Legume")),
-       x = expression("AI"["90_day"]),
-       y = expression(log~"(N"[mass]~")"),
-       color = expression("Soil N (ppm NO"[3]~"-N)")) +
-  theme_bw(base_size = 18) +
-  theme(title = element_text(size = 16)) +
-  guides(color = guide_legend(override.aes = list(alpha = 0.1)))
+  scale_shape_manual(values = c(21, 22, 23, 24),
+                     labels = c(expression("C"[3]~"forb"),
+                                expression("C"[3]~"graminoid"),
+                                expression("C"[4]~"graminoid"),
+                                expression("legume"))) +
+  scale_fill_manual(values = cbbPalette, 
+                    labels = c(expression("C"[3]~"forb"),
+                               expression("C"[3]~"graminoid"),
+                               expression("C"[4]~"graminoid"),
+                               expression("legume"))) +
+  labs(x = expression("AI"["90"]),
+       y = expression(ln~"(N"[mass]~")"),
+       fill = "Plant functional type",
+       shape = "Plant functional type") +
+  theme_bw(base_size = 24) +
+  theme(legend.text.align = 0) +
+  guides(color = "none")
 
-nmass.forb <- ggplot(data = subset(df, pft == "c3_forb"),
-                     aes(x = ai.90, y = log(narea))) +
-  geom_point(size = 3, shape = 21, fill = "grey", alpha = 0.7) +
-  stat_function(fun = function(x) 0.539*x + 0.397,
-                lwd = 2) +
-  stat_function(aes(color = "0"), fun = function(x) 1.133*x - 0.141,
-                lwd = 2, alpha = 0.5) +
-  stat_function(aes(color = "10"), fun = function(x) 0.827*x + 0.136,
-                lwd = 2, alpha = 0.5) + 
-  stat_function(aes(color = "20"), fun = function(x) 0.522*x + 0.413,
-                lwd = 2, alpha = 0.5) +
-  stat_function(aes(color = "40"), fun = function(x) -0.089*x + 0.967,
-                lwd = 2, lty = 2, alpha = 0.5) +
-  stat_function(aes(color = "80"), fun = function(x) -1.312*x + 2.075,
-                lwd = 2, alpha = 0.5) +
-  scale_y_continuous(limits = c(0, 3), breaks = seq(0, 3, 1)) +
-  scale_x_continuous(limits = c(0.25, 1.5), breaks = seq(0.25, 1.5, 0.25)) +
+## Normal aridity index
+nmass.ai15yr<- ggplot(data = subset(df, pft != "c3_shrub"),
+                      aes(x = ai.15yr, y = log(n.leaf))) +
+  geom_jitter(aes(shape = pft, fill = pft), width = 0.02, size = 3, alpha = 0.7) +
+  stat_function(fun = function(x) -1.261*x + 1.398, lwd = 2,
+                xlim = c(0.36, 1)) +  
+  stat_function(aes(color = "c3_forb"), 
+                fun = function(x) -1.190*x + 1.480, lwd = 2, alpha = 0.7,
+                xlim = c(0.36, 1)) +
+  stat_function(aes(color = "c3_graminoid"), 
+                fun = function(x) -2.688*x + 2.026, lwd = 2, alpha = 0.7,
+                xlim = c(0.36, 1), lty = 2) +
+  stat_function(aes(color = "c4_graminoid"), 
+                fun = function(x) -1.364*x + 1.137, lwd = 2, alpha = 0.7,
+                xlim = c(0.36, 1)) +
+  stat_function(aes(color = "legume"), 
+                fun = function(x) 0.197*x + 0.948, lwd = 2, alpha = 0.7,
+                xlim = c(0.36, 1), lty = 2) +
+  scale_y_continuous(limits = c(-1, 2), breaks = seq(-1, 2, 1)) +
+  scale_x_continuous(limits = c(0.36, 1), breaks = seq(0.36, 1, 0.16)) +
   scale_color_manual(values = cbbPalette) +
-  labs(title = expression(bold("C"[3]~"forb")),
-       x = expression("AI"["90_day"]),
-       y = expression(log~"(N"[mass]~")"),
-       color = expression("Soil N (ppm NO"[3]~"-N)")) +
-  theme_bw(base_size = 18) +
-  theme(title = element_text(size = 16)) +
-  guides(color = guide_legend(override.aes = list(alpha = 0.1)))
+  scale_shape_manual(values = c(21, 22, 23, 24),
+                     labels = c(expression("C"[3]~"forb"),
+                                expression("C"[3]~"graminoid"),
+                                expression("C"[4]~"graminoid"),
+                                expression("legume"))) +
+  scale_fill_manual(values = cbbPalette, 
+                    labels = c(expression("C"[3]~"forb"),
+                               expression("C"[3]~"graminoid"),
+                               expression("C"[4]~"graminoid"),
+                               expression("legume"))) +
+  labs(x = expression("AI"["2006_2020"]),
+       y = expression(ln~"(N"[mass]~")"),
+       fill = "Plant functional type",
+       shape = "Plant functional type") +
+  theme_bw(base_size = 24) +
+  theme(legend.text.align = 0) +
+  guides(color = "none")
 
-nmass.c3gram <- ggplot(data = subset(df, pft == "c3_graminoid"),
-                       aes(x = ai.90, y = log(narea))) +
-  geom_point(size = 3, shape = 21, fill = "grey", alpha = 0.7) +
-  # stat_function(fun = function(x) 0.100*x + 0.360,
-  #               lwd = 2, lty = 2) +
-  # stat_function(aes(color = "0"), fun = function(x) 1.451*x - 0.770,
-  #               lwd = 2, alpha = 0.5) +
-  # stat_function(aes(color = "10"), fun = function(x) 0.756*x - 0.188,
-  #               lwd = 2, alpha = 0.5) + 
-  # stat_function(aes(color = "20"), fun = function(x) 0.060*x + 0.394,
-  #               lwd = 2, alpha = 0.5) +
-  # stat_function(aes(color = "40"), fun = function(x) -1.332*x + 1.578,
-  #               lwd = 2, lty = 2, alpha = 0.5) +
-  # stat_function(aes(color = "80"), fun = function(x) -4.115*x + 3.886,
-  #               lwd = 2, lty = 2, alpha = 0.5) +
-scale_y_continuous(limits = c(0, 3), breaks = seq(0, 3, 1)) +
-  scale_x_continuous(limits = c(0.25, 1.5), breaks = seq(0.25, 1.5, 0.25)) +
+# Soil N
+nmass.soiln <- ggplot(data = subset(df, pft != "c3_shrub"),
+                      aes(x = soil.no3n, y = log(nmass))) +
+  geom_jitter(aes(shape = pft, fill = pft), width = 0.005, size = 3, alpha = 0.7) +
+  stat_function(fun = function(x) 0.005*x + 0.513, lwd = 2,
+                xlim = c(0, 80)) +  
+  stat_function(aes(color = "c3_forb"), 
+                fun = function(x) 0.001*x + 0.655, lwd = 2, alpha = 0.7,
+                lty = 2, xlim = c(0, 80)) +
+  stat_function(aes(color = "c3_graminoid"), 
+                fun = function(x) 0.007*x + 0.315, lwd = 2, alpha = 0.7,
+                lty = 2, xlim = c(0, 80)) +
+  stat_function(aes(color = "c4_graminoid"), 
+                fun = function(x) 0.002*x + 0.122, lwd = 2, alpha = 0.7,
+                lty = 2, xlim = c(0, 80)) +
+  stat_function(aes(color = "legume"), 
+                fun = function(x) 0.008*x + 0.961, lwd = 2,
+                xlim = c(0, 80)) +
+  scale_y_continuous(limits = c(-1, 3), breaks = seq(-1, 3, 1)) +
+  scale_x_continuous(limits = c(0, 80), breaks = seq(0, 80, 20)) +
   scale_color_manual(values = cbbPalette) +
-  labs(title = expression(bold("C"[3]~"graminoid")),
-       x = expression("AI"["90_day"]),
-       y = expression(log~"(N"[mass]~")"),
-       color = expression("Soil N (ppm NO"[3]~"-N)")) +
-  theme_bw(base_size = 18) +
-  theme(title = element_text(size = 16)) +
-  guides(color = guide_legend(override.aes = list(alpha = 0.1)))
-
-nmass.c4gram <- ggplot(data = subset(df, pft == "c4_graminoid"),
-                       aes(x = ai.90, y = log(narea))) +
-  geom_point(size = 3, shape = 21, fill = "grey", alpha = 0.7) +
-  stat_function(fun = function(x) 0.687*x - 0.164,
-                lwd = 2) +
-  stat_function(aes(color = "0"), fun = function(x) 0.569*x - 0.199,
-                lwd = 2, alpha = 0.5) +
-  stat_function(aes(color = "10"), fun = function(x) 0.630*x - 0.181,
-                lwd = 2, alpha = 0.5) + 
-  stat_function(aes(color = "20"), fun = function(x) 0.691*x - 0.163,
-                lwd = 2, alpha = 0.5) +
-  stat_function(aes(color = "40"), fun = function(x) 0.813*x - 0.126,
-                lwd = 2, lty = 2, alpha = 0.5) +
-  stat_function(aes(color = "80"), fun = function(x) 1.056*x - 0.053,
-                lwd = 2, lty = 2, alpha = 0.5) +
-  scale_y_continuous(limits = c(0, 3), breaks = seq(0, 3, 1)) +
-  scale_x_continuous(limits = c(0.25, 1.5), breaks = seq(0.25, 1.5, 0.25)) +
-  scale_color_manual(values = cbbPalette) +
-  labs(title = expression(bold("C"[4]~"graminoid")),
-       x = expression("AI"["90_day"]),
-       y = expression(log~"(N"[area]~")"),
-       color = expression("Soil N (ppm NO"[3]~"-N)")) +
-  theme_bw(base_size = 18) +
-  theme(title = element_text(size = 16)) +
-  guides(color = guide_legend(override.aes = list(alpha = 0.1)))
+  scale_shape_manual(values = c(21, 22, 23, 24),
+                     labels = c(expression("C"[3]~"forb"),
+                                expression("C"[3]~"graminoid"),
+                                expression("C"[4]~"graminoid"),
+                                expression("legume"))) +
+  scale_fill_manual(values = cbbPalette, 
+                    labels = c(expression("C"[3]~"forb"),
+                               expression("C"[3]~"graminoid"),
+                               expression("C"[4]~"graminoid"),
+                               expression("legume"))) +
+  labs(x = expression("Soil N (ppm NO"[3]~"- N)"),
+       y = expression(ln~"(N"[mass]~")"),
+       fill = "Plant functional type",
+       shape = "Plant functional type") +
+  theme_bw(base_size = 24) +
+  theme(legend.text.align = 0) +
+  guides(color = "none")
 
 png("../working_drafts/TXeco_Nmass.png",
     width = 10, height = 8, units = 'in', res = 600)
@@ -352,9 +370,9 @@ dev.off()
 ##########################################################################
 ## Coarse lmer for sla
 ##########################################################################
-df$sla[c(20, 21, 196, 235)] <- NA
+df$marea[c(20, 21, 244, 299)] <- NA
 
-marea <- lmer(log(lma * 10000) ~ (ai.90 + ai.15yr) * soil.no3n * pft + (1 | NCRS.code),
+marea <- lmer(log(marea) ~ (ai.90 + ai.15yr) * soil.no3n * pft + (1 | NCRS.code),
               data = subset(df, pft != "c3_shrub"))
 
 # Check model assumptions
@@ -371,96 +389,34 @@ Anova(marea)
 r.squaredGLMM(marea)
 
 # Pairwise comparisons
-test(emtrends(marea, ~soil.no3n*pft, "ai.90", at = list(soil.no3n = c(0, 20, 40, 60))))
+test(emtrends(marea, ~1, "ai.90"))
 
-emmeans(marea, ~soil.no3n*pft, "ai.90", at = list(soil.no3n = c(0, 20, 40, 60),
-                                                  ai.90 = 0))
+## Two way interaction between ai.90 and soil.no3n
+test(emtrends(marea, ~soil.no3n, "ai.90", at = list(soil.no3n = c(0, 10, 20, 40, 80))))
+emmeans(marea, ~soil.no3n, "ai.90", at = list(soil.no3n = c(0, 10, 20, 40, 80),
+                                              ai.90 = 0))
+
+## Two way interaction between ai.90 and pft
+test(emtrends(marea, ~pft, "ai.90"))
+emmeans(marea, ~soil.no3n, "ai.90", at = list(soil.no3n = c(0, 10, 20, 40, 80),
+                                              ai.90 = 0))
+
+## Two way interaction between ai.15yr and pft
+test(emtrends(marea, ~pft, "ai.15yr"))
+emmeans(marea, ~soil.no3n, "ai.15yr", at = list(soil.no3n = c(0, 10, 20, 40, 80),
+                                              ai.90 = 0))
+
+## Two way interaction between soil.no3n and pft
+test(emtrends(marea, ~pft, "soil.no3n"))
+emmeans(marea, ~soil.no3n, "ai.15yr", at = list(soil.no3n = c(0, 10, 20, 40, 80),
+                                                ai.90 = 0))
 
 
-## Narea plot for legume
-marea.leg <- ggplot(data = subset(df, pft == "legume"),
-                    aes(x = ai.90, y = lma * 10000)) +
-  geom_point(size = 3, shape = 21, fill = "grey", alpha = 0.7) +
-  stat_function(aes(color = "0"), fun = function(x) exp(-1.818*x + 5.799),
-                lwd = 2, alpha = 0.7) +
-  stat_function(aes(color = "20"), fun = function(x) exp(-1.662*x + 5.790),
-                lwd = 2, alpha = 0.7) +
-  stat_function(aes(color = "40"), fun = function(x) exp(-1.506*x + 5.780),
-                lwd = 2, lty = 2, alpha = 0.7) +
-  stat_function(aes(color = "60"), fun = function(x) exp(-1.350*x + 5.771),
-                lwd = 2, lty = 2, alpha = 0.7) +
-  scale_y_continuous(limits = c(0, 210), breaks = seq(0, 210, 70)) +
-  scale_x_continuous(limits = c(0.25, 1.5), breaks = seq(0.25, 1.5, 0.25)) +
-  scale_color_brewer(palette = "Spectral") +
-  labs(title = "Legume",
-       x = expression("AI"["90_day"]),
-       y = expression("M"[area]~"(g m"^-2~")"),
-       color = "Soil N (ppm NO3-N)") +
-  theme_bw(base_size = 18)
 
-marea.forb <- ggplot(data = subset(df, pft == "c3_forb"),
-                     aes(x = ai.90, y = lma * 10000)) +
-  geom_point(size = 3, shape = 21, fill = "grey", alpha = 0.7) +
-  stat_function(aes(color = "0"), fun = function(x) exp(-0.784*x + 5.198),
-                lwd = 2, alpha = 0.7) +
-  stat_function(aes(color = "20"), fun = function(x) exp(-0.292*x + 4.730),
-                lwd = 2, lty = 2, alpha = 0.7) +
-  stat_function(aes(color = "40"), fun = function(x) exp(0.201*x + 4.261),
-                lwd = 2, lty = 2, alpha = 0.7) +
-  stat_function(aes(color = "60"), fun = function(x) exp(0.694*x + 3.792),
-                lwd = 2, alpha = 0.7) +
-  scale_y_continuous(limits = c(0, 210), breaks = seq(0, 210, 70)) +
-  scale_x_continuous(limits = c(0.25, 1.5), breaks = seq(0.25, 1.5, 0.25)) +
-  scale_color_brewer(palette = "Spectral") +
-  labs(title = expression("C"[3]~"forb"),
-       x = expression("AI"["90_day"]),
-       y = expression("M"[area]~"(g m"^-2~")"),
-       color = "Soil N (ppm NO3-N)") +
-  theme_bw(base_size = 18)
-
-marea.c3gram <- ggplot(data = subset(df, pft == "c3_graminoid"),
-                       aes(x = ai.90, y = lma * 10000)) +
-  geom_point(size = 3, shape = 21, fill = "grey", alpha = 0.7) +
-  stat_function(aes(color = "0"), fun = function(x) exp(-0.226*x + 4.904),
-                lwd = 2, lty = 2, alpha = 0.7) +
-  stat_function(aes(color = "20"), fun = function(x) exp(0.905*x + 4.142),
-                lwd = 2, lty = 2, alpha = 0.7) +
-  stat_function(aes(color = "40"), fun = function(x) exp(2.035*x + 3.380),
-                lwd = 2, lty = 2, alpha = 0.7) +
-  stat_function(aes(color = "60"), fun = function(x) exp(3.165*x + 2.618),
-                lwd = 2, lty = 2, alpha = 0.7) +
-  scale_y_continuous(limits = c(0, 300), breaks = seq(0, 300, 60)) +
-  scale_x_continuous(limits = c(0.25, 1.5), breaks = seq(0.25, 1.5, 0.25)) +
-  scale_color_brewer(palette = "Spectral") +
-  labs(title = expression("C"[3]~"graminoid"),
-       x = expression("AI"["90_day"]),
-       y = expression("M"[area]~"(g m"^-2~")"),
-       color = "Soil N (ppm NO3-N)") +
-  theme_bw(base_size = 18)
-
-marea.c4gram <- ggplot(data = subset(df, pft == "c4_graminoid"),
-                       aes(x = ai.90, y = lma * 10000)) +
-  geom_point(size = 3, shape = 21, fill = "grey", alpha = 0.7) +
-  stat_function(aes(color = "0"), fun = function(x) exp(-0.843*x + 5.098),
-                lwd = 2, alpha = 0.7) +
-  stat_function(aes(color = "20"), fun = function(x) exp(0.077*x + 4.385),
-                lwd = 2, lty = 2, alpha = 0.7) +
-  stat_function(aes(color = "40"), fun = function(x) exp(0.998*x + 3.671),
-                lwd = 2, lty = 2, alpha = 0.7) +
-  stat_function(aes(color = "60"), fun = function(x) exp(1.919*x + 2.958),
-                lwd = 2, alpha = 0.7) +
-  scale_y_continuous(limits = c(0, 300), breaks = seq(0, 300, 60)) +
-  scale_x_continuous(limits = c(0.25, 1.5), breaks = seq(0.25, 1.5, 0.25)) +
-  scale_color_brewer(palette = "Spectral") +
-  labs(title = expression("C"[4]~"graminoid"),
-       x = expression("AI"["90_day"]),
-       y = expression("M"[area]~"(g m"^-2~")"),
-       color = "Soil N (ppm NO3-N)") +
-  theme_bw(base_size = 18)
 
 png("../working_drafts/TXeco_Marea.png",
     width = 10, height = 8, units = 'in', res = 600)
-ggarrange(marea.leg, marea.forb, marea.c3gram, marea.c4gram,
+ggarrange(
           nrow = 2, ncol = 2, common.legend = TRUE, legend = "right", 
           align = "hv", labels = "AUTO")
 dev.off()
@@ -468,8 +424,7 @@ dev.off()
 ##########################################################################
 ## Coarse lmer for chi
 ##########################################################################
-df$chi[c(71, 233, 240, 249, 396, 402)] <- NA
-df$chi[df$pft == "c3_graminoid" & df$chi < 0.5] <- NA
+df$chi[c(71, 93, 293, 301, 324, 426, 505, 506, 507, 508, 527, 534)] <- NA
 
 chi <- lmer(chi ~ (ai.90 + ai.15yr) * soil.no3n * pft + (1 | NCRS.code),
               data = subset(df, pft != "c3_shrub"))
@@ -487,94 +442,16 @@ summary(chi)
 Anova(chi)
 r.squaredGLMM(chi)
 
+test(emtrends(chi, ~soil.no3n*pft, "ai.90", at = list(soil.no3n = c(0, 10, 20, 40, 80))))
+
 
 # Pairwise comparisons
-test(emtrends(chi, ~soil.no3n*pft, "ai.90", at = list(soil.no3n = c(0, 20, 40, 60))))
+test(emtrends(chi, ~soil.no3n*pft, "ai.90", 
+              at = list(soil.no3n = c(0, 20, 40, 60))))
 
 emmeans(chi, ~soil.no3n*pft, "ai.90", at = list(soil.no3n = c(0, 20, 40, 60),
                                                   ai.90 = 0))
 
-
-## Chi plot for legume
-chi.leg <- ggplot(data = subset(df, pft == "legume"),
-                    aes(x = ai.90, y = chi)) +
-  geom_point(size = 3, shape = 21, fill = "grey", alpha = 0.7) +
-  stat_function(aes(color = "0"), fun = function(x) 0.269*x + 0.600,
-                lwd = 2, alpha = 0.7) +
-  stat_function(aes(color = "20"), fun = function(x) 0.161*x + 0.670,
-                lwd = 2, alpha = 0.7) +
-  stat_function(aes(color = "40"), fun = function(x) 0.053*x + 0.741,
-                lwd = 2, lty = 2, alpha = 0.7) +
-  stat_function(aes(color = "60"), fun = function(x) -0.055*x + 0.811,
-                lwd = 2, lty = 2, alpha = 0.7) +
-  scale_y_continuous(limits = c(0.6, 1), breaks = seq(0.6, 1, 0.1)) +
-  scale_x_continuous(limits = c(0.25, 1.5), breaks = seq(0.25, 1.5, 0.25)) +
-  scale_color_brewer(palette = "Spectral") +
-  labs(title = "Legume",
-       x = expression("AI"["90_day"]),
-       y = expression("M"[area]~"(g m"^-2~")"),
-       color = "Soil N (ppm NO3-N)") +
-  theme_bw(base_size = 18)
-
-chi.forb <- ggplot(data = subset(df, pft == "c3_forb"),
-                     aes(x = ai.90, y = chi)) +
-  geom_point(size = 3, shape = 21, fill = "grey", alpha = 0.7) +
-  stat_function(aes(color = "0"), fun = function(x) 0.042*x + 0.779,
-                lwd = 2, lty = 2, alpha = 0.7) +
-  stat_function(aes(color = "20"), fun = function(x) 0.058*x + 0.768,
-                lwd = 2, alpha = 0.7) +
-  stat_function(aes(color = "40"), fun = function(x) 0.074*x + 0.757,
-                lwd = 2, alpha = 0.7) +
-  stat_function(aes(color = "60"), fun = function(x) 0.090*x + 0.746,
-                lwd = 2, lty = 2, alpha = 0.7) +
-  scale_y_continuous(limits = c(0.6, 1), breaks = seq(0.6, 1, 0.1)) +
-  scale_x_continuous(limits = c(0.25, 1.5), breaks = seq(0.25, 1.5, 0.25)) +
-  scale_color_brewer(palette = "Spectral") +
-  labs(title = expression("C"[3]~"forb"),
-       x = expression("AI"["90_day"]),
-       y = expression("M"[area]~"(g m"^-2~")"),
-       color = "Soil N (ppm NO3-N)") +
-  theme_bw(base_size = 18)
-
-chi.c3gram <- ggplot(data = subset(df, pft == "c3_graminoid"),
-                       aes(x = ai.90, y = chi)) +
-  geom_point(size = 3, shape = 21, fill = "grey", alpha = 0.7) +
-  stat_function(aes(color = "0"), fun = function(x) -0.968*x + 1.289,
-                lwd = 2, alpha = 0.7) +
-  stat_function(aes(color = "20"), fun = function(x) 0.395*x + 0.382,
-                lwd = 2, lty = 2, alpha = 0.7) +
-  stat_function(aes(color = "40"), fun = function(x) 1.759*x - 0.524,
-                lwd = 2, alpha = 0.7) +
-  stat_function(aes(color = "60"), fun = function(x) 3.123*x - 1.431,
-                lwd = 2, alpha = 0.7) +
-  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.25)) +
-  scale_x_continuous(limits = c(0.25, 1.5), breaks = seq(0.25, 1.5, 0.25)) +
-  scale_color_brewer(palette = "Spectral") +
-  labs(title = expression("C"[3]~"graminoid"),
-       x = expression("AI"["90_day"]),
-       y = expression("M"[area]~"(g m"^-2~")"),
-       color = "Soil N (ppm NO3-N)") +
-  theme_bw(base_size = 18)
-
-chi.c4gram <- ggplot(data = subset(df, pft == "c4_graminoid"),
-                       aes(x = ai.90, y = chi)) +
-  geom_point(size = 3, shape = 21, fill = "grey", alpha = 0.7) +
-  stat_function(aes(color = "0"), fun = function(x) -0.095*x + 0.105,
-                lwd = 2, alpha = 0.7) +
-  stat_function(aes(color = "20"), fun = function(x) 0.132*x - 0.059,
-                lwd = 2, alpha = 0.7) +
-  stat_function(aes(color = "40"), fun = function(x) 0.359*x - 0.223,
-                lwd = 2, alpha = 0.7) +
-  stat_function(aes(color = "60"), fun = function(x) 0.586*x - 0.387,
-                lwd = 2, alpha = 0.7) +
-  scale_y_continuous(limits = c(0, 0.4), breaks = seq(0, 0.4, 0.1)) +
-  scale_x_continuous(limits = c(0.25, 1.5), breaks = seq(0.25, 1.5, 0.25)) +
-  scale_color_brewer(palette = "Spectral") +
-  labs(title = expression("C"[4]~"graminoid"),
-       x = expression("AI"["90_day"]),
-       y = expression("M"[area]~"(g m"^-2~")"),
-       color = "Soil N (ppm NO3-N)") +
-  theme_bw(base_size = 18)
 
 png("../working_drafts/TXeco_chi.png",
     width = 10, height = 8, units = 'in', res = 600)
@@ -583,18 +460,9 @@ ggarrange(chi.leg, chi.forb, chi.c3gram, chi.c4gram,
           align = "hv", labels = "AUTO")
 dev.off()
 
-
-
-
-
-
-
-
 ##########################################################################
 ## Coarse lmer for narea:chi
 ##########################################################################
-df$narea.chi[c(18, 52, 54, 235, 271, 308, 321, 325, 403, 464)] <- NA
-
 chi <- lmer(log(narea.chi) ~ (ai.90 + ai.15yr) * soil.no3n * pft + (1 | NCRS.code),
             data = subset(df, pft != "c3_shrub"))
 
@@ -616,86 +484,6 @@ test(emtrends(chi, ~soil.no3n*pft, "ai.90", at = list(soil.no3n = c(0, 10, 20, 3
 emmeans(chi, ~soil.no3n*pft, "ai.90", at = list(soil.no3n = c(0, 10, 20, 30),
                                                 ai.90 = 0))
 
-## Narea:chi plot for legume
-narea.chi.leg <- ggplot(data = subset(df, pft == "legume"),
-                        aes(x = ai.90, y = log(narea.chi))) +
-  geom_point(size = 3, shape = 21, fill = "grey", alpha = 0.7) +
-  stat_function(aes(color = "0"),
-                fun = function(x) -2.078*x + 2.700, lwd = 2, alpha = 0.7) +
-  stat_function(aes(color = "10"),
-                fun = function(x) -1.824*x + 2.598, lwd = 2, alpha = 0.7) +
-  stat_function(aes(color = "20"),
-                fun = function(x) -1.570*x + 2.495, lwd = 2, alpha = 0.7) +
-  stat_function(aes(color = "30"),
-                fun = function(x) -1.316*x + 2.393, lwd = 2, lty = 2, alpha = 0.7) +
-  scale_y_continuous(limits = c(0, 3), breaks = seq(0, 3, 0.6)) +
-  scale_x_continuous(limits = c(0.25, 1.5), breaks = seq(0.25, 1.5, 0.25)) +
-  scale_color_brewer(palette = "Spectral") +
-  labs(title = "Legume",
-       x = expression("AI"["90_day"]),
-       y = expression(log~"(N"[area]~":"~chi~")"),
-       color = "Soil N (ppm NO3-N)") +
-  theme_bw(base_size = 18)
-
-narea.chi.forb <- ggplot(data = subset(df, pft == "c3_forb"),
-                         aes(x = ai.90, y = log(narea.chi))) +
-  geom_point(size = 3, shape = 21, fill = "grey", alpha = 0.7) +
-  stat_function(aes(color = "0"),
-                fun = function(x) 0.279*x + 0.703, lwd = 2, lty = 2, alpha = 0.7) +
-  stat_function(aes(color = "10"),
-                fun = function(x) 0.151*x + 0.803, lwd = 2, lty = 2, alpha = 0.7) +
-  stat_function(aes(color = "20"),
-                fun = function(x) 0.022*x + 0.902, lwd = 2, lty = 2, alpha = 0.7) +
-  stat_function(aes(color = "30"),
-                fun = function(x) -0.106*x + 1.002, lwd = 2, lty = 2, alpha = 0.7) +
-  scale_y_continuous(limits = c(0, 3), breaks = seq(0, 3, 0.6)) +
-  scale_x_continuous(limits = c(0.25, 1.5), breaks = seq(0.25, 1.5, 0.25)) +
-  scale_color_brewer(palette = "Spectral") +
-  labs(title = expression("C"[3]~"forb"),
-       x = expression("AI"["90_day"]),
-       y = expression(log~"(N"[area]~":"~chi~")"),
-       color = "Soil N (ppm NO3-N)") +
-  theme_bw(base_size = 18)
-
-narea.chi.c3gram <- ggplot(data = subset(df, pft == "c3_graminoid"),
-                         aes(x = ai.90, y = log(narea.chi))) +
-  geom_point(size = 3, shape = 21, fill = "grey", alpha = 0.7) +
-  stat_function(aes(color = "0"),
-                fun = function(x) 4.727*x - 1.654, lwd = 2, alpha = 0.7) +
-  stat_function(aes(color = "10"),
-                fun = function(x) 2.343*x - 0.066, lwd = 2, lty = 2, alpha = 0.7) +
-  stat_function(aes(color = "20"),
-                fun = function(x) -0.042*x + 1.522, lwd = 2, lty = 2, alpha = 0.7) +
-  stat_function(aes(color = "30"),
-                fun = function(x) -2.427*x + 3.110, lwd = 2, lty = 2, alpha = 0.7) +
-    scale_y_continuous(limits = c(0, 3), breaks = seq(0, 3, 0.6)) +
-  scale_x_continuous(limits = c(0.25, 1.5), breaks = seq(0.25, 1.5, 0.25)) +
-  scale_color_brewer(palette = "Spectral") +
-  labs(title = expression("C"[3]~"graminoid"),
-       x = expression("AI"["90_day"]),
-       y = expression(log~"(N"[area]~":"~chi~")"),
-       color = "Soil N (ppm NO3-N)") +
-  theme_bw(base_size = 18)
-
-narea.chi.c4gram <- ggplot(data = subset(df, pft == "c4_graminoid"),
-                           aes(x = ai.90, y = log(narea.chi))) +
-  geom_point(size = 3, shape = 21, fill = "grey", alpha = 0.7) +
-  stat_function(aes(color = "0"),
-                fun = function(x) 0.603*x + 2.975, lwd = 2, lty = 2, alpha = 0.7) +
-  stat_function(aes(color = "10"),
-                fun = function(x) 1.861*x + 2.139, lwd = 2, alpha = 0.7) +
-  stat_function(aes(color = "20"),
-                fun = function(x) 3.119*x + 1.302, lwd = 2, alpha = 0.7) +
-  stat_function(aes(color = "30"),
-                fun = function(x) 4.377*x + 0.466, lwd = 2, alpha = 0.7) +
-  scale_y_continuous(limits = c(1, 5), breaks = seq(1, 5, 1)) +
-  scale_x_continuous(limits = c(0.25, 1.5), breaks = seq(0.25, 1.5, 0.25)) +
-  scale_color_brewer(palette = "Spectral") +
-  labs(title = expression("C"[4]~"graminoid"),
-       x = expression("AI"["90_day"]),
-       y = expression(log~"(N"[area]~":"~chi~")"),
-       color = "Soil N (ppm NO3-N)") +
-  theme_bw(base_size = 18)
 
 
 png("../working_drafts/TXeco_Narea_chi.png",
