@@ -10,13 +10,16 @@ library(MuMIn)
 library(multcomp)
 library(multcompView)
 library(ggpubr)
+library(relaimpo)
 
 # Turn off digit rounding in emmean args
 emm_options(opt.digits = FALSE)
 
 # Load compiled datasheet
 df <- read.csv("../data_sheets/TXeco_compiled_datasheet.csv",
-               na.strings = c("NA", "NaN"))
+               na.strings = c("NA", "NaN")) %>%
+  filter(pft != "c3_shrub" & site != "Bell_2020_05" & 
+           site != "Russel_2020_01")
 df$narea.chi <- df$narea / df$chi
 
 ## Add colorblind friendly palette
@@ -29,12 +32,106 @@ length(df$pft[df$pft == "legume"])
 length(df$pft[df$pft == "c3_forb"])
 
 ##########################################################################
+## Fxns to calculate relative importance for mixed models. From:
+## https://gist.github.com/BERENZ/e9b581a4b7160357934e and copied from
+## analysis code at https://github.com/SmithEcophysLab/NutNet_Narea/blob/main/Analysis/narea_analysis.R
+##########################################################################
+calc.relip.mm <- function(model,type = 'lmg') {
+  if (!isLMM(model) & !isGLMM(model)) {
+    stop('Currently supports only lmer/glmer objects', call. = FALSE)
+  }
+  require(lme4)
+  X <- getME(model,'X')
+  X <- X[ , -1]
+  Y <- getME(model, 'y')
+  s_resid <- sigma(model)
+  s_effect <- getME(model, 'theta') * s_resid
+  s2 <- sum(s_resid^2, s_effect^2)
+  V <- Diagonal(x = s2, n = nrow(X))
+  YX <- cbind(Y, X)
+  cov_XY <- solve(t(YX) %*% solve(V) %*% as.matrix(YX))
+  colnames(cov_XY) <- rownames(cov_XY) <- colnames(YX)
+  importances <- calc.relimp(as.matrix(cov_XY), rela = F, type = type)
+  return(importances)
+}
+
+calc.relip.boot.mm <- function(model,type = 'lmg') {
+  if (!isLMM(model) & !isGLMM(model)) {
+    stop('Currently supports only lmer/glmer objects', call. = FALSE)
+  }
+  require(lme4)
+  X <- getME(model,'X')
+  X <- X[ , -1]
+  Y <- getME(model, 'y')
+  s_resid <- sigma(model)
+  s_effect <- getME(model, 'theta') * s_resid
+  s2 <- sum(s_resid^2, s_effect^2)
+  V <- Diagonal(x = s2, n = nrow(X))
+  YX <- cbind(Y, X)
+  cov_XY <- solve(t(YX) %*% solve(V) %*% as.matrix(YX))
+  colnames(cov_XY) <- rownames(cov_XY) <- colnames(YX)
+  bootresults <- boot.relimp(as.matrix(cov_XY), b=1000, rela = F, type = type)
+  importances <- booteval.relimp(bootresults, norank=T)
+  return(importances)
+}
+
+##########################################################################
+## Edaphic effects on Narea
+##########################################################################
+df$narea[c(223, 275)] <- NA
+
+narea.soil <- lmer(log(narea) ~ soil.pH * soil.cec * 
+                     (soil.no3n + soil.phos + soil.potassium) +
+                     (1 | sampling.year) + (1 | NCRS.code),
+                   data = df)
+
+# Check model assumptions
+plot(narea.soil)
+qqnorm(residuals(narea.soil))
+qqline(residuals(narea.soil))
+hist(residuals(narea.soil))
+shapiro.test(residuals(narea.soil))
+outlierTest(narea.soil)
+
+# Model output
+summary(narea.soil)
+Anova(narea.soil) ## Long-term climate
+r.squaredGLMM(narea.soil)
+
+
+##########################################################################
+## Climatic effects on Narea
+##########################################################################
+df$narea[c(223, 275)] <- NA
+
+narea.clim <- lmer(log(narea) ~ (ai.90 + ai.15yr) * mat.15yr * map.15yr * 
+                     (1 | sampling.year) + (1 | NCRS.code),
+                   data = df)
+
+# Check model assumptions
+plot(narea.clim)
+qqnorm(residuals(narea.clim))
+qqline(residuals(narea.clim))
+hist(residuals(narea.clim))
+shapiro.test(residuals(narea.clim))
+outlierTest(narea.clim)
+
+# Model output
+summary(narea.clim)
+Anova(narea.clim)
+r.squaredGLMM(narea.clim)
+
+##########################################################################
 ## Coarse lmer for Narea
 ##########################################################################
 df$narea[c(83, 89, 165, 244, 299)] <- NA
+df$narea[c(183)] <- NA
 
-narea <- lmer(log(narea) ~ (ai.90 + ai.15yr) * soil.no3n * pft + (1 | NCRS.code),
-              data = subset(df, pft != "c3_shrub"))
+narea <- lmer(log(narea) ~ (ai.90 + ai.15yr) * soil.no3n * pft + 
+                (1 | sampling.year) + (1 | NCRS.code),
+              data = subset(df, pft != "c3_shrub" & 
+                              site != "Bell_2020_05" & 
+                              site != "Russel_2020_01"))
 
 # Check model assumptions
 plot(narea)
@@ -49,7 +146,67 @@ summary(narea)
 Anova(narea)
 r.squaredGLMM(narea)
 
+data.frame(Anova(narea))
+## find relative importance for each factor from model
+narea.relimp.results <- calc.relip.mm(narea)$lmg
+relimp.narea <- data.frame(factor = c("ai.90", 
+                                      "ai.15yr", 
+                                      "soil.no3n",
+                                      "pft", 
+                                      "ai.90 * soil.no3n",
+                                      "ai.15yr * soil.no3n",
+                                      "ai.90 * pft",
+                                      "ai.15yr * pft",
+                                      "soil.no3n * pft",
+                                      "ai.90 * soil.no3n * pft",
+                                      "ai.15yr * soil.no3n * pft",
+                                      "unexplained"),
+                           relative.importance = as.numeric(
+                             as.character(c(narea.relimp.results[1:3], 
+                                            sum(narea.relimp.results[4:6]),
+                                            narea.relimp.results[7:8],
+                                            sum(narea.relimp.results[9:11]),
+                                            sum(narea.relimp.results[12:14]),
+                                            sum(narea.relimp.results[15:17]),
+                                            sum(narea.relimp.results[18:20]),
+                                            sum(narea.relimp.results[21:23]),
+                                            1 - sum(narea.relimp.results)))))
+
+
+relimp_leafnarea <- NULL
+relimp_leafnarea$Factor <- c("90-day AI", 
+                             "15-year AI", 
+                             "Soil NO3-N",
+                             "PFT", 
+                             "90-day AI * Soil NO3-N",
+                             "15-year AI * Soil NO3-N",
+                             "90-day AI * PFT",
+                             "15-year AI * PFT",
+                             "Soil NO3-N * PFT",
+                             "90-day AI * Soil NO3-N * PFT",
+                             "15-year AI * Soil NO3-N * PFT",
+                             "Unexplained")
+                             
+
+relimp_leafnarea$Importance <- as.numeric(as.character(c(narea.relimp.results[1:3], 
+                                                         sum(narea.relimp.results[4:6]),
+                                                         narea.relimp.results[7:8],
+                                                         sum(narea.relimp.results[9:11]),
+                                                         sum(narea.relimp.results[12:14]),
+                                                         sum(narea.relimp.results[15:17]),
+                                                         sum(narea.relimp.results[18:20]),
+                                                         sum(narea.relimp.results[21:23]),
+                                                         1 - sum(narea.relimp.results))))
+relimp_leafnarea_df <- as.data.frame(relimp_leafnarea)
+
+
 # Pairwise comparisons
+## Test ai.90 trend within each pft
+test(emtrends(narea, ~soil.no3n*pft, "ai.15yr", at = list(soil.no3n = c(0, 10, 20, 40, 80))))
+emmeans(narea, ~pft, "ai.90", at = list(ai.90 = 0))
+
+
+
 ## Test ai.90 trend within each pft
 test(emtrends(narea, ~pft, "ai.90"))
 emmeans(narea, ~pft, "ai.90", at = list(ai.90 = 0))
