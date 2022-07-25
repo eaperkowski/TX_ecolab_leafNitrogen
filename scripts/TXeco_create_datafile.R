@@ -17,7 +17,8 @@ biomass <- read.csv("../data_sheets/TXeco_drybiomass.csv", na.strings = "NA")
 ## Import soil data, spei data, site coord data, and species id data
 ##########################################################################
 clim <- read.csv("../climate_data/TXeco_climate_data.csv", 
-                 stringsAsFactors = FALSE, na.strings = "NA")
+                 stringsAsFactors = FALSE, na.strings = "NA") %>%
+  select(site:pt.15yr, tavg30:sf1)
 
 site.coords <- read.csv("../data_sheets/TXeco_sitecoords.csv")
 
@@ -30,6 +31,8 @@ soil <- read.csv("../data_sheets/TXeco_soil_characteristics.csv")
 ## Load calc_chi function
 ##########################################################################
 source("/Users/eaperkowski/git/r_functions/calc_chi.R")
+source("/Users/eaperkowski/git/r_functions/calc_beta.R")
+source("/Users/eaperkowski/git/r_functions/calc_optchi.R")
 
 ##########################################################################
 ## Import raw costech files
@@ -104,5 +107,8 @@ full.df$chi <- ifelse(full.df$pft == "c4_graminoid",
                       calc_chi_c4(full.df$d13C),
                       calc_chi_c3(full.df$d13C))
 full.df$chi[full.df$chi < 0.2 | full.df$chi > 0.95] <- NA
+full.df$beta <- calc_beta(chi = full.df$chi, temp = full.df$tavg7, 
+                          vpd = full.df$vpd7 * 10, z = full.df$elevation.m)
 
+## Write csv
 write.csv(full.df, "../data_sheets/TXeco_compiled_datasheet.csv")
