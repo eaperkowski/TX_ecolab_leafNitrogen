@@ -112,10 +112,12 @@ norm.30yr <- concat.clim %>%
   group_by(site, sampling.year, visit.type, year) %>%
   summarize(map = sum(daily.prcp, na.rm = TRUE),
             mat = mean(daily.tmean, na.rm = TRUE),
+            mav = mean(daily.vpdmean, na.rm = TRUE),
             matmin = mean(daily.tmin, na.rm = TRUE)) %>%
   ungroup(year) %>%
   summarize(map.30yr = mean(map),
-            mat.30yr = mean(mat))
+            mat.30yr = mean(mat),
+            mav.30yr = mean(mav))
 
 ###############################################################################
 norm.15yr <- concat.clim %>%
@@ -123,10 +125,13 @@ norm.15yr <- concat.clim %>%
   group_by(site, sampling.year, visit.type, year) %>%
   summarize(map = sum(daily.prcp, na.rm = TRUE),
             mat = mean(daily.tmean, na.rm = TRUE),
-            matmin = mean(daily.tmin, na.rm = TRUE)) %>%
+            mav = mean(daily.vpdmean, na.rm = TRUE),
+            matmin = mean(daily.tmin, na.rm = TRUE),
+            matmax = mean(daily.tmax, na.rm = TRUE)) %>%
   ungroup(year) %>%
   summarize(map.15yr = mean(map),
-            mat.15yr = mean(mat))
+            mat.15yr = mean(mat),
+            mav.15yr = mean(mav))
 
 normals <- norm.15yr %>%
   full_join(norm.30yr)
@@ -776,23 +781,7 @@ d1 <- concat.clim %>% filter(date > sampling.date - 1) %>%
 
 ## Merge all iterative climate means with normals data frame
 ## Also merge aridity index values for single climate data file
-d <- normals %>% full_join(d90) %>%
-  full_join(d89) %>% full_join(d88) %>% full_join(d87) %>% 
-  full_join(d86) %>% full_join(d85) %>% full_join(d84) %>% full_join(d83) %>% 
-  full_join(d82) %>% full_join(d81) %>% full_join(d80) %>% full_join(d79) %>% 
-  full_join(d78) %>% full_join(d77) %>% full_join(d76) %>% full_join(d75) %>% 
-  full_join(d74) %>% full_join(d73) %>% full_join(d72) %>% full_join(d71) %>% 
-  full_join(d70) %>% full_join(d69) %>% full_join(d68) %>% full_join(d67) %>% 
-  full_join(d66) %>% full_join(d65) %>% full_join(d64) %>% full_join(d63) %>% 
-  full_join(d62) %>% full_join(d61) %>% full_join(d60) %>% full_join(d59) %>% 
-  full_join(d58) %>% full_join(d57) %>% full_join(d56) %>% full_join(d55) %>% 
-  full_join(d54) %>% full_join(d53) %>% full_join(d52) %>% full_join(d51) %>% 
-  full_join(d50) %>% full_join(d49) %>% full_join(d48) %>% full_join(d47) %>% 
-  full_join(d46) %>% full_join(d45) %>% full_join(d44) %>% full_join(d43) %>% 
-  full_join(d42) %>% full_join(d41) %>% full_join(d40) %>% full_join(d39) %>% 
-  full_join(d38) %>% full_join(d37) %>% full_join(d36) %>% full_join(d35) %>% 
-  full_join(d34) %>% full_join(d33) %>% full_join(d32) %>% full_join(d31) %>% 
-  full_join(d30) %>% full_join(d29) %>% full_join(d28) %>% full_join(d27) %>% 
+d <- normals %>% full_join(d30) %>% full_join(d29) %>% full_join(d28) %>% full_join(d27) %>% 
   full_join(d26) %>% full_join(d25) %>% full_join(d24) %>% full_join(d23) %>% 
   full_join(d22) %>% full_join(d21) %>% full_join(d20) %>% full_join(d19) %>% 
   full_join(d18) %>% full_join(d17) %>% full_join(d16) %>% full_join(d15) %>% 
@@ -804,7 +793,7 @@ d <- normals %>% full_join(d90) %>%
 ## Read in climate aridity index values
 ai <- read.csv("../climate_data/TXeco_siteAridity_SPLASH.csv")
 
-d <- d %>% full_join(ai) %>% dplyr::select(site:mat.30yr, 
+d <- d %>% full_join(ai) %>% dplyr::select(site:mav.30yr, 
                                            ai.30:ai.30yr,
                                            everything())
 

@@ -306,3 +306,124 @@ temp30.modelSelect %>%
   full_join(temp2.modelSelect) %>% full_join(temp1.modelSelect) %>%
   arrange(AICc)
 ## 20-day temperature is best model
+
+###############################################################################
+# VPD
+###############################################################################
+vpd30 <- lmer(log(marea) ~ vpd30 + (1 | sampling.year) + (1 | NCRS.code), data = df)
+vpd29 <- lmer(log(marea) ~ vpd29 + (1 | sampling.year) + (1 | NCRS.code), data = df)
+vpd28 <- lmer(log(marea) ~ vpd28 + (1 | sampling.year) + (1 | NCRS.code), data = df)
+vpd27 <- lmer(log(marea) ~ vpd27 + (1 | sampling.year) + (1 | NCRS.code), data = df)
+vpd26 <- lmer(log(marea) ~ vpd26 + (1 | sampling.year) + (1 | NCRS.code), data = df)
+vpd25 <- lmer(log(marea) ~ vpd25 + (1 | sampling.year) + (1 | NCRS.code), data = df)
+vpd24 <- lmer(log(marea) ~ vpd24 + (1 | sampling.year) + (1 | NCRS.code), data = df)
+vpd23 <- lmer(log(marea) ~ vpd23 + (1 | sampling.year) + (1 | NCRS.code), data = df)
+vpd22 <- lmer(log(marea) ~ vpd22 + (1 | sampling.year) + (1 | NCRS.code), data = df)
+vpd21 <- lmer(log(marea) ~ vpd21 + (1 | sampling.year) + (1 | NCRS.code), data = df)
+vpd20 <- lmer(log(marea) ~ vpd20 + (1 | sampling.year) + (1 | NCRS.code), data = df)
+vpd19 <- lmer(log(marea) ~ vpd19 + (1 | sampling.year) + (1 | NCRS.code), data = df)
+vpd18 <- lmer(log(marea) ~ vpd18 + (1 | sampling.year) + (1 | NCRS.code), data = df)
+vpd17 <- lmer(log(marea) ~ vpd17 + (1 | sampling.year) + (1 | NCRS.code), data = df)
+vpd16 <- lmer(log(marea) ~ vpd16 + (1 | sampling.year) + (1 | NCRS.code), data = df)
+vpd15 <- lmer(log(marea) ~ vpd15 + (1 | sampling.year) + (1 | NCRS.code), data = df)
+vpd14 <- lmer(log(marea) ~ vpd14 + (1 | sampling.year) + (1 | NCRS.code), data = df)
+vpd13 <- lmer(log(marea) ~ vpd13 + (1 | sampling.year) + (1 | NCRS.code), data = df)
+vpd12 <- lmer(log(marea) ~ vpd12 + (1 | sampling.year) + (1 | NCRS.code), data = df)
+vpd11 <- lmer(log(marea) ~ vpd11 + (1 | sampling.year) + (1 | NCRS.code), data = df)
+vpd10 <- lmer(log(marea) ~ vpd10 + (1 | sampling.year) + (1 | NCRS.code), data = df)
+vpd9 <- lmer(log(marea) ~ vpd9 + (1 | sampling.year) + (1 | NCRS.code), data = df)
+vpd8 <- lmer(log(marea) ~ vpd8 + (1 | sampling.year) + (1 | NCRS.code), data = df)
+vpd7 <- lmer(log(marea) ~ vpd7 + (1 | sampling.year) + (1 | NCRS.code), data = df)
+vpd6 <- lmer(log(marea) ~ vpd6 + (1 | sampling.year) + (1 | NCRS.code), data = df)
+vpd5 <- lmer(log(marea) ~ vpd5 + (1 | sampling.year) + (1 | NCRS.code), data = df)
+vpd4 <- lmer(log(marea) ~ vpd4 + (1 | sampling.year) + (1 | NCRS.code), data = df)
+vpd3 <- lmer(log(marea) ~ vpd3 + (1 | sampling.year) + (1 | NCRS.code), data = df)
+vpd2 <- lmer(log(marea) ~ vpd2 + (1 | sampling.year) + (1 | NCRS.code), data = df)
+vpd1 <- lmer(log(marea) ~ vpd1 + (1 | sampling.year) + (1 | NCRS.code), data = df)
+mav <- lmer(log(marea) ~ mav.15yr + (1 | sampling.year) + (1 | NCRS.code), data = df)
+
+# Model selection across timescales
+vpd30.modelSelect <- data.frame(day = 30, var = "vpd", AICc = AICc(vpd30), 
+                                RMSE = rmse(vpd30), r.squaredGLMM(vpd30))
+vpd29.modelSelect <- data.frame(day = 29, var = "vpd", AICc = AICc(vpd29), 
+                                RMSE = rmse(vpd29), r.squaredGLMM(vpd29))
+vpd28.modelSelect <- data.frame(day = 28, var = "vpd", AICc = AICc(vpd28), 
+                                RMSE = rmse(vpd28), r.squaredGLMM(vpd28))
+vpd27.modelSelect <- data.frame(day = 27, var = "vpd", AICc = AICc(vpd27), 
+                                RMSE = rmse(vpd27), r.squaredGLMM(vpd27))
+vpd26.modelSelect <- data.frame(day = 26, var = "vpd", AICc = AICc(vpd26), 
+                                RMSE = rmse(vpd26), r.squaredGLMM(vpd26))
+vpd25.modelSelect <- data.frame(day = 25, var = "vpd", AICc = AICc(vpd25), 
+                                RMSE = rmse(vpd25), r.squaredGLMM(vpd25))
+vpd24.modelSelect <- data.frame(day = 24, var = "vpd", AICc = AICc(vpd24), 
+                                RMSE = rmse(vpd24), r.squaredGLMM(vpd24))
+vpd23.modelSelect <- data.frame(day = 23, var = "vpd", AICc = AICc(vpd23), 
+                                RMSE = rmse(vpd23), r.squaredGLMM(vpd23))
+vpd22.modelSelect <- data.frame(day = 22, var = "vpd", AICc = AICc(vpd22), 
+                                RMSE = rmse(vpd22), r.squaredGLMM(vpd22))
+vpd21.modelSelect <- data.frame(day = 21, var = "vpd", AICc = AICc(vpd21), 
+                                RMSE = rmse(vpd21), r.squaredGLMM(vpd21))
+vpd20.modelSelect <- data.frame(day = 20, var = "vpd", AICc = AICc(vpd20), 
+                                RMSE = rmse(vpd20), r.squaredGLMM(vpd20))
+vpd19.modelSelect <- data.frame(day = 19, var = "vpd", AICc = AICc(vpd19), 
+                                RMSE = rmse(vpd19), r.squaredGLMM(vpd19))
+vpd18.modelSelect <- data.frame(day = 18, var = "vpd", AICc = AICc(vpd18), 
+                                RMSE = rmse(vpd18), r.squaredGLMM(vpd18))
+vpd17.modelSelect <- data.frame(day = 17, var = "vpd", AICc = AICc(vpd17), 
+                                RMSE = rmse(vpd17), r.squaredGLMM(vpd17))
+vpd16.modelSelect <- data.frame(day = 16, var = "vpd", AICc = AICc(vpd16), 
+                                RMSE = rmse(vpd16), r.squaredGLMM(vpd16))
+vpd15.modelSelect <- data.frame(day = 15, var = "vpd", AICc = AICc(vpd15), 
+                                RMSE = rmse(vpd15), r.squaredGLMM(vpd15))
+vpd14.modelSelect <- data.frame(day = 14, var = "vpd", AICc = AICc(vpd14), 
+                                RMSE = rmse(vpd14), r.squaredGLMM(vpd14))
+vpd13.modelSelect <- data.frame(day = 13, var = "vpd", AICc = AICc(vpd13), 
+                                RMSE = rmse(vpd13), r.squaredGLMM(vpd13))
+vpd12.modelSelect <- data.frame(day = 12, var = "vpd", AICc = AICc(vpd12), 
+                                RMSE = rmse(vpd12), r.squaredGLMM(vpd12))
+vpd11.modelSelect <- data.frame(day = 11, var = "vpd", AICc = AICc(vpd11), 
+                                RMSE = rmse(vpd11), r.squaredGLMM(vpd11))
+vpd10.modelSelect <- data.frame(day = 10, var = "vpd", AICc = AICc(vpd10), 
+                                RMSE = rmse(vpd10), r.squaredGLMM(vpd10))
+vpd9.modelSelect <- data.frame(day = 9, var = "vpd", AICc = AICc(vpd9), 
+                               RMSE = rmse(vpd9), r.squaredGLMM(vpd9))
+vpd8.modelSelect <- data.frame(day = 8, var = "vpd", AICc = AICc(vpd8), 
+                               RMSE = rmse(vpd8), r.squaredGLMM(vpd8))
+vpd7.modelSelect <- data.frame(day = 7, var = "vpd", AICc = AICc(vpd7), 
+                               RMSE = rmse(vpd7), r.squaredGLMM(vpd7))
+vpd6.modelSelect <- data.frame(day = 6, var = "vpd", AICc = AICc(vpd6), 
+                               RMSE = rmse(vpd6), r.squaredGLMM(vpd6))
+vpd5.modelSelect <- data.frame(day = 5, var = "vpd", AICc = AICc(vpd5), 
+                               RMSE = rmse(vpd5), r.squaredGLMM(vpd5))
+vpd4.modelSelect <- data.frame(day = 4, var = "vpd", AICc = AICc(vpd4), 
+                               RMSE = rmse(vpd4), r.squaredGLMM(vpd4))
+vpd3.modelSelect <- data.frame(day = 3, var = "vpd", AICc = AICc(vpd3), 
+                               RMSE = rmse(vpd3), r.squaredGLMM(vpd3))
+vpd2.modelSelect <- data.frame(day = 2, var = "vpd", AICc = AICc(vpd2), 
+                               RMSE = rmse(vpd2), r.squaredGLMM(vpd2))
+vpd1.modelSelect <- data.frame(day = 1, var = "vpd", AICc = AICc(vpd1), 
+                               RMSE = rmse(vpd1), r.squaredGLMM(vpd1))
+mav.15yr.modelSelect <- data.frame(day = 5478, var = "vpd", AICc = AICc(mav), 
+                                   RMSE = rmse(mav), r.squaredGLMM(mav))
+
+vpd30.modelSelect %>% 
+  full_join(mav.15yr.modelSelect) %>% full_join(vpd29.modelSelect) %>% 
+  full_join(vpd28.modelSelect) %>% full_join(vpd27.modelSelect) %>% 
+  full_join(vpd26.modelSelect) %>% full_join(vpd25.modelSelect) %>%
+  full_join(vpd24.modelSelect) %>% full_join(vpd23.modelSelect) %>% 
+  full_join(vpd22.modelSelect) %>% full_join(vpd21.modelSelect) %>% 
+  full_join(vpd20.modelSelect) %>% full_join(vpd19.modelSelect) %>%
+  full_join(vpd18.modelSelect) %>% full_join(vpd17.modelSelect) %>% 
+  full_join(vpd16.modelSelect) %>% full_join(vpd15.modelSelect) %>% 
+  full_join(vpd14.modelSelect) %>% full_join(vpd13.modelSelect) %>%
+  full_join(vpd12.modelSelect) %>% full_join(vpd11.modelSelect) %>% 
+  full_join(vpd10.modelSelect) %>% full_join(vpd9.modelSelect) %>% 
+  full_join(vpd8.modelSelect) %>% full_join(vpd7.modelSelect) %>%
+  full_join(vpd6.modelSelect) %>% full_join(vpd5.modelSelect) %>% 
+  full_join(vpd4.modelSelect) %>% full_join(vpd3.modelSelect) %>% 
+  full_join(vpd2.modelSelect) %>% full_join(vpd1.modelSelect) %>%
+  mutate(concat.select = AICc + RMSE) %>%
+  arrange(AICc)
+## 17-day VPD is best model
+
+

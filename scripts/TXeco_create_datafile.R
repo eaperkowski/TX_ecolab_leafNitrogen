@@ -17,8 +17,7 @@ biomass <- read.csv("../data_sheets/TXeco_drybiomass.csv", na.strings = "NA")
 ## Import soil data, spei data, site coord data, and species id data
 ##########################################################################
 clim <- read.csv("../climate_data/TXeco_climate_data.csv", 
-                 stringsAsFactors = FALSE, na.strings = "NA") %>%
-  dplyr::select(site:pt.15yr, tavg30:sf1)
+                 stringsAsFactors = FALSE, na.strings = "NA")
 
 site.coords <- read.csv("../data_sheets/TXeco_sitecoords.csv")
 
