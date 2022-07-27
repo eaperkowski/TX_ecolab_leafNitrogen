@@ -23,13 +23,192 @@ df <- read.csv("../data_sheets/TXeco_compiled_datasheet.csv",
 df$narea.chi <- df$narea / df$chi
 
 ## Add colorblind friendly palette
-cbbPalette <- c("#DDAA33", "#BB5566", "#004488", "#555555", "#FFFFFF")
+cbbPalette <- c("#0077BB", "#33BBEE", "#009988", "#EE7733", "#CC3311")
+cbbPalette2 <- c("#CC3311", "#EE7733", "#009988", "#33BBEE", "#0077BB")
 
 ## Figure out sample sizes within each pft class
 length(df$pft[df$pft == "c3_graminoid"])
 length(df$pft[df$pft == "c4_graminoid"])
 length(df$pft[df$pft == "legume"])
 length(df$pft[df$pft == "c3_forb"])
+
+##########################################################################
+## Beta
+##########################################################################
+df$beta[c(62, 300)] <- NA
+
+beta <- lmer(log(beta) ~ ai.60 * soil.no3n * pft + (1 | sampling.year) +
+               (1 | NCRS.code), data = df)
+
+# Check model assumptions
+plot(beta)
+qqnorm(residuals(beta))
+qqline(residuals(beta))
+densityPlot(residuals(beta))
+shapiro.test(residuals(beta))
+outlierTest(beta)
+
+# Model output
+summary(beta)
+Anova(beta)
+r.squaredGLMM(beta)
+
+# Three way interaction 
+test(emtrends(beta, ~soil.no3n*pft, "ai.60", 
+              at = list(soil.no3n = c(0, 10, 20, 40, 80))))
+emmeans(beta, ~soil.no3n*pft, "ai.60", 
+        at = list(soil.no3n = c(0, 10, 20, 40, 80), ai.60 = 0))
+
+## Two way interaction between pft and ai.60 (for slope)
+test(emtrends(beta, ~pft, "ai.60"))
+emmeans(beta, ~pft, "ai.60", at = list(ai.60 = 0))
+
+beta.c3forb <- ggplot(data = subset(df, pft == "c3_forb"),
+                      aes(x = ai.90, y = log(beta))) +
+  geom_jitter(width = 0.02, size = 3, alpha = 0.7, shape = 21, fill = "#BBBBBB") +
+  geom_hline(yintercept = 5, lty = 2, lwd = 1) +
+  stat_function(aes(color = "0"), 
+                fun = function(x) 0.769*x + 3.445, lwd = 2,
+                xlim = c(0.3, 1.5)) +
+  #stat_function(aes(color = "10"), 
+  #              fun = function(x) 0.682*x + 3.529, lwd = 2,
+  #              xlim = c(0.3, 1.5)) +
+  stat_function(aes(color = "20"), 
+                fun = function(x) 0.595*x + 3.613, lwd = 2,
+                xlim = c(0.3, 1.5)) +
+  stat_function(aes(color = "40"), 
+                fun = function(x) 0.421*x + 3.781, lwd = 2,
+                xlim = c(0.3, 1.5), lty = 2) +
+  stat_function(aes(color = "80"), 
+                fun = function(x) 0.072*x + 4.117, lwd = 2,
+                xlim = c(0.3, 1.5), lty = 2) +
+  scale_y_continuous(limits = c(-2, 7), breaks = seq(-2, 7, 3)) +  scale_x_continuous(limits = c(0.3, 1.5), breaks = seq(0.3, 1.5, 0.3)) +
+  scale_color_manual(values = cbbPalette2) +
+  labs(title = expression("C"[3]~"forb"),
+       x = expression("AI"["60"]),
+       y = expression(ln~beta),
+       color = expression("Soil NO"[3]~"- N (ppm)")) +
+  theme_bw(base_size = 24) +
+  theme(legend.text.align = 1)
+
+beta.c3gram <- ggplot(data = subset(df, pft == "c3_graminoid"),
+                      aes(x = ai.90, y = log(beta))) +
+  geom_jitter(width = 0.02, size = 3, alpha = 0.7, shape = 21, fill = "#BBBBBB") +
+  geom_hline(yintercept = 5, lty = 2, lwd = 1) +
+  stat_function(aes(color = "0"), 
+                fun = function(x) 1.068*x + 3.034, lwd = 2,
+                xlim = c(0.3, 1.5), lty = 2) +
+  #stat_function(aes(color = "10"), 
+  #              fun = function(x) 5.259*x - 0.161, lwd = 2,
+  #              xlim = c(0.3, 1.5)) +
+  stat_function(aes(color = "20"), 
+                fun = function(x) 9.451*x - 3.356, lwd = 2,
+                xlim = c(0.3, 1.5)) +
+  stat_function(aes(color = "40"), 
+                fun = function(x) 17.834*x - 9.746, lwd = 2,
+                xlim = c(0.3, 1.5)) +
+  stat_function(aes(color = "80"), 
+                fun = function(x) 34.600*x - 22.526, lwd = 2,
+                xlim = c(0.3, 1.5)) +
+  scale_y_continuous(limits = c(-2, 7), breaks = seq(-2, 7, 3)) +  scale_x_continuous(limits = c(0.3, 1.5), breaks = seq(0.3, 1.5, 0.3)) +
+  scale_color_manual(values = cbbPalette2) +
+  labs(title = expression("C"[3]~"graminoid"),
+       x = expression("AI"["60"]),
+       y = expression(ln~beta),
+       color = expression("Soil NO"[3]~"- N (ppm)")) +
+  theme_bw(base_size = 24) +
+  theme(legend.text.align = 1)
+
+beta.c4gram <- ggplot(data = subset(df, pft == "c4_graminoid"),
+                      aes(x = ai.90, y = log(beta))) +
+  geom_jitter(width = 0.02, size = 3, alpha = 0.7, shape = 21, fill = "#BBBBBB") +
+  geom_hline(yintercept = 5, lty = 2, lwd = 1) +
+  stat_function(aes(color = "0"), 
+                fun = function(x) -1.987*x + 2.868, lwd = 2,
+                xlim = c(0.3, 1.5)) +
+  #stat_function(aes(color = "10"), 
+  #              fun = function(x) -3.043*x + 3.780, lwd = 2,
+  #              xlim = c(0.3, 1.5)) +
+  stat_function(aes(color = "20"), 
+                fun = function(x) -4.099*x + 4.692, lwd = 2,
+                xlim = c(0.3, 1.5)) +
+  stat_function(aes(color = "40"), 
+                fun = function(x) -6.210*x + 6.516, lwd = 2,
+                xlim = c(0.3, 1.5)) +
+  stat_function(aes(color = "80"), 
+                fun = function(x) -10.434*x + 10.165, lwd = 2,
+                xlim = c(0.3, 1.5)) +
+  scale_y_continuous(limits = c(-2, 7), breaks = seq(-2, 7, 3)) +
+  scale_x_continuous(limits = c(0.3, 1.5), breaks = seq(0.3, 1.5, 0.3)) +
+  scale_color_manual(values = cbbPalette2) +
+  labs(title = expression("C"[4]~"graminoid"),
+       x = expression("AI"["60"]),
+       y = expression(ln~beta),
+       color = expression("Soil NO"[3]~"- N (ppm)")) +
+  theme_bw(base_size = 24) +
+  theme(legend.text.align = 1)
+
+beta.legume <- ggplot(data = subset(df, pft == "legume"),
+                      aes(x = ai.90, y = log(beta))) +
+  geom_hline(yintercept = 5, lty = 2, lwd = 1) +
+  geom_jitter(width = 0.02, size = 3, alpha = 0.7, shape = 21, fill = "#BBBBBB") +
+  stat_function(aes(color = "0"), 
+                fun = function(x) 0.674*x + 3.270, lwd = 2,
+                xlim = c(0.3, 1.5)) +
+  #stat_function(aes(color = "10"), 
+  #              fun = function(x) 0.682*x + 3.214, lwd = 2,
+  #              xlim = c(0.3, 1.5)) +
+  stat_function(aes(color = "20"), 
+                fun = function(x) 0.690*x + 3.157, lwd = 2,
+                xlim = c(0.3, 1.5)) +
+  stat_function(aes(color = "40"), 
+                fun = function(x) 0.706*x + 3.043, lwd = 2,
+                xlim = c(0.3, 1.5), lty = 2) +
+  stat_function(aes(color = "80"), 
+                fun = function(x) 0.738*x + 2.816, lwd = 2,
+                xlim = c(0.3, 1.5), lty = 2) +
+  scale_y_continuous(limits = c(-2, 7), breaks = seq(-2, 7, 3)) +
+  scale_x_continuous(limits = c(0.3, 1.5), breaks = seq(0.3, 1.5, 0.3)) +
+  scale_color_manual(values = cbbPalette2) +
+  labs(title = expression("C"[3]~"legume"),
+       x = expression("AI"["60"]),
+       y = expression(ln~beta),
+       color = expression("Soil NO"[3]~"- N (ppm)")) +
+  theme_bw(base_size = 24) +
+  theme(legend.text.align = 1)
+
+
+png("../working_drafts/TXeco_beta.png",
+    width = 15, height = 10, units = 'in', res = 600)
+ggpubr::ggarrange(beta.c3forb, beta.legume, beta.c3gram, beta.c4gram, 
+                  nrow = 2, ncol = 2, common.legend = TRUE, legend = "right", 
+                  align = "hv", labels = "AUTO", 
+                  font.label = list(size = 24, face = "bold"))
+dev.off()
+
+##########################################################################
+## Beta
+##########################################################################
+df$beta[c(62, 300)] <- NA
+
+beta <- lmer(log(beta) ~ ai.60 * soil.no3n * pft + (1 | sampling.year) +
+               (1 | NCRS.code), data = df)
+
+# Check model assumptions
+plot(beta)
+qqnorm(residuals(beta))
+qqline(residuals(beta))
+densityPlot(residuals(beta))
+
+shapiro.test(residuals(beta))
+outlierTest(beta)
+
+# Model output
+summary(beta)
+Anova(beta)
+r.squaredGLMM(beta)
+
+
 
 ##########################################################################
 ## Climatic effects on Narea
@@ -499,9 +678,6 @@ emmeans(marea, ~soil.no3n, "ai.15yr", at = list(soil.no3n = c(0, 10, 20, 40, 80)
 test(emtrends(marea, ~pft, "soil.no3n"))
 emmeans(marea, ~soil.no3n, "ai.15yr", at = list(soil.no3n = c(0, 10, 20, 40, 80),
                                                 ai.90 = 0))
-
-
-
 
 png("../working_drafts/TXeco_Marea.png",
     width = 10, height = 8, units = 'in', res = 600)
