@@ -189,25 +189,168 @@ dev.off()
 ##########################################################################
 ## Beta
 ##########################################################################
-df$beta[c(62, 300)] <- NA
+df$chi[c(62, 260, 261, 278, 300, 302, 440, 465, 484, 486)] <- NA
 
-beta <- lmer(log(beta) ~ ai.60 * soil.no3n * pft + (1 | sampling.year) +
+chi <- lmer(chi ~ ai.15yr * soil.no3n * pft + (1 | sampling.year) +
                (1 | NCRS.code), data = df)
 
 # Check model assumptions
-plot(beta)
-qqnorm(residuals(beta))
-qqline(residuals(beta))
-densityPlot(residuals(beta))
+plot(chi)
+qqnorm(residuals(chi))
+qqline(residuals(chi))
+densityPlot(residuals(chi))
 
-shapiro.test(residuals(beta))
-outlierTest(beta)
+shapiro.test(residuals(chi))
+outlierTest(chi)
 
 # Model output
-summary(beta)
-Anova(beta)
-r.squaredGLMM(beta)
+summary(chi)
+Anova(chi)
+r.squaredGLMM(chi)
 
+# Three way interaction between soil no3n, pft, and ai.15yr
+test(emtrends(chi, ~soil.no3n*pft, "ai.15yr", 
+              at = list(soil.no3n = c(0, 10, 20, 40, 80))))
+emmeans(chi, ~soil.no3n*pft, "ai.15yr", 
+        at = list(soil.no3n = c(0, 10, 20, 40, 80), ai.15yr = 0))
+
+
+chi.c3forb <- ggplot(data = subset(df, pft == "c3_forb"),
+                      aes(x = ai.15yr, y = chi)) +
+  geom_jitter(width = 0.02, size = 3, alpha = 0.7, shape = 21, fill = "#BBBBBB") +
+  stat_function(aes(color = "0"), 
+                fun = function(x) 0.168*x + 0.709, lwd = 2,
+                xlim = c(0.4, 1)) +
+  #stat_function(aes(color = "10"), 
+  #              fun = function(x) 0.157*x + 0.717, lwd = 2,
+  #              xlim = c(0.4, 1)) +
+  stat_function(aes(color = "20"), 
+                fun = function(x) 0.147*x + 0.725, lwd = 2,
+                xlim = c()) +
+  stat_function(aes(color = "40"), 
+                fun = function(x) 0.125*x + 0.740, lwd = 2,
+                xlim = c(0.4, 1), lty = 2) +
+  stat_function(aes(color = "80"), 
+                fun = function(x) 0.082*x + 0.771, lwd = 2,
+                xlim = c(0.4, 1), lty = 2) +
+  scale_y_continuous(limits = c(0.4, 1), breaks = seq(0.4, 1, 0.2)) +
+  scale_x_continuous(limits = c(0.4, 1.0), breaks = seq(0.4, 1.0, 0.2)) + 
+  scale_color_manual(values = cbbPalette2) +
+  labs(title = expression("C"[3]~"forb"),
+       x = expression("AI"["15yr"]),
+       y = expression(chi),
+       color = expression("Soil NO"[3]~"- N (ppm)")) +
+  theme_bw(base_size = 24) +
+  theme(legend.text.align = 1)
+
+chi.c3gram <- ggplot(data = subset(df, pft == "c3_graminoid"),
+                      aes(x = ai.15yr, y = chi)) +
+  geom_jitter(width = 0.02, size = 3, alpha = 0.7, shape = 21, fill = "#BBBBBB") +
+  stat_function(aes(color = "0"), 
+                fun = function(x) 0.824*x + 0.360, lwd = 2,
+                xlim = c(0.4, 1)) +
+  #stat_function(aes(color = "10"), 
+  #              fun = function(x) 0.418*x + 0.569, lwd = 2,
+  #              xlim = c(0.4, 1)) +
+  stat_function(aes(color = "20"), 
+                fun = function(x) 0.012*x + 0.778, lwd = 2,
+                xlim = c(0.4, 1), lty = 2) +
+  stat_function(aes(color = "40"), 
+                fun = function(x) -0.799*x + 1.196, lwd = 2,
+                xlim = c(0.4, 1), lty = 2) +
+  stat_function(aes(color = "80"), 
+                fun = function(x) -2.423*x + 2.032, lwd = 2,
+                xlim = c(0.4, 1), lty = 2) +
+  scale_y_continuous(limits = c(0.4, 1), breaks = seq(0.4, 1, 0.2)) +
+  scale_x_continuous(limits = c(0.4, 1.0), breaks = seq(0.4, 1.0, 0.2)) +
+  scale_color_manual(values = cbbPalette2) +
+  labs(title = expression("C"[3]~"graminoid"),
+       x = expression("AI"["15yr"]),
+       y = expression(chi),
+       color = expression("Soil NO"[3]~"- N (ppm)")) +
+  theme_bw(base_size = 24) +
+  theme(legend.text.align = 1)
+
+chi.c4gram <- ggplot(data = subset(df, pft == "c4_graminoid"),
+                      aes(x = ai.15yr, y = chi)) +
+  geom_jitter(width = 0.02, size = 3, alpha = 0.7, shape = 21, fill = "#BBBBBB") +
+  stat_function(aes(color = "0"), 
+                fun = function(x) -0.278*x + 0.710, lwd = 2,
+                xlim = c(0.4, 1)) +
+  #stat_function(aes(color = "10"), 
+  #              fun = function(x) -0.353*x + 0.753, lwd = 2,
+  #              xlim = c(0.4, 1)) +
+  stat_function(aes(color = "20"), 
+                fun = function(x) -0.428*x + 0.796, lwd = 2,
+                xlim = c(0.4, 1)) +
+  stat_function(aes(color = "40"), 
+                fun = function(x) -0.578*x + 0.883, lwd = 2,
+                xlim = c(0.4, 1)) +
+  stat_function(aes(color = "80"), 
+                fun = function(x) -0.878*x + 1.057, lwd = 2,
+                xlim = c(0.4, 1), lty = 2) +
+  scale_y_continuous(limits = c(0.4, 1), breaks = seq(0.4, 1, 0.2)) +
+  scale_x_continuous(limits = c(0.4, 1.0), breaks = seq(0.4, 1.0, 0.2)) +
+  scale_color_manual(values = cbbPalette2) +
+  labs(title = expression("C"[4]~"graminoid"),
+       x = expression("AI"["15yr"]),
+       y = expression(chi),
+       color = expression("Soil NO"[3]~"- N (ppm)")) +
+  theme_bw(base_size = 24) +
+  theme(legend.text.align = 1)
+
+chi.legume <- ggplot(data = subset(df, pft == "legume"),
+                      aes(x = ai.15yr, y = chi)) +
+  geom_jitter(width = 0.02, size = 3, alpha = 0.7, shape = 21, fill = "#BBBBBB") +
+  stat_function(aes(color = "0"), 
+                fun = function(x) 0.120*x + 0.714, lwd = 2,
+                xlim = c(0.4, 1)) +
+  #stat_function(aes(color = "10"), 
+  #              fun = function(x) 0.168*x + 0.683, lwd = 2,
+  #              xlim = c(0.3, 1)) +
+  stat_function(aes(color = "20"), 
+                fun = function(x) 0.215*x + 0.653, lwd = 2,
+                xlim = c(), lty = 2) +
+  stat_function(aes(color = "40"), 
+                fun = function(x) 0.310*x + 0.592, lwd = 2,
+                xlim = c(0.4, 1), lty = 2) +
+  stat_function(aes(color = "80"), 
+                fun = function(x) 0.499*x + 0.471, lwd = 2,
+                xlim = c(0.4, 1), lty = 2) +
+  scale_y_continuous(limits = c(0.4, 1), breaks = seq(0.4, 1, 0.2)) +
+  scale_x_continuous(limits = c(0.4, 1.0), breaks = seq(0.4, 1.0, 0.2)) +
+  scale_color_manual(values = cbbPalette2) +
+  labs(title = expression("C"[3]~"legume"),
+       x = expression("AI"["15yr"]),
+       y = expression(chi),
+       color = expression("Soil NO"[3]~"- N (ppm)")) +
+  theme_bw(base_size = 24) +
+  theme(legend.text.align = 1)
+
+
+
+spp.avg <- ggplot(data = df,
+                  aes(x = pft, y = chi)) +
+  geom_boxplot(aes(fill = pft)) +
+  scale_y_continuous(limits = c(0.4, 1), breaks = seq(0.4, 1, 0.2)) +
+  scale_fill_manual(values = cbbPalette2) +
+  scale_x_discrete(labels = c(expression("C"[3]~"forb"),
+                              expression("C"[3]~"graminoid"),
+                              expression("C"[4]~"graminoid"),
+                              expression("C"[3]~"legume"))) +
+  labs(x = "Plant functional type",
+       y = expression(chi)) +
+  guides(fill = "none") +
+  theme_bw(base_size = 18)
+
+
+png("../working_drafts/TXeco_chi.png",
+    width = 15, height = 10, units = 'in', res = 600)
+ggpubr::ggarrange(chi.c3forb, chi.legume, chi.c3gram, chi.c4gram, 
+                  nrow = 2, ncol = 2, common.legend = TRUE, legend = "right", 
+                  align = "hv", labels = "AUTO", 
+                  font.label = list(size = 24, face = "bold"))
+dev.off()
 
 
 ##########################################################################
