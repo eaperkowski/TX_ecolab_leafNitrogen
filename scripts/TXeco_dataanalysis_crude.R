@@ -35,7 +35,7 @@ length(df$pft[df$pft == "c3_forb"])
 ##########################################################################
 ## Beta
 ##########################################################################
-df$beta[c(62, 253, 293)] <- NA
+df$beta[c(62, 293)] <- NA
 
 
 beta <- lmer(log(beta) ~ ai.60 * soil.no3n * pft + (1 | sampling.year) +
@@ -53,6 +53,7 @@ outlierTest(beta)
 summary(beta)
 Anova(beta)
 r.squaredGLMM(beta)
+
 
 # Two-way interaction between ai.60 and pft
 test(emtrends(beta, ~pft, "ai.60"))
@@ -162,7 +163,12 @@ dev.off()
 ##########################################################################
 df$narea[c(462)] <- NA
 
-narea <- lmer(log(narea) ~ beta * soil.no3n * pft + 
+cor.test(df$chi, df$beta, method = "pearson")
+cor.test(df$ai.15yr, df$beta)
+## Note: beta and ai.15yr are not correlated, so it might be worth adding 
+## both predictors to lmer
+
+narea <- lmer(log(narea) ~ ai.15yr * log(beta) * soil.no3n * pft + 
                      (1 | sampling.year) + (1 | NCRS.code),
                    data = df)
 
@@ -179,9 +185,21 @@ summary(narea)
 Anova(narea)
 r.squaredGLMM(narea)
 
+## Three-way interaction between ai.15yr, log(beta), and pft
+test(emtrends(narea, ~soil.no3n*log(beta), "ai.15yr", 
+              at = list(beta = c(1,2,4,6),
+                        soil.no3n = c(0, 20, 40, 80))))
+emmeans(narea, ~log(beta)*pft, "ai.15yr", 
+        at = list(beta = c(1,2,4,6),
+                  ai.15yr = 0))
+
+## Two-way interaction between ai.15yr and pft
+test(emtrends(narea, ~pft, "ai.15yr"))
+emmeans(narea, ~pft, "ai.15yr", at = list(ai.15yr = 0))
 
 
-test(emtrends(narea, ~pft, "soil.no3n"))
+## Two-way interaction between log(beta) and pft
+test(emtrends(narea, ~pft, "log(beta)"))
 emmeans(narea, ~pft, "beta", at = list(beta = 0))
 
 
@@ -211,3 +229,27 @@ png("../working_drafts/TXeco_chi_b.png",
     width = 8, height = 4, units = 'in', res = 600)
 chi.plot
 dev.off()
+
+##########################################################################
+## Narea
+##########################################################################
+df$n.leaf[c(344, 462)] <- NA
+
+
+nmass <- lmer(log(n.leaf) ~ ai.60 * log(beta) * soil.no3n * pft + 
+                (1 | sampling.year) + (1 | NCRS.code),
+              data = df)
+
+# Check model assumptions
+plot(nmass)
+qqnorm(residuals(nmass))
+qqline(residuals(nmass))
+hist(residuals(nmass))
+shapiro.test(residuals(nmass))
+outlierTest(nmass)
+
+# Model output
+summary(nmass)
+Anova(nmass)
+r.squaredGLMM(nmass)
+
