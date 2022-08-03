@@ -10,7 +10,6 @@ library(MuMIn)
 library(multcomp)
 library(multcompView)
 library(ggpubr)
-library(relaimpo)
 
 # Turn off digit rounding in emmean args
 emm_options(opt.digits = FALSE)
@@ -18,9 +17,8 @@ emm_options(opt.digits = FALSE)
 # Load compiled datasheet
 df <- read.csv("../data_sheets/TXeco_compiled_datasheet.csv",
                na.strings = c("NA", "NaN")) %>%
-  filter(pft != "c3_shrub" & pft!= "c3_graminoid" & site != "Bell_2020_05" & 
+  filter(pft != "c3_shrub" & site != "Bell_2020_05" & 
            site != "Russel_2020_01")
-df$narea.chi <- df$narea / df$chi
 
 ## Add colorblind friendly palette
 cbbPalette <- c("#0077BB", "#33BBEE", "#009988", "#EE7733", "#CC3311")
@@ -32,36 +30,85 @@ length(df$pft[df$pft == "c4_graminoid"])
 length(df$pft[df$pft == "legume"])
 length(df$pft[df$pft == "c3_forb"])
 
+## Calculate relative soil moisture metrics (based on 150 mm bucket)
+df$wn.30.rel <- df$wn.30 / 150
+df$wn.60.rel <- df$wn.60 / 150
+df$wn.90.rel <- df$wn.90 / 150
+df$wn.15yr.rel <- df$wn.15yr / 150
+df$wn.30yr.rel <- df$wn.30yr / 150
+
 ##########################################################################
 ## Beta
 ##########################################################################
-df$beta[c(62, 293)] <- NA
+df$beta[260] <- NA
 
+## Check soil moisture timescale
+beta.30 <- lmer(log(beta) ~ (wn.30.rel + soil.no3n) * (n.fixer + photo) + 
+                  (1 | NCRS.code), data = df)
+beta.60 <- lmer(log(beta) ~ (wn.60.rel + soil.no3n) * (n.fixer + photo) + 
+                  (1 | NCRS.code), data = df)
+beta.90 <- lmer(log(beta) ~ (wn.90.rel + soil.no3n) * (n.fixer + photo) + 
+                  (1 | NCRS.code), data = df)
+beta.15yr <- lmer(log(beta) ~ (wn.15yr.rel + soil.no3n) * (n.fixer + photo) + 
+                    (1 | NCRS.code), data = df)
 
-beta <- lmer(log(beta) ~ ai.60 * soil.no3n * pft + (1 | sampling.year) +
-               (1 | NCRS.code), data = df)
+## Model selection for relevant soil moisture timescale
+AICc(beta.30, beta.60, beta.90, beta.15yr) %>% arrange(AICc)
+## 30-day soil moisture estimates are the best model
 
 # Check model assumptions
-plot(beta)
-qqnorm(residuals(beta))
-qqline(residuals(beta))
-densityPlot(residuals(beta))
-shapiro.test(residuals(beta))
-outlierTest(beta)
+plot(beta.30)
+qqnorm(residuals(beta.30))
+qqline(residuals(beta.30))
+densityPlot(residuals(beta.30))
+shapiro.test(residuals(beta.30))
+outlierTest(beta.30)
 
 # Model output
-summary(beta)
-Anova(beta)
-r.squaredGLMM(beta)
+summary(beta.30)
+Anova(beta.30)
+r.squaredGLMM(beta.30)
 
+# Two-way interaction between wn.30.rel and photo
+test(emtrends(beta.30, ~photo, "wn.30.rel"))
 
-# Two-way interaction between ai.60 and pft
-test(emtrends(beta, ~pft, "ai.60"))
-emmeans(beta, ~pft, at = list(ai.60 = 0))
+# Two-way interaction between soil.no3n and photo
+test(emtrends(beta.30, ~photo, "soil.no3n"))
 
-# Individual pft effect
-emmeans(beta, pairwise~pft)
+# Two-way interaction between soil.no3n and n.fixer
+test(emtrends(beta.30, ~n.fixer, "soil.no3n"))
 
+# Individual effect of soil.no3n
+test(emtrends(beta.30, ~1, "soil.no3n"))
+
+# Individual effect of soil.no3n
+test(emtrends(beta.30, ~1, "soil.no3n"))
+
+# Individual effect of wn.30.rel
+test(emtrends(beta.30, ~1, "wn.30.rel"))
+
+# Individual effect of photo
+emmeans(beta.30, pairwise~photo)
+
+# Marginal interaction between soil.no3n and n.fixer
+test(emtrends(beta.30, pairwise~n.fixer, "soil.no3n"))
+
+# Marginal interaction between soil.no3n and n.fixer
+test(emtrends(beta.30, pairwise~photo, "soil.no3n"))
+
+## Notes:
+## Interaction between wn.30.rel and photo pathway indicate no effect of
+## soil moisture on beta in c3 species, but strong negative effect of
+## increasing soil moisture on beta in c4 species. Supports strong individual
+## effect of photo pathway on beta, where c3 species generally had higher
+## beta than c4 species
+##
+## Individual effect of wn.30.rel and soil N indicate strong negative effect
+## of increasing soil N and wn.30.rel on beta
+##
+## Marginal interaction between soil.no3n and Nfixer, and soil.no3n and photo
+## reveal stronger negative effect of soil N on beta in N-fixers; stronger negative
+## effect of soil N on beta in c4 species
 
 ##########################################################################
 ## Beta plot
@@ -96,11 +143,12 @@ dev.off()
 ##########################################################################
 ## Chi
 ##########################################################################
-df$chi[c(62, 83, 113, 132, 253, 254, 255, 271, 293, 295, 365,
-         433, 436, 434, 437, 453, 455)] <- NA
+df$chi[c(62, 111, 116, 300)] <- NA
+df$chi[c(465)] <- NA
+df$chi[c(260, 467, 468)] <- NA
 
-chi <- lmer(chi ~ ai.15yr * soil.no3n * pft + (1 | sampling.year) +
-               (1 | NCRS.code), data = df)
+chi <- lmer(chi ~ vpd1 + tavg13 + ((wn.30.rel + soil.no3n) * (n.fixer + photo)) + 
+              (1 | NCRS.code), data = df)
 
 
 # Check model assumptions
@@ -108,7 +156,6 @@ plot(chi)
 qqnorm(residuals(chi))
 qqline(residuals(chi))
 densityPlot(residuals(chi))
-
 shapiro.test(residuals(chi))
 outlierTest(chi)
 
@@ -117,13 +164,17 @@ summary(chi)
 Anova(chi)
 r.squaredGLMM(chi)
 
-# Two-way interaction between ai.15yr and pft
-test(emtrends(chi, ~pft, "ai.15yr"))
-emmeans(chi, ~pft, at = list(ai.15yr = 0))
+## Individual effect of vpd1
+test(emtrends(chi, ~1, "vpd1"))
 
-# Individual effect of ai.15yr on chi
-emmeans(chi, pairwise~pft)
+## Two-way interaction between 30-day relative soil moisture and photopath
+test(emtrends(chi, ~photo, "wn.30.rel"))
 
+## Two-way interaction between soil N availability and photopath
+test(emtrends(chi, ~photo, "soil.no3n"))
+
+## Two-way interaction between soil N availability and n.fix pathway
+test(emtrends(chi, ~n.fixer, "soil.no3n"))
 
 ##########################################################################
 ## Chi plots
@@ -159,31 +210,27 @@ dev.off()
 
 
 ##########################################################################
-## Narea
+## Nmass
 ##########################################################################
-df$narea[c(462)] <- NA
+df$n.leaf[c(493)] <- NA
 
-cor.test(df$chi, df$beta, method = "pearson")
-cor.test(df$ai.15yr, df$beta)
-## Note: beta and ai.15yr are not correlated, so it might be worth adding 
-## both predictors to lmer
-
-narea <- lmer(log(narea) ~ ai.15yr * log(beta) * soil.no3n * pft + 
-                     (1 | sampling.year) + (1 | NCRS.code),
-                   data = df)
+nmass <- lmer(log(n.leaf) ~ vpd15 + tavg21 + 
+                ((wn.30.rel + soil.no3n) * (n.fixer + photo)) + (1 | NCRS.code),
+              data = df)
 
 # Check model assumptions
-plot(narea)
-qqnorm(residuals(narea))
-qqline(residuals(narea))
-hist(residuals(narea))
-shapiro.test(residuals(narea))
-outlierTest(narea)
+plot(nmass)
+qqnorm(residuals(nmass))
+qqline(residuals(nmass))
+hist(residuals(nmass))
+densityPlot(residuals(nmass))
+shapiro.test(residuals(nmass))
+outlierTest(nmass)
 
 # Model output
-summary(narea)
-Anova(narea)
-r.squaredGLMM(narea)
+summary(nmass)
+Anova(nmass)
+r.squaredGLMM(nmass)
 
 ## Three-way interaction between ai.15yr, log(beta), and pft
 test(emtrends(narea, ~soil.no3n*log(beta), "ai.15yr", 

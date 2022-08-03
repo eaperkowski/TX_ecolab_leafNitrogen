@@ -791,11 +791,12 @@ d <- normals %>% full_join(d30) %>% full_join(d29) %>% full_join(d28) %>% full_j
   full_join(d2) %>% full_join(d1) 
 
 ## Read in climate aridity index values
-ai <- read.csv("../climate_data/TXeco_siteAridity_SPLASH.csv")
+splash.df <- read.csv("../climate_data/TXeco_siteAridity_SPLASH.csv")
 
-d <- d %>% full_join(ai) %>% dplyr::select(site:mav.30yr, 
-                                           ai.30:ai.30yr,
-                                           everything())
+d <- d %>% full_join(splash.df) %>% 
+  dplyr::select(site:mav.30yr, 
+                ai.30:ai.30yr,
+                everything())
 
 ## Write csv
 write.csv(d, "../climate_data/TXeco_climate_data.csv",

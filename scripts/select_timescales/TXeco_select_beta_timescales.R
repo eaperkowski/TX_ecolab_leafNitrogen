@@ -5,11 +5,15 @@ library(dplyr)
 library(car)
 library(lme4)
 library(MuMIn)
+library(modelr)
+library(merTools)
 
 ###############################################################################
 # Load compiled data file
 ###############################################################################
-df <- read.csv("../data_sheets/TXeco_compiled_datasheet.csv")
+df <- read.csv("../data_sheets/TXeco_compiled_datasheet.csv") %>%
+  filter(pft != "c3_shrub" & pft!= "c3_graminoid" & site != "Bell_2020_05" & 
+           site != "Russel_2020_01")
 
 ###############################################################################
 # Iterative models for growing season aridity and for log(narea)
@@ -17,28 +21,28 @@ df <- read.csv("../data_sheets/TXeco_compiled_datasheet.csv")
 df$beta[c(71, 93, 326, 524)] <- NA
 
 # 30-day aridity
-ai.30 <- lmer(log(beta) ~ ai.30 + (1 | sampling.year) + (1 | NCRS.code), data = df)
+ai.30 <- lmer(log(beta) ~ ai.30 + (1 | NCRS.code), data = df)
 shapiro.test(residuals(ai.30))
 hist(residuals(ai.30))
 outlierTest(ai.30)
 Anova(ai.30)
 
 # 60-day aridity
-ai.60 <- lmer(log(beta) ~ ai.60 + (1 | sampling.year) + (1 | NCRS.code), data = df)
+ai.60 <- lmer(log(beta) ~ ai.60 + (1 | NCRS.code), data = df)
 shapiro.test(residuals(ai.60))
 hist(residuals(ai.60))
 outlierTest(ai.60)
 Anova(ai.60)
 
 # 90-day aridity
-ai.90 <- lmer(log(beta) ~ ai.90 + (1 | sampling.year) + (1 | NCRS.code), data = df)
+ai.90 <- lmer(log(beta) ~ ai.90 + (1 | NCRS.code), data = df)
 shapiro.test(residuals(ai.90))
 hist(residuals(ai.90))
 outlierTest(ai.90)
 Anova(ai.90)
 
 # 15-year aridity
-ai.15yr <- lmer(log(beta) ~ ai.15yr + (1 | sampling.year) + (1 | NCRS.code), data = df)
+ai.15yr <- lmer(log(beta) ~ ai.15yr + (1 | NCRS.code), data = df)
 shapiro.test(residuals(ai.15yr))
 hist(residuals(ai.15yr))
 outlierTest(ai.15yr)
@@ -70,37 +74,37 @@ ai.30_modelSelect %>% full_join(ai.60_modelSelect) %>%
 ###############################################################################
 # Precipitation AICc for log(narea)
 ###############################################################################
-prcp30 <- lmer(log(beta) ~ prcp30 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-prcp29 <- lmer(log(beta) ~ prcp29 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-prcp28 <- lmer(log(beta) ~ prcp28 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-prcp27 <- lmer(log(beta) ~ prcp27 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-prcp26 <- lmer(log(beta) ~ prcp26 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-prcp25 <- lmer(log(beta) ~ prcp25 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-prcp24 <- lmer(log(beta) ~ prcp24 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-prcp23 <- lmer(log(beta) ~ prcp23 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-prcp22 <- lmer(log(beta) ~ prcp22 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-prcp21 <- lmer(log(beta) ~ prcp21 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-prcp20 <- lmer(log(beta) ~ prcp20 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-prcp19 <- lmer(log(beta) ~ prcp19 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-prcp18 <- lmer(log(beta) ~ prcp18 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-prcp17 <- lmer(log(beta) ~ prcp17 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-prcp16 <- lmer(log(beta) ~ prcp16 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-prcp15 <- lmer(log(beta) ~ prcp15 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-prcp14 <- lmer(log(beta) ~ prcp14 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-prcp13 <- lmer(log(beta) ~ prcp13 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-prcp12 <- lmer(log(beta) ~ prcp12 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-prcp11 <- lmer(log(beta) ~ prcp11 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-prcp10 <- lmer(log(beta) ~ prcp10 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-prcp9 <- lmer(log(beta) ~ prcp9 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-prcp8 <- lmer(log(beta) ~ prcp8 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-prcp7 <- lmer(log(beta) ~ prcp7 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-prcp6 <- lmer(log(beta) ~ prcp6 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-prcp5 <- lmer(log(beta) ~ prcp5 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-prcp4 <- lmer(log(beta) ~ prcp4 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-prcp3 <- lmer(log(beta) ~ prcp3 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-prcp2 <- lmer(log(beta) ~ prcp2 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-prcp1 <- lmer(log(beta) ~ prcp1 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-map <- lmer(log(beta) ~ map.15yr + (1 | sampling.year) + (1 | NCRS.code), data = df)
+prcp30 <- lmer(log(beta) ~ prcp30 + (1 | NCRS.code), data = df)
+prcp29 <- lmer(log(beta) ~ prcp29 + (1 | NCRS.code), data = df)
+prcp28 <- lmer(log(beta) ~ prcp28 + (1 | NCRS.code), data = df)
+prcp27 <- lmer(log(beta) ~ prcp27 + (1 | NCRS.code), data = df)
+prcp26 <- lmer(log(beta) ~ prcp26 + (1 | NCRS.code), data = df)
+prcp25 <- lmer(log(beta) ~ prcp25 + (1 | NCRS.code), data = df)
+prcp24 <- lmer(log(beta) ~ prcp24 + (1 | NCRS.code), data = df)
+prcp23 <- lmer(log(beta) ~ prcp23 + (1 | NCRS.code), data = df)
+prcp22 <- lmer(log(beta) ~ prcp22 + (1 | NCRS.code), data = df)
+prcp21 <- lmer(log(beta) ~ prcp21 + (1 | NCRS.code), data = df)
+prcp20 <- lmer(log(beta) ~ prcp20 + (1 | NCRS.code), data = df)
+prcp19 <- lmer(log(beta) ~ prcp19 + (1 | NCRS.code), data = df)
+prcp18 <- lmer(log(beta) ~ prcp18 + (1 | NCRS.code), data = df)
+prcp17 <- lmer(log(beta) ~ prcp17 + (1 | NCRS.code), data = df)
+prcp16 <- lmer(log(beta) ~ prcp16 + (1 | NCRS.code), data = df)
+prcp15 <- lmer(log(beta) ~ prcp15 + (1 | NCRS.code), data = df)
+prcp14 <- lmer(log(beta) ~ prcp14 + (1 | NCRS.code), data = df)
+prcp13 <- lmer(log(beta) ~ prcp13 + (1 | NCRS.code), data = df)
+prcp12 <- lmer(log(beta) ~ prcp12 + (1 | NCRS.code), data = df)
+prcp11 <- lmer(log(beta) ~ prcp11 + (1 | NCRS.code), data = df)
+prcp10 <- lmer(log(beta) ~ prcp10 + (1 | NCRS.code), data = df)
+prcp9 <- lmer(log(beta) ~ prcp9 + (1 | NCRS.code), data = df)
+prcp8 <- lmer(log(beta) ~ prcp8 + (1 | NCRS.code), data = df)
+prcp7 <- lmer(log(beta) ~ prcp7 + (1 | NCRS.code), data = df)
+prcp6 <- lmer(log(beta) ~ prcp6 + (1 | NCRS.code), data = df)
+prcp5 <- lmer(log(beta) ~ prcp5 + (1 | NCRS.code), data = df)
+prcp4 <- lmer(log(beta) ~ prcp4 + (1 | NCRS.code), data = df)
+prcp3 <- lmer(log(beta) ~ prcp3 + (1 | NCRS.code), data = df)
+prcp2 <- lmer(log(beta) ~ prcp2 + (1 | NCRS.code), data = df)
+prcp1 <- lmer(log(beta) ~ prcp1 + (1 | NCRS.code), data = df)
+map <- lmer(log(beta) ~ map.15yr + (1 | NCRS.code), data = df)
 
 # Model selection across timescales
 prcp30.modelSelect <- data.frame(day = 30, var = "prcp", AICc = AICc(prcp30), 
@@ -189,37 +193,37 @@ prcp30.modelSelect %>%
 ###############################################################################
 # Iterative models for Tmean and log(narea)
 ###############################################################################
-temp30 <- lmer(log(beta) ~ tavg30 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-temp29 <- lmer(log(beta) ~ tavg29 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-temp28 <- lmer(log(beta) ~ tavg28 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-temp27 <- lmer(log(beta) ~ tavg27 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-temp26 <- lmer(log(beta) ~ tavg26 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-temp25 <- lmer(log(beta) ~ tavg25 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-temp24 <- lmer(log(beta) ~ tavg24 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-temp23 <- lmer(log(beta) ~ tavg23 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-temp22 <- lmer(log(beta) ~ tavg22 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-temp21 <- lmer(log(beta) ~ tavg21 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-temp20 <- lmer(log(beta) ~ tavg20 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-temp19 <- lmer(log(beta) ~ tavg19 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-temp18 <- lmer(log(beta) ~ tavg18 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-temp17 <- lmer(log(beta) ~ tavg17 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-temp16 <- lmer(log(beta) ~ tavg16 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-temp15 <- lmer(log(beta) ~ tavg15 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-temp14 <- lmer(log(beta) ~ tavg14 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-temp13 <- lmer(log(beta) ~ tavg13 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-temp12 <- lmer(log(beta) ~ tavg12 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-temp11 <- lmer(log(beta) ~ tavg11 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-temp10 <- lmer(log(beta) ~ tavg10 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-temp9 <- lmer(log(beta) ~ tavg9 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-temp8 <- lmer(log(beta) ~ tavg8 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-temp7 <- lmer(log(beta) ~ tavg7 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-temp6 <- lmer(log(beta) ~ tavg6 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-temp5 <- lmer(log(beta) ~ tavg5 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-temp4 <- lmer(log(beta) ~ tavg4 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-temp3 <- lmer(log(beta) ~ tavg3 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-temp2 <- lmer(log(beta) ~ tavg2 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-temp1 <- lmer(log(beta) ~ tavg1 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-mat <- lmer(log(beta) ~ mat.15yr + (1 | sampling.year) + (1 | NCRS.code), data = df)
+temp30 <- lmer(log(beta) ~ tavg30 + (1 | NCRS.code), data = df)
+temp29 <- lmer(log(beta) ~ tavg29 + (1 | NCRS.code), data = df)
+temp28 <- lmer(log(beta) ~ tavg28 + (1 | NCRS.code), data = df)
+temp27 <- lmer(log(beta) ~ tavg27 + (1 | NCRS.code), data = df)
+temp26 <- lmer(log(beta) ~ tavg26 + (1 | NCRS.code), data = df)
+temp25 <- lmer(log(beta) ~ tavg25 + (1 | NCRS.code), data = df)
+temp24 <- lmer(log(beta) ~ tavg24 + (1 | NCRS.code), data = df)
+temp23 <- lmer(log(beta) ~ tavg23 + (1 | NCRS.code), data = df)
+temp22 <- lmer(log(beta) ~ tavg22 + (1 | NCRS.code), data = df)
+temp21 <- lmer(log(beta) ~ tavg21 + (1 | NCRS.code), data = df)
+temp20 <- lmer(log(beta) ~ tavg20 + (1 | NCRS.code), data = df)
+temp19 <- lmer(log(beta) ~ tavg19 + (1 | NCRS.code), data = df)
+temp18 <- lmer(log(beta) ~ tavg18 + (1 | NCRS.code), data = df)
+temp17 <- lmer(log(beta) ~ tavg17 + (1 | NCRS.code), data = df)
+temp16 <- lmer(log(beta) ~ tavg16 + (1 | NCRS.code), data = df)
+temp15 <- lmer(log(beta) ~ tavg15 + (1 | NCRS.code), data = df)
+temp14 <- lmer(log(beta) ~ tavg14 + (1 | NCRS.code), data = df)
+temp13 <- lmer(log(beta) ~ tavg13 + (1 | NCRS.code), data = df)
+temp12 <- lmer(log(beta) ~ tavg12 + (1 | NCRS.code), data = df)
+temp11 <- lmer(log(beta) ~ tavg11 + (1 | NCRS.code), data = df)
+temp10 <- lmer(log(beta) ~ tavg10 + (1 | NCRS.code), data = df)
+temp9 <- lmer(log(beta) ~ tavg9 + (1 | NCRS.code), data = df)
+temp8 <- lmer(log(beta) ~ tavg8 + (1 | NCRS.code), data = df)
+temp7 <- lmer(log(beta) ~ tavg7 + (1 | NCRS.code), data = df)
+temp6 <- lmer(log(beta) ~ tavg6 + (1 | NCRS.code), data = df)
+temp5 <- lmer(log(beta) ~ tavg5 + (1 | NCRS.code), data = df)
+temp4 <- lmer(log(beta) ~ tavg4 + (1 | NCRS.code), data = df)
+temp3 <- lmer(log(beta) ~ tavg3 + (1 | NCRS.code), data = df)
+temp2 <- lmer(log(beta) ~ tavg2 + (1 | NCRS.code), data = df)
+temp1 <- lmer(log(beta) ~ tavg1 + (1 | NCRS.code), data = df)
+mat <- lmer(log(beta) ~ mat.15yr + (1 | NCRS.code), data = df)
 
 # Model selection across timescales
 temp30.modelSelect <- data.frame(day = 30, var = "temp", AICc = AICc(temp30), 
@@ -307,101 +311,103 @@ temp30.modelSelect %>%
 ###############################################################################
 # VPD
 ###############################################################################
-vpd30 <- lmer(log(beta) ~ vpd30 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-vpd29 <- lmer(log(beta) ~ vpd29 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-vpd28 <- lmer(log(beta) ~ vpd28 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-vpd27 <- lmer(log(beta) ~ vpd27 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-vpd26 <- lmer(log(beta) ~ vpd26 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-vpd25 <- lmer(log(beta) ~ vpd25 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-vpd24 <- lmer(log(beta) ~ vpd24 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-vpd23 <- lmer(log(beta) ~ vpd23 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-vpd22 <- lmer(log(beta) ~ vpd22 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-vpd21 <- lmer(log(beta) ~ vpd21 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-vpd20 <- lmer(log(beta) ~ vpd20 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-vpd19 <- lmer(log(beta) ~ vpd19 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-vpd18 <- lmer(log(beta) ~ vpd18 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-vpd17 <- lmer(log(beta) ~ vpd17 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-vpd16 <- lmer(log(beta) ~ vpd16 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-vpd15 <- lmer(log(beta) ~ vpd15 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-vpd14 <- lmer(log(beta) ~ vpd14 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-vpd13 <- lmer(log(beta) ~ vpd13 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-vpd12 <- lmer(log(beta) ~ vpd12 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-vpd11 <- lmer(log(beta) ~ vpd11 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-vpd10 <- lmer(log(beta) ~ vpd10 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-vpd9 <- lmer(log(beta) ~ vpd9 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-vpd8 <- lmer(log(beta) ~ vpd8 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-vpd7 <- lmer(log(beta) ~ vpd7 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-vpd6 <- lmer(log(beta) ~ vpd6 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-vpd5 <- lmer(log(beta) ~ vpd5 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-vpd4 <- lmer(log(beta) ~ vpd4 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-vpd3 <- lmer(log(beta) ~ vpd3 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-vpd2 <- lmer(log(beta) ~ vpd2 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-vpd1 <- lmer(log(beta) ~ vpd1 + (1 | sampling.year) + (1 | NCRS.code), data = df)
-mav <- lmer(log(beta) ~ mav.15yr + (1 | sampling.year) + (1 | NCRS.code), data = df)
+df$beta[c(253)] <- NA
+
+vpd30 <- lmer(log(beta) ~ vpd30 + (1 | NCRS.code), data = df)
+vpd29 <- lmer(log(beta) ~ vpd29 + (1 | NCRS.code), data = df)
+vpd28 <- lmer(log(beta) ~ vpd28 + (1 | NCRS.code), data = df)
+vpd27 <- lmer(log(beta) ~ vpd27 + (1 | NCRS.code), data = df)
+vpd26 <- lmer(log(beta) ~ vpd26 + (1 | NCRS.code), data = df)
+vpd25 <- lmer(log(beta) ~ vpd25 + (1 | NCRS.code), data = df)
+vpd24 <- lmer(log(beta) ~ vpd24 + (1 | NCRS.code), data = df)
+vpd23 <- lmer(log(beta) ~ vpd23 + (1 | NCRS.code), data = df)
+vpd22 <- lmer(log(beta) ~ vpd22 + (1 | NCRS.code), data = df)
+vpd21 <- lmer(log(beta) ~ vpd21 + (1 | NCRS.code), data = df)
+vpd20 <- lmer(log(beta) ~ vpd20 + (1 | NCRS.code), data = df)
+vpd19 <- lmer(log(beta) ~ vpd19 + (1 | NCRS.code), data = df)
+vpd18 <- lmer(log(beta) ~ vpd18 + (1 | NCRS.code), data = df)
+vpd17 <- lmer(log(beta) ~ vpd17 + (1 | NCRS.code), data = df)
+vpd16 <- lmer(log(beta) ~ vpd16 + (1 | NCRS.code), data = df)
+vpd15 <- lmer(log(beta) ~ vpd15 + (1 | NCRS.code), data = df)
+vpd14 <- lmer(log(beta) ~ vpd14 + (1 | NCRS.code), data = df)
+vpd13 <- lmer(log(beta) ~ vpd13 + (1 | NCRS.code), data = df)
+vpd12 <- lmer(log(beta) ~ vpd12 + (1 | NCRS.code), data = df)
+vpd11 <- lmer(log(beta) ~ vpd11 + (1 | NCRS.code), data = df)
+vpd10 <- lmer(log(beta) ~ vpd10 + (1 | NCRS.code), data = df)
+vpd9 <- lmer(log(beta) ~ vpd9 + (1 | NCRS.code), data = df)
+vpd8 <- lmer(log(beta) ~ vpd8 + (1 | NCRS.code), data = df)
+vpd7 <- lmer(log(beta) ~ vpd7 + (1 | NCRS.code), data = df)
+vpd6 <- lmer(log(beta) ~ vpd6 + (1 | NCRS.code), data = df)
+vpd5 <- lmer(log(beta) ~ vpd5 + (1 | NCRS.code), data = df)
+vpd4 <- lmer(log(beta) ~ vpd4 + (1 | NCRS.code), data = df)
+vpd3 <- lmer(log(beta) ~ vpd3 + (1 | NCRS.code), data = df)
+vpd2 <- lmer(log(beta) ~ vpd2 + (1 | NCRS.code), data = df)
+vpd1 <- lmer(log(beta) ~ vpd1 + (1 | NCRS.code), data = df)
+mav <- lmer(log(beta) ~ mav.15yr + (1 | NCRS.code), data = df)
 
 # Model selection across timescales
 vpd30.modelSelect <- data.frame(day = 30, var = "vpd", AICc = AICc(vpd30), 
-                                 RMSE = rmse(vpd30), r.squaredGLMM(vpd30))
+                                 RMSE = RMSE.merMod(vpd30), r.squaredGLMM(vpd30))
 vpd29.modelSelect <- data.frame(day = 29, var = "vpd", AICc = AICc(vpd29), 
-                                 RMSE = rmse(vpd29), r.squaredGLMM(vpd29))
+                                 RMSE = RMSE.merMod(vpd29), r.squaredGLMM(vpd29))
 vpd28.modelSelect <- data.frame(day = 28, var = "vpd", AICc = AICc(vpd28), 
-                                 RMSE = rmse(vpd28), r.squaredGLMM(vpd28))
+                                 RMSE = RMSE.merMod(vpd28), r.squaredGLMM(vpd28))
 vpd27.modelSelect <- data.frame(day = 27, var = "vpd", AICc = AICc(vpd27), 
-                                 RMSE = rmse(vpd27), r.squaredGLMM(vpd27))
+                                 RMSE = RMSE.merMod(vpd27), r.squaredGLMM(vpd27))
 vpd26.modelSelect <- data.frame(day = 26, var = "vpd", AICc = AICc(vpd26), 
-                                 RMSE = rmse(vpd26), r.squaredGLMM(vpd26))
+                                 RMSE = RMSE.merMod(vpd26), r.squaredGLMM(vpd26))
 vpd25.modelSelect <- data.frame(day = 25, var = "vpd", AICc = AICc(vpd25), 
-                                 RMSE = rmse(vpd25), r.squaredGLMM(vpd25))
+                                 RMSE = RMSE.merMod(vpd25), r.squaredGLMM(vpd25))
 vpd24.modelSelect <- data.frame(day = 24, var = "vpd", AICc = AICc(vpd24), 
-                                 RMSE = rmse(vpd24), r.squaredGLMM(vpd24))
+                                 RMSE = RMSE.merMod(vpd24), r.squaredGLMM(vpd24))
 vpd23.modelSelect <- data.frame(day = 23, var = "vpd", AICc = AICc(vpd23), 
-                                 RMSE = rmse(vpd23), r.squaredGLMM(vpd23))
+                                 RMSE = RMSE.merMod(vpd23), r.squaredGLMM(vpd23))
 vpd22.modelSelect <- data.frame(day = 22, var = "vpd", AICc = AICc(vpd22), 
-                                 RMSE = rmse(vpd22), r.squaredGLMM(vpd22))
+                                 RMSE = RMSE.merMod(vpd22), r.squaredGLMM(vpd22))
 vpd21.modelSelect <- data.frame(day = 21, var = "vpd", AICc = AICc(vpd21), 
-                                 RMSE = rmse(vpd21), r.squaredGLMM(vpd21))
+                                 RMSE = RMSE.merMod(vpd21), r.squaredGLMM(vpd21))
 vpd20.modelSelect <- data.frame(day = 20, var = "vpd", AICc = AICc(vpd20), 
-                                 RMSE = rmse(vpd20), r.squaredGLMM(vpd20))
+                                 RMSE = RMSE.merMod(vpd20), r.squaredGLMM(vpd20))
 vpd19.modelSelect <- data.frame(day = 19, var = "vpd", AICc = AICc(vpd19), 
-                                 RMSE = rmse(vpd19), r.squaredGLMM(vpd19))
+                                 RMSE = RMSE.merMod(vpd19), r.squaredGLMM(vpd19))
 vpd18.modelSelect <- data.frame(day = 18, var = "vpd", AICc = AICc(vpd18), 
-                                 RMSE = rmse(vpd18), r.squaredGLMM(vpd18))
+                                 RMSE = RMSE.merMod(vpd18), r.squaredGLMM(vpd18))
 vpd17.modelSelect <- data.frame(day = 17, var = "vpd", AICc = AICc(vpd17), 
-                                 RMSE = rmse(vpd17), r.squaredGLMM(vpd17))
+                                 RMSE = RMSE.merMod(vpd17), r.squaredGLMM(vpd17))
 vpd16.modelSelect <- data.frame(day = 16, var = "vpd", AICc = AICc(vpd16), 
-                                 RMSE = rmse(vpd16), r.squaredGLMM(vpd16))
+                                 RMSE = RMSE.merMod(vpd16), r.squaredGLMM(vpd16))
 vpd15.modelSelect <- data.frame(day = 15, var = "vpd", AICc = AICc(vpd15), 
-                                 RMSE = rmse(vpd15), r.squaredGLMM(vpd15))
+                                 RMSE = RMSE.merMod(vpd15), r.squaredGLMM(vpd15))
 vpd14.modelSelect <- data.frame(day = 14, var = "vpd", AICc = AICc(vpd14), 
-                                 RMSE = rmse(vpd14), r.squaredGLMM(vpd14))
+                                 RMSE = RMSE.merMod(vpd14), r.squaredGLMM(vpd14))
 vpd13.modelSelect <- data.frame(day = 13, var = "vpd", AICc = AICc(vpd13), 
-                                 RMSE = rmse(vpd13), r.squaredGLMM(vpd13))
+                                 RMSE = RMSE.merMod(vpd13), r.squaredGLMM(vpd13))
 vpd12.modelSelect <- data.frame(day = 12, var = "vpd", AICc = AICc(vpd12), 
-                                 RMSE = rmse(vpd12), r.squaredGLMM(vpd12))
+                                 RMSE = RMSE.merMod(vpd12), r.squaredGLMM(vpd12))
 vpd11.modelSelect <- data.frame(day = 11, var = "vpd", AICc = AICc(vpd11), 
-                                 RMSE = rmse(vpd11), r.squaredGLMM(vpd11))
+                                 RMSE = RMSE.merMod(vpd11), r.squaredGLMM(vpd11))
 vpd10.modelSelect <- data.frame(day = 10, var = "vpd", AICc = AICc(vpd10), 
-                                 RMSE = rmse(vpd10), r.squaredGLMM(vpd10))
+                                 RMSE = RMSE.merMod(vpd10), r.squaredGLMM(vpd10))
 vpd9.modelSelect <- data.frame(day = 9, var = "vpd", AICc = AICc(vpd9), 
-                                RMSE = rmse(vpd9), r.squaredGLMM(vpd9))
+                                RMSE = RMSE.merMod(vpd9), r.squaredGLMM(vpd9))
 vpd8.modelSelect <- data.frame(day = 8, var = "vpd", AICc = AICc(vpd8), 
-                                RMSE = rmse(vpd8), r.squaredGLMM(vpd8))
+                                RMSE = RMSE.merMod(vpd8), r.squaredGLMM(vpd8))
 vpd7.modelSelect <- data.frame(day = 7, var = "vpd", AICc = AICc(vpd7), 
-                                RMSE = rmse(vpd7), r.squaredGLMM(vpd7))
+                                RMSE = RMSE.merMod(vpd7), r.squaredGLMM(vpd7))
 vpd6.modelSelect <- data.frame(day = 6, var = "vpd", AICc = AICc(vpd6), 
-                                RMSE = rmse(vpd6), r.squaredGLMM(vpd6))
+                                RMSE = RMSE.merMod(vpd6), r.squaredGLMM(vpd6))
 vpd5.modelSelect <- data.frame(day = 5, var = "vpd", AICc = AICc(vpd5), 
-                                RMSE = rmse(vpd5), r.squaredGLMM(vpd5))
+                                RMSE = RMSE.merMod(vpd5), r.squaredGLMM(vpd5))
 vpd4.modelSelect <- data.frame(day = 4, var = "vpd", AICc = AICc(vpd4), 
-                                RMSE = rmse(vpd4), r.squaredGLMM(vpd4))
+                                RMSE = RMSE.merMod(vpd4), r.squaredGLMM(vpd4))
 vpd3.modelSelect <- data.frame(day = 3, var = "vpd", AICc = AICc(vpd3), 
-                                RMSE = rmse(vpd3), r.squaredGLMM(vpd3))
+                                RMSE = RMSE.merMod(vpd3), r.squaredGLMM(vpd3))
 vpd2.modelSelect <- data.frame(day = 2, var = "vpd", AICc = AICc(vpd2), 
-                                RMSE = rmse(vpd2), r.squaredGLMM(vpd2))
+                                RMSE = RMSE.merMod(vpd2), r.squaredGLMM(vpd2))
 vpd1.modelSelect <- data.frame(day = 1, var = "vpd", AICc = AICc(vpd1), 
-                                RMSE = rmse(vpd1), r.squaredGLMM(vpd1))
+                                RMSE = RMSE.merMod(vpd1), r.squaredGLMM(vpd1))
 mav.15yr.modelSelect <- data.frame(day = 5478, var = "vpd", AICc = AICc(mav), 
-                                   RMSE = rmse(mav), r.squaredGLMM(mav))
+                                   RMSE = RMSE.merMod(mav), r.squaredGLMM(mav))
 
 vpd30.modelSelect %>% 
   full_join(mav.15yr.modelSelect) %>% full_join(vpd29.modelSelect) %>% 
@@ -419,7 +425,6 @@ vpd30.modelSelect %>%
   full_join(vpd6.modelSelect) %>% full_join(vpd5.modelSelect) %>% 
   full_join(vpd4.modelSelect) %>% full_join(vpd3.modelSelect) %>% 
   full_join(vpd2.modelSelect) %>% full_join(vpd1.modelSelect) %>%
-  mutate(concat.select = AICc + RMSE) %>%
   arrange(AICc)
 ## 1-day VPD is best model
 

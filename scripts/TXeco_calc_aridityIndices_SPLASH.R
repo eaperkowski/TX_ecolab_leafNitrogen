@@ -4659,7 +4659,7 @@ daily.clim <- sites.daily.1991 %>%
   full_join(sites.daily.2020) %>% full_join(sites.daily.2021) %>%
   full_join(sites) %>%
   dplyr::select(site, date, year, month, day, latitude, longitude, elv_m,
-         sampling.year:primary.2021, sf:aet) %>%
+         sampling.year:primary.2021, sf:aet, ro) %>%
   mutate(initial.2020 = ymd(initial.2020),
          primary.2020 = ymd(primary.2020),
          initial.2021 = ymd(initial.2021),
@@ -4688,8 +4688,6 @@ initial.2020eco <- daily.clim %>%
   dplyr::select(site, latitude:elv_m, sampling.date, sampling.year, visit.type, 
                 date, month, year, sf:aet)
 
-
-
 # 2020 primary site visits
 primary.2020eco <- daily.clim %>%
   dplyr::filter(site == "Bexar_2019_13" | site == "Harris_2020_03" |
@@ -4705,7 +4703,6 @@ primary.2020eco <- daily.clim %>%
   distinct() %>%  ## Note duplicate values for Harris, two rows of single dates
   dplyr::select(site, latitude:elv_m, sampling.date, sampling.year, visit.type, 
                 date, month, year, sf:aet)
-
 
 # 2021 initial site visits
 initial.2021eco <- daily.clim %>%
@@ -4756,20 +4753,48 @@ concat.clim <- initial.2020eco %>%
 ## Calculate 30, 60, 90 day site Priestley-Taylor coefficient and aridity
 ## index (P/PET)
 ###############################################################################
+
 txeco.splash.90day <- concat.clim %>%
   group_by(site, sampling.year, visit.type) %>%
   filter(date > sampling.date - 90) %>%
-  summarize(ai.90 = sum(pn, na.rm = TRUE)/sum(pet, na.rm = TRUE))
+  summarize(ho.90 = mean(ho, na.rm = TRUE),
+            hn.90 = mean(hn, na.rm = TRUE),
+            ppfd.90 = mean(ppfd, na.rm = TRUE),
+            cond.90 = sum(cond, na.rm = TRUE),
+            eet.90 = sum(eet, na.rm = TRUE),
+            pet.90 = sum(pet, na.rm = TRUE),
+            aet.90 = sum(aet, na.rm = TRUE),
+            wn.90 = mean(soil.moisture, na.rm = TRUE),
+            ai.90 = sum(pn, na.rm = TRUE) / sum(pet, na.rm = TRUE),
+            pt.90 = sum(aet, na.rm = TRUE) / sum(eet, na.rm = TRUE))
 
 txeco.splash.60day <- concat.clim %>%
   group_by(site, sampling.year, visit.type) %>%
   filter(date > sampling.date - 60) %>%
-  summarize(ai.60 = sum(pn, na.rm = TRUE) / sum(pet, na.rm = TRUE))
+  summarize(ho.60 = mean(ho, na.rm = TRUE),
+            hn.60 = mean(hn, na.rm = TRUE),
+            ppfd.60 = mean(ppfd, na.rm = TRUE),
+            cond.60 = sum(cond, na.rm = TRUE),
+            eet.60 = sum(eet, na.rm = TRUE),
+            pet.60 = sum(pet, na.rm = TRUE),
+            aet.60 = sum(aet, na.rm = TRUE),
+            wn.60 = mean(soil.moisture, na.rm = TRUE),
+            ai.60 = sum(pn, na.rm = TRUE) / sum(pet, na.rm = TRUE),
+            pt.60 = sum(aet, na.rm = TRUE) / sum(eet, na.rm = TRUE))
 
 txeco.splash.30day <- concat.clim %>%
   group_by(site, sampling.year, visit.type) %>%
   filter(date > sampling.date - 30) %>%
-  summarize(ai.30 = sum(pn, na.rm = TRUE)/sum(pet, na.rm = TRUE))
+  summarize(ho.30 = mean(ho, na.rm = TRUE),
+            hn.30 = mean(hn, na.rm = TRUE),
+            ppfd.30 = mean(ppfd, na.rm = TRUE),
+            cond.30 = sum(cond, na.rm = TRUE),
+            eet.30 = sum(eet, na.rm = TRUE),
+            pet.30 = sum(pet, na.rm = TRUE),
+            aet.30 = sum(aet, na.rm = TRUE),
+            wn.30 = mean(soil.moisture, na.rm = TRUE),
+            ai.30 = sum(pn, na.rm = TRUE) / sum(pet, na.rm = TRUE),
+            pt.30 = sum(aet, na.rm = TRUE) / sum(eet, na.rm = TRUE))
 
 ## Merge files
 site.gs.aridity <- txeco.splash.30day %>%
@@ -4783,28 +4808,52 @@ site.gs.aridity <- txeco.splash.30day %>%
 txeco.splash.30yr.aridity <- concat.clim %>%
   filter(year != 2021) %>%
   dplyr::group_by(site, year) %>%
-  dplyr::summarize(total.aet = sum(aet, na.rm = TRUE),
-                   total.eet = sum(eet, na.rm = TRUE),
-                   total.pet = sum(pet, na.rm = TRUE),
-                   total.pn = sum(pn, na.rm = TRUE),
-                   mean.annual.ai = total.pn / total.pet,
-                   mean.annual.pt = total.aet / total.eet) %>%
-  ungroup(year) %>%
-  summarize(ai.30yr = mean(mean.annual.ai),
-            pt.30yr = mean(mean.annual.pt))
-
+  dplyr::summarize(ho = mean(ho, na.rm = TRUE),
+                   hn = mean(hn, na.rm = TRUE),
+                   ppfd = mean(ppfd, na.rm = TRUE),
+                   cond = sum(cond, na.rm = TRUE),
+                   eet = sum(eet, na.rm = TRUE),
+                   pet = sum(pet, na.rm = TRUE),
+                   aet = sum(aet, na.rm = TRUE),
+                   wn = mean(soil.moisture, na.rm = TRUE),
+                   ai = sum(pn, na.rm = TRUE) / sum(pet, na.rm = TRUE),
+                   pt = sum(aet, na.rm = TRUE) / sum(eet, na.rm = TRUE)) %>%
+  dplyr::ungroup(year) %>%
+  dplyr::summarize(ho.30yr = mean(ho, na.rm = TRUE),
+                   hn.30yr = mean(hn, na.rm = TRUE),
+                   ppfd.30yr = mean(ppfd, na.rm = TRUE),
+                   cond.30yr = mean(cond, na.rm = TRUE),
+                   eet.30yr = mean(eet, na.rm = TRUE),
+                   pet.30yr = mean(pet, na.rm = TRUE),
+                   aet.30yr = mean(aet, na.rm = TRUE),
+                   wn.30yr = mean(wn, na.rm = TRUE),
+                   ai.30yr = mean(ai, na.rm = TRUE),
+                   pt.30yr = mean(pt, na.rm = TRUE))
+    
 txeco.splash.15yr.aridity <- concat.clim %>%
   filter(year >= 2006 & year <= 2020) %>%
   dplyr::group_by(site, year) %>%
-  dplyr::summarize(total.aet = sum(aet, na.rm = TRUE),
-                   total.eet = sum(eet, na.rm = TRUE),
-                   total.pet = sum(pet, na.rm = TRUE),
-                   total.pn = sum(pn, na.rm = TRUE),
-                   mean.annual.ai = total.pn / total.pet,
-                   mean.annual.pt = total.aet / total.eet) %>%
-  ungroup(year) %>%
-  summarize(ai.15yr = mean(mean.annual.ai), 
-            pt.15yr = mean(mean.annual.pt))
+  dplyr::summarize(ho = mean(ho, na.rm = TRUE),
+                   hn = mean(hn, na.rm = TRUE),
+                   ppfd = mean(ppfd, na.rm = TRUE),
+                   cond = sum(cond, na.rm = TRUE),
+                   eet = sum(eet, na.rm = TRUE),
+                   pet = sum(pet, na.rm = TRUE),
+                   aet = sum(aet, na.rm = TRUE),
+                   wn = mean(soil.moisture, na.rm = TRUE),
+                   ai = sum(pn, na.rm = TRUE) / sum(pet, na.rm = TRUE),
+                   pt = sum(aet, na.rm = TRUE) / sum(eet, na.rm = TRUE)) %>%
+  dplyr::ungroup(year) %>%
+  dplyr::summarize(ho.15yr = mean(ho, na.rm = TRUE),
+                   hn.15yr = mean(hn, na.rm = TRUE),
+                   ppfd.15yr = mean(ppfd, na.rm = TRUE),
+                   cond.15yr = mean(cond, na.rm = TRUE),
+                   eet.15yr = mean(eet, na.rm = TRUE),
+                   pet.15yr = mean(pet, na.rm = TRUE),
+                   aet.15yr = mean(aet, na.rm = TRUE),
+                   wn.15yr = mean(wn, na.rm = TRUE),
+                   ai.15yr = mean(ai, na.rm = TRUE),
+                   pt.15yr = mean(pt, na.rm = TRUE))
 
 ## Merge files
 sites.aridity.indices <- txeco.splash.30day %>%
@@ -4813,11 +4862,8 @@ sites.aridity.indices <- txeco.splash.30day %>%
   full_join(txeco.splash.15yr.aridity, by = "site") %>%
   full_join(txeco.splash.30yr.aridity, by = "site")
 
-## Write 30, 60, 90 day aridity index mean file
+## Write 30, 60, 90 day and 15/30 year SPLASH results
 write.csv(sites.aridity.indices, "../climate_data/TXeco_siteAridity_SPLASH.csv",
           row.names = FALSE)
-
-
-
 
 
