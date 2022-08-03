@@ -70,7 +70,8 @@ Anova(beta.30)
 r.squaredGLMM(beta.30)
 
 # Two-way interaction between wn.30.rel and photo
-test(emtrends(beta.30, ~photo, "wn.30.rel"))
+test(emtrends(beta.30, ~photo, "wn.30"))
+emmeans(beta.30, ~photo, "wn.30.rel", at = list(wn.30.rel = 0))
 
 # Two-way interaction between soil.no3n and photo
 test(emtrends(beta.30, ~photo, "soil.no3n"))
@@ -80,12 +81,14 @@ test(emtrends(beta.30, ~n.fixer, "soil.no3n"))
 
 # Individual effect of soil.no3n
 test(emtrends(beta.30, ~1, "soil.no3n"))
+emmeans(beta.30, ~1, "soil.no3n", at = list(soil.no3n = 0))
 
 # Individual effect of soil.no3n
 test(emtrends(beta.30, ~1, "soil.no3n"))
 
 # Individual effect of wn.30.rel
 test(emtrends(beta.30, ~1, "wn.30.rel"))
+emmeans(beta.30, ~1, at = list(wn.30.rel = 0))
 
 # Individual effect of photo
 emmeans(beta.30, pairwise~photo)
@@ -113,25 +116,54 @@ test(emtrends(beta.30, pairwise~photo, "soil.no3n"))
 ##########################################################################
 ## Beta plot
 ##########################################################################
-beta.plot <- ggplot(data = df, aes(x = ai.60, y = beta)) +
-  geom_hline(yintercept = 146, lty = 2, lwd = 1) +
-  geom_jitter(aes(fill = pft),
-              width = 0.02, size = 3, alpha = 0.7, shape = 21) +
-  stat_function(fun = function(x) exp(0.524*x + 3.653), lwd = 2,
-                xlim = c(0.3, 1.8), color = cbbPalette2[1]) +
-  stat_function(fun = function(x) exp(-4.282*x + 4.824), lwd = 2,
-                xlim = c(0.3, 1.8), color = cbbPalette2[2]) +
-  stat_function(fun = function(x) exp(0.602*x + 3.221), lwd = 2, lty = 2,
-                xlim = c(0.3, 1.8), color = cbbPalette2[3]) +
-  scale_fill_manual(values = cbbPalette2, labels = c(expression("C"[3]~"forb"),
-                                                     expression("C"[4]~"graminoid"),
-                                                     expression("C"[3]~"legume"))) +
-  scale_x_continuous(limits = c(0.3, 1.8), breaks = seq(0.3, 1.8, 0.3)) +
-  scale_y_continuous(limits = c(-50, 600), breaks = seq(0, 600, 200)) +
-  labs(x = "60-day P/PET",
+min(df$wn.30.rel)
+max(df$wn.30.rel)
+
+beta.sm.plot <- ggplot(data = subset(df, !is.na(photo)), 
+                                  aes(x = wn.30.rel, y = log(beta))) +
+  geom_hline(yintercept = 5, lty = 2, lwd = 1) +
+  geom_jitter(aes(fill = photo),
+              width = 0.02, size = 3, alpha = 0.3, shape = 21) +
+  stat_function(fun = function(x) 0.131*x + 3.749, lwd = 2, lty = 2, # c3
+                xlim = c(0.1, 0.9), color = cbbPalette[1]) +
+  stat_function(fun = function(x) -4.450*x + 3.418, lwd = 2, # c4
+                xlim = c(0.1, 0.9), color = cbbPalette[4]) +
+  stat_function(fun = function(x) -2.159*x + 3.584, lwd = 2, # overall
+                xlim = c(0.1, 0.9), color = "black") + 
+  scale_fill_manual(values = c(cbbPalette[1], cbbPalette[4]), 
+                    labels = c(expression("C"[3]),
+                               expression("C"[4]))) +
+  scale_x_continuous(limits = c(0.1, 0.9), breaks = seq(0.1, 0.9, 0.2)) +
+  scale_y_continuous(limits = c(-2.5, 7.5), breaks = seq(-2.5, 7.5, 2.5)) +
+  labs(x = "30-day relative soil moisture",
        y = expression(ln~beta),
-       fill = "Plant functional type") +
+       fill = "Photosynthetic pathway") +
   theme_bw(base_size = 18) +
+  theme(legend.text.align = 0)
+
+beta.soiln.plot <- ggplot(data = subset(df, !is.na(photo) & !is.na(n.fixer)), 
+                       aes(x = soil.no3n, y = log(beta))) +
+  geom_hline(yintercept = 5, lty = 2, lwd = 1) +
+  geom_jitter(aes(fill = photo, shape = n.fixer),
+              width = 0.02, size = 3, alpha = 0.3) +
+  # stat_function(fun = function(x) *x + , lwd = 2, lty = 2, # c3
+  #               xlim = c(0.1, 0.9), color = cbbPalette[1]) +
+  # stat_function(fun = function(x) *x + , lwd = 2, # c4
+  #               xlim = c(0.1, 0.9), color = cbbPalette[4]) +
+  stat_function(fun = function(x) -0.0134*x + 2.841, lwd = 2, # overall
+                xlim = c(0, 80), color = "black") + 
+  scale_shape_manual(values = c(21, 22), labels = c("No", "Yes")) +
+  scale_fill_manual(values = c(cbbPalette[1], cbbPalette[4]), 
+                    labels = c(expression("C"[3]),
+                               expression("C"[4]))) +
+  scale_x_continuous(limits = c(0, 80), breaks = seq(0, 80, 20)) +
+  scale_y_continuous(limits = c(-2.5, 7.5), breaks = seq(-2.5, 7.5, 2.5)) +
+  labs(x = expression("Soil NO"[3]~"- N availability (ppm)"),
+       y = expression(ln~beta),
+       fill = "Photosynthetic pathway",
+       shape = "N-fixing association") +
+  theme_bw(base_size = 18) +
+  guides(fill = guide_legend(override.aes = list(shape = 21))) +
   theme(legend.text.align = 0)
 
 
@@ -147,7 +179,7 @@ df$chi[c(62, 111, 116, 300)] <- NA
 df$chi[c(465)] <- NA
 df$chi[c(260, 467, 468)] <- NA
 
-chi <- lmer(chi ~ vpd1 + tavg13 + ((wn.30.rel + soil.no3n) * (n.fixer + photo)) + 
+chi <- lmer(chi ~ vpd1 + tavg13 + ((wn.30 + soil.no3n) * (n.fixer + photo)) + 
               (1 | NCRS.code), data = df)
 
 
