@@ -261,35 +261,39 @@ dev.off()
 ##########################################################################
 ## Nmass
 ##########################################################################
-df$n.leaf[c(401, 469, 509)] <- NA
+df$narea[c(20, 21, 227, 228, 400, 509)] <- NA
 
-nmass <- lmer(log(n.leaf) ~ ((wn.30 + soil.no3n) * (n.fixer + photo)) + chi + beta +
-                (1 | NCRS.code),
+narea <- lmer(log(narea) ~ ((wn.30 + soil.no3n) * (n.fixer + photo)) + chi + 
+                log(beta) + marea + n.leaf + (1 | NCRS.code),
               data = df)
 
 # Check model assumptions
-plot(nmass)
-qqnorm(residuals(nmass))
-qqline(residuals(nmass))
-hist(residuals(nmass))
-densityPlot(residuals(nmass))
-shapiro.test(residuals(nmass))
-outlierTest(nmass)
+plot(narea)
+qqnorm(residuals(narea))
+qqline(residuals(narea))
+hist(residuals(narea))
+densityPlot(residuals(narea))
+shapiro.test(residuals(narea))
+outlierTest(narea)
 
 # Model output
-summary(nmass)
-Anova(nmass)
-r.squaredGLMM(nmass)
+summary(narea)
+Anova(narea)
+r.squaredGLMM(narea)
 
 # Marginal interaction between wn.30 and photo
-test(emtrends(nmass, ~photo, "wn.30"))
-emmeans(nmass, ~photo, "wn.30", at = list(wn.30 = 0))
+test(emtrends(narea, ~1, "beta"))
+emmeans(narea, ~1, "beta", at = list(beta=0))
+
+
+
+
 
 ##########################################################################
-## Nmass plots
+## Narea plots
 ##########################################################################
 chi.water.plot <- ggplot(data = subset(df, !is.na(photo)), 
-                         aes(x = wn.30, y = log(n.leaf))) +
+                         aes(x = log(beta), y = log(narea))) +
   geom_jitter(aes(fill = photo),width = 0.5, size = 3, alpha = 0.3, shape = 21) +
   stat_function(fun = function(x) 0.0076*x + 0.364, lwd = 2,
                 xlim = c(25, 125), color = cbbPalette2[2]) + #c3
