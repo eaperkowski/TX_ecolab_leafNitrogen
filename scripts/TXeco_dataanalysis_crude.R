@@ -19,17 +19,20 @@ emm_options(opt.digits = FALSE)
 df <- read.csv("../data_sheets/TXeco_compiled_datasheet.csv",
                na.strings = c("NA", "NaN")) %>%
   filter(site != "Bell_2020_05" & 
-           site != "Russel_2020_01")
+           site != "Russel_2020_01") %>%
+  mutate(pft = ifelse(pft == "c4_graminoid", 
+                      "c4_nonlegume",
+                      ifelse(pft == "c3_graminoid" | pft == "c3_forb" | pft == "c3_shrub",
+                             "c3_nonlegume", 
+                             ifelse(pft == "legume", 
+                                    "c3_legume", 
+                                    NA))),
+         chi = ifelse(chi > 0.95 | chi < 0.20, NA, chi))
 
 ## Add colorblind friendly palette
 cbbPalette <- c("#0077BB", "#33BBEE", "#009988", "#EE7733", "#CC3311")
 cbbPalette2 <- c("#CC3311", "#EE7733", "#009988", "#33BBEE", "#0077BB")
 cbbPalette3 <- c("#DDAA33", "#BB5566", "#004488")
-
-## Rename pfts by c3_legume, c3_nonlegume, c4_nonlegume
-df$pft[df$pft == "c4_graminoid"] <- "c4_nonlegume"
-df$pft[df$pft == "c3_graminoid" | df$pft == "c3_forb" | df$pft == "c3_shrub"] <- "c3_nonlegume"
-df$pft[df$pft == "legume"] <- "c3_legume"
 
 ## Figure out sample sizes within each pft class
 length(df$pft[df$pft == "c3_legume"])
@@ -49,8 +52,8 @@ df$vpd1 <- df$vpd1 / 10
 ##########################################################################
 ## Beta
 ##########################################################################
-df$beta[c(62, 275, 315)] <- NA
 df$pft <- factor(df$pft, levels = c("c3_legume", "c4_nonlegume", "c3_nonlegume"))
+df$beta[c(62, 275, 315)] <- NA
 
 ## Check soil moisture timescale
 beta.30 <- lmer(log(beta) ~ wn.30 * soil.no3n * pft + 
@@ -81,33 +84,27 @@ r.squaredGLMM(beta.60)
 
 # Two-way interaction between wn.60 and pft
 test(emtrends(beta.60, ~pft, "wn.60"))
-emmeans(beta.60, ~pft, "wn.60", at = list(wn.60 = 0))
 
 # Individual effect of soil NO3-N
 test(emtrends(beta.60, ~1, "soil.no3n"))
-emmeans(beta.60, ~1, "soil.no3n", at = list(soil.no3n = 0))
 
 # Three-way interaction between wn.60, soil.no3n, and pft
 test(emtrends(beta.60, ~pft*soil.no3n, "wn.60", 
               at = list(soil.no3n = c(0, 20, 40, 80))))
-emmeans(beta.60, ~pft, "wn.60", at = list(wn.60 = 0))
 ## Negative effect of wn.60 on beta increases with soil NO3-N availability 
 ## (makes sense because soil NO3-N generally decreases beta)
 
 test(emtrends(beta.60, ~wn.60*pft, "soil.no3n", 
               at = list(wn.60 = c(30, 60, 90))))
-emmeans(beta.60, ~pft, "wn.60", at = list(wn.60 = 0))
 
 
 # Individual effect of soil NO3-N
 test(emtrends(beta.60, ~1, "soil.no3n"))
-emmeans(beta.60, ~1, "soil.no3n", at = list(soil.no3n = 0))
 
 test(emtrends(beta.60, ~pft*soil.no3n, "wn.60", at = list(soil.no3n = c(0, 20, 40, 80))))
-emmeans(beta.60, ~pft, "wn.60", at = list(wn.60 = 0))
 
 ##########################################################################
-## Beta plot
+## Beta plots
 ##########################################################################
 beta.no3n.pred <- data.frame(get_model_data(beta.60, 
                                             type = "pred", 
@@ -115,8 +112,12 @@ beta.no3n.pred <- data.frame(get_model_data(beta.60,
 beta.no3n.int <- data.frame(get_model_data(beta.60, 
                                            type = "pred", 
                                            terms = c("soil.no3n", "pft")))
+beta.h2o.pred <- data.frame(get_model_data(beta.60, type = "pred", 
+                                           terms = c("wn.60")))
+beta.h2o.inter <- data.frame(get_model_data(beta.60, type = "pred", 
+                                            terms = c("wn.60", "pft")))
 
-beta.no3n.plot <- ggplot(data = subset(df, !is.na(pft)), 
+beta.no3n.ind <- ggplot(data = subset(df, !is.na(pft)), 
                     aes(x = soil.no3n, y = log(beta))) +
   geom_jitter(aes(fill = pft),
               width = 0.5, size = 3, alpha = 0.7, shape = 21) +
@@ -138,42 +139,55 @@ beta.no3n.plot <- ggplot(data = subset(df, !is.na(pft)),
   theme_bw(base_size = 18) +
   theme(legend.text.align = 0,
         panel.border = element_rect(size = 1.25))
-beta.no3n.plot
+beta.no3n.ind
 
-png("../working_drafts/TXeco_beta_no3n.png",
-    width = 8, height = 6, units = 'in', res = 600)
-beta.no3n.plot
+png("../working_drafts/TXeco_beta_no3n_ind.png",
+    width = 8, height = 5, units = 'in', res = 600)
+beta.no3n.ind
 dev.off()
 
-beta.h2o.ind <- data.frame(get_model_data(beta.60, type = "pred", 
-                                          terms = c("wn.60")))
-beta.h2o.int <- data.frame(get_model_data(beta.60, type = "pred", 
-                                           terms = c("wn.60", "pft")))
-
-beta.h2o.plot <- ggplot(data = subset(df, !is.na(photo)), 
-                          aes(x = wn.60, y = log(beta))) +
-  #geom_hline(yintercept = 5, lty = 2, lwd = 1) +
+beta.h2o.ind <- ggplot(data = subset(df, !is.na(pft)), 
+                       aes(x = wn.60, y = log(beta))) +
   geom_jitter(aes(fill = pft),
               width = 0.1, size = 3, alpha = 0.7, shape = 21) +
-  # geom_ribbon(data = beta.h2o.ind, 
-  #             aes(x = x, y = log(predicted), ymin = log(conf.low), 
-  #                 ymax = log(conf.high)), alpha = 0.1) +
-  # geom_line(data = subset(beta.h2o.ind), size = 1.5,
-  #           aes(x = x, y = log(predicted)), lty = 2) +
-  geom_ribbon(data = subset(beta.h2o.int, group == "c3_legume"), 
+  geom_ribbon(data = beta.h2o.pred, 
+              aes(x = x, y = log(predicted), ymin = log(conf.low), 
+                  ymax = log(conf.high)), alpha = 0.25) +
+  geom_line(data = subset(beta.h2o.pred), size = 1.5,
+            aes(x = x, y = log(predicted)), lty = 2) +
+  scale_fill_manual(values = c(cbbPalette3), 
+                    labels = c(expression("C"[3]~"legume"),
+                               expression("C"[4]~"non-legume"),
+                               expression("C"[3]~"non-legume"))) +
+  scale_x_continuous(limits = c(20, 120), breaks = seq(20, 120, 20)) +
+  scale_y_continuous(limits = c(-2.5, 7.5), breaks = seq(-2.5, 7.5, 2.5)) +
+  labs(x = expression(bold("60-day mean daily soil moisture (mm)")),
+       y = expression(bold(ln~beta)),
+       fill = "Functional group") +
+  theme_bw(base_size = 18) +
+  theme(legend.text.align = 0,
+        panel.border = element_rect(size = 1.25))
+beta.h2o.ind
+
+beta.h2o.int <- ggplot(data = subset(df, !is.na(pft)), 
+                          aes(x = wn.60, y = log(beta))) +
+  geom_hline(yintercept = 5, lty = 2, lwd = 1) +
+  geom_jitter(aes(fill = pft),
+              width = 0.1, size = 3, alpha = 0.7, shape = 21) +
+  geom_ribbon(data = subset(beta.h2o.inter, group == "c3_legume"), 
               aes(x = x, y = log(predicted), ymin = log(conf.low), 
                   ymax = log(conf.high)), alpha = 0.25, fill = cbbPalette3[1]) +
-  geom_line(data = subset(beta.h2o.int, group == "c3_legume"), size = 1,
+  geom_line(data = subset(beta.h2o.inter, group == "c3_legume"), size = 1,
             aes(x = x, y = log(predicted)), color = cbbPalette3[1], lty = 2) +
-  geom_ribbon(data = subset(beta.h2o.int, group == "c4_nonlegume"), 
+  geom_ribbon(data = subset(beta.h2o.inter, group == "c4_nonlegume"), 
               aes(x = x, y = log(predicted), ymin = log(conf.low), 
                   ymax = log(conf.high)), alpha = 0.25, fill = cbbPalette3[2]) +
-  geom_line(data = subset(beta.h2o.int, group == "c4_nonlegume"), size = 1,
+  geom_line(data = subset(beta.h2o.inter, group == "c4_nonlegume"), size = 1,
             aes(x = x, y = log(predicted)), color = cbbPalette3[2]) +
-  geom_ribbon(data = subset(beta.h2o.int, group == "c3_nonlegume"), 
+  geom_ribbon(data = subset(beta.h2o.inter, group == "c3_nonlegume"), 
               aes(x = x, y = log(predicted), ymin = log(conf.low), 
                   ymax = log(conf.high)), alpha = 0.25, fill = cbbPalette3[3]) +
-  geom_line(data = subset(beta.h2o.int, group == "c3_nonlegume"), size = 1,
+  geom_line(data = subset(beta.h2o.inter, group == "c3_nonlegume"), size = 1,
             aes(x = x, y = log(predicted)), color = cbbPalette3[3], lty = 2) +
   scale_fill_manual(values = c(cbbPalette3), 
                     labels = c(expression("C"[3]~"legume"),
@@ -187,27 +201,40 @@ beta.h2o.plot <- ggplot(data = subset(df, !is.na(photo)),
   theme_bw(base_size = 18) +
   theme(legend.text.align = 0,
         panel.border = element_rect(size = 1.25))
-beta.h2o.plot
+beta.h2o.int
 
-ggarrange(beta.h2o.plot, beta.no3n.plot, 
-          ncol = 2, align = "hv", legend = "right", common.legend = TRUE)
+png("../working_drafts/TXeco_beta_h2o_ind.png",
+    width = 8, height = 5, units = 'in', res = 600)
+beta.h2o.ind
+dev.off()
 
-png("../working_drafts/TXeco_beta.png",
-    width = 13, height = 5, units = 'in', res = 600)
-ggarrange(beta.h2o.plot, beta.no3n.plot, ncol = 2, align = "hv",
-          legend = "right", common.legend = TRUE, 
-          labels = "AUTO", font.label = list(size = 18))
+png("../working_drafts/TXeco_beta_h2o_int.png",
+    width = 8, height = 5, units = 'in', res = 600)
+beta.h2o.int
 dev.off()
 
 ##########################################################################
 ## Chi
 ##########################################################################
-df$chi[c(62, 114, 119, 315, 317, 483, 492)] <- NA
-df$chi[c(11, 247, 456, 481, 484)] <- NA
-df$chi[c(84, 276, 293, 304, 308, 402, 482, 491, 37, 292, 502, 503, 284)] <- NA
+df <- read.csv("../data_sheets/TXeco_compiled_datasheet.csv",
+               na.strings = c("NA", "NaN")) %>%
+  filter(site != "Bell_2020_05" & 
+           site != "Russel_2020_01") %>%
+  mutate(pft = ifelse(pft == "c4_graminoid", 
+                      "c4_nonlegume",
+                      ifelse(pft == "c3_graminoid" | pft == "c3_forb" | pft == "c3_shrub",
+                             "c3_nonlegume", 
+                             ifelse(pft == "legume", 
+                                    "c3_legume", 
+                                    NA))),
+         chi = ifelse(chi > 0.95 | chi < 0.20, NA, chi))
+df$pft <- factor(df$pft, levels = c("c3_legume", "c4_nonlegume", "c3_nonlegume"))
 
-chi <- lmer(chi ~ vpd1 + tavg13 + ((wn.30 + soil.no3n) * (n.fixer + photo)) + 
-              beta + (1 | NCRS.code), data = df)
+
+df$chi[c(11, 62, 315)] <- NA
+
+chi <- lmer(chi ~ wn.60 * soil.no3n * pft + log(beta) + 
+              (1 | NCRS.code), data = df)
 
 # Check model assumptions
 plot(chi)
@@ -222,78 +249,184 @@ summary(chi)
 Anova(chi)
 r.squaredGLMM(chi)
 
-## Individual effect of vpd1 and tavg 13
-test(emtrends(chi, ~1, "vpd1"))
-emmeans(chi, ~1, "vpd1", at = list(vpd1=0))
+## Single factor effect of wn.60 on chi
+test(emtrends(chi, ~1, "wn.60"))
 
-test(emtrends(chi, ~1, "tavg13"))
-emmeans(chi, ~1, "tavg13", at = list(tavg13=0))
+## Single factor effect of soil.no3n on chi
+test(emtrends(chi, ~1, "soil.no3n"))
 
-test(emtrends(chi, ~n.fixer, "soil.no3n"))
-emmeans(chi, ~n.fixer, "soil.no3n", at = list(soil.no3n=0))
+## Single factor effect of soil.no3n on chi
+cld(emmeans(chi, pairwise~pft))
 
-## Two-way interaction between 30-day relative soil moisture and photopath
-test(emtrends(chi, ~photo, "wn.30"))
-emmeans(chi, ~photo, "wn.30", at = list(wn.30 = 0))
-
-## Two-way interaction between soil N availability and photopath
-test(emtrends(chi, ~photo, "soil.no3n"))
-
-## Two-way interaction between soil N availability and n.fix pathway
-test(emtrends(chi, ~n.fixer, "soil.no3n"))
 
 ##########################################################################
 ## Chi plots
 ##########################################################################
-chi.water.plot <- ggplot(data = subset(df, !is.na(photo)), 
-                                           aes(x = wn.30, y = chi)) +
-  geom_jitter(aes(fill = photo),width = 0.5, size = 3, alpha = 0.3, shape = 21) +
-  stat_function(fun = function(x) 0.00045*x + 0.761, lwd = 2, lty = 2,
-                xlim = c(25, 125), color = cbbPalette2[2]) + #c3
-  stat_function(fun = function(x) -0.0021*x + 0.747, lwd = 2,
-                xlim = c(25, 125), color = cbbPalette2[5]) + #c4
-  scale_fill_manual(values = c(cbbPalette2[c(2,5)]), labels = c(expression("C"[3]),
-                                                                expression("C"[4]))) +
-  scale_x_continuous(limits = c(25, 130), breaks = seq(25, 130, 35)) +
-  scale_y_continuous(limits = c(0.2, 1), breaks = seq(0.2, 1, 0.2)) +
-  labs(x = expression(bold("30-day soil moisture (mm day"^-1~")")),
-       y = expression(bold(chi)),
-       fill = "Photo. pathway") +
-  theme_bw(base_size = 18) +
-  theme(legend.text.align = 0)
+chi.no3n.pred <- data.frame(get_model_data(chi, 
+                                           type = "pred", 
+                                           terms = "soil.no3n"))
+chi.no3n.inter <- data.frame(get_model_data(chi, 
+                                            type = "pred", 
+                                            terms = c("soil.no3n", "pft")))
+chi.h2o.pred <- data.frame(get_model_data(chi, type = "pred", 
+                                          terms = c("wn.60")))
+chi.h2o.inter <- data.frame(get_model_data(chi, type = "pred", 
+                                           terms = c("wn.60", "pft")))
 
-chi.soiln.plot <- ggplot(data = subset(df, !is.na(n.fixer)), 
-                         aes(x = soil.no3n, y = chi)) +
-  geom_jitter(aes(fill = n.fixer), width = 0.5, size = 3, alpha = 0.3, shape = 21) +
-  stat_function(fun = function(x) -0.00125*x + 0.720, lwd = 2,
-                xlim = c(0, 80), color = cbbPalette2[2]) + # Nfixer
-  stat_function(fun = function(x) -0.00069*x + 0.713, lwd = 2,
-                xlim = c(0, 80), color = cbbPalette2[5]) + # Non-fixer
-  scale_fill_manual(values = c(cbbPalette2[c(2,5)]), 
-                    labels = c(expression("N"[fixer]),
-                               expression("Non-N"[fixer]))) +
+chi.no3n.ind <- ggplot(data = subset(df, !is.na(pft)), 
+                      aes(x = soil.no3n, y = chi)) +
+  geom_jitter(aes(fill = pft),width = 0.7, size = 3, 
+              alpha = 0.7, shape = 21) +
+  geom_ribbon(data = chi.no3n.pred, 
+              aes(x = x, y = predicted, ymin = conf.low, 
+                  ymax = conf.high), alpha = 0.25) +
+  geom_line(data = chi.no3n.pred, size = 1.5,
+            aes(x = x, y = predicted)) +
+  scale_fill_manual(values = cbbPalette3, 
+                    labels = c(expression("C"[3]~"legume"),
+                               expression("C"[4]~"non-legume"),
+                               expression("C"[3]~"non-legume"))) +
   scale_x_continuous(limits = c(0, 80), breaks = seq(0, 80, 20)) +
   scale_y_continuous(limits = c(0.2, 1), breaks = seq(0.2, 1, 0.2)) +
   labs(x = expression(bold("Soil nitrogen availability (ppm NO"[3]~"-N)")),
        y = expression(bold(chi)),
-       fill = "N-fixing capability") +
+       fill = "Functional group") +
   theme_bw(base_size = 18) +
-  theme(legend.text.align = 0)
+  theme(legend.text.align = 0,
+        panel.border = element_rect(size = 1.25))
 
-png("../working_drafts/TXeco_chi.png",
-    width = 12, height = 5, units = 'in', res = 600)
-ggarrange(chi.water.plot, chi.soiln.plot, ncol = 2, align = "hv",
-          legend = "bottom", labels = "AUTO", font.label = list(size = 18))
+chi.no3n.int <- ggplot(data = subset(df, !is.na(pft)), 
+                      aes(x = soil.no3n, y = chi)) +
+  geom_jitter(aes(fill = pft),
+              width = 0.1, size = 3, alpha = 0.7, shape = 21) +
+  geom_ribbon(data = subset(chi.no3n.inter, group == "c3_legume"), 
+              aes(x = x, y = predicted, ymin = conf.low, 
+                  ymax = conf.high), alpha = 0.25, fill = cbbPalette3[1]) +
+  geom_line(data = subset(chi.no3n.inter, group == "c3_legume"), size = 1,
+            aes(x = x, y = predicted), color = cbbPalette3[1]) +
+  geom_ribbon(data = subset(chi.no3n.inter, group == "c4_nonlegume"), 
+              aes(x = x, y = predicted, ymin = conf.low, 
+                  ymax = conf.high), alpha = 0.25, fill = cbbPalette3[2]) +
+  geom_line(data = subset(chi.no3n.inter, group == "c4_nonlegume"), size = 1,
+            aes(x = x, y = predicted), color = cbbPalette3[2]) +
+  geom_ribbon(data = subset(chi.no3n.inter, group == "c3_nonlegume"), 
+              aes(x = x, y = predicted, ymin = conf.low, 
+                  ymax = conf.high), alpha = 0.25, fill = cbbPalette3[3]) +
+  geom_line(data = subset(chi.no3n.inter, group == "c3_nonlegume"), size = 1,
+            aes(x = x, y = predicted), color = cbbPalette3[3]) +
+  scale_fill_manual(values = cbbPalette3, 
+                    labels = c(expression("C"[3]~"legume"),
+                               expression("C"[4]~"non-legume"),
+                               expression("C"[3]~"non-legume"))) +
+  scale_x_continuous(limits = c(0, 80), breaks = seq(0, 80, 20)) +
+  scale_y_continuous(limits = c(0.2, 1), breaks = seq(0.2, 1, 0.2)) +
+  labs(x = expression(bold("Soil nitrogen availability (ppm NO"[3]~"-N)")),
+       y = expression(bold(chi)),
+       fill = "Functional group") +
+  theme_bw(base_size = 18) +
+  theme(legend.text.align = 0,
+        panel.border = element_rect(size = 1.25))
+chi.no3n.int  
+
+
+chi.h2o.ind <- ggplot(data = subset(df, !is.na(pft)), 
+                      aes(x = wn.60, y = chi)) +
+  geom_jitter(aes(fill = pft),width = 0.7, size = 3, 
+              alpha = 0.7, shape = 21) +
+  geom_ribbon(data = chi.h2o.pred, 
+              aes(x = x, y = predicted, ymin = conf.low, 
+                  ymax = conf.high), alpha = 0.25) +
+  geom_line(data = chi.h2o.pred, size = 1.5,
+            aes(x = x, y = predicted)) +
+  scale_fill_manual(values = cbbPalette3, 
+                    labels = c(expression("C"[3]~"legume"),
+                               expression("C"[4]~"non-legume"),
+                               expression("C"[3]~"non-legume"))) +
+  scale_x_continuous(limits = c(20, 120), breaks = seq(20, 120, 20)) +
+  scale_y_continuous(limits = c(0.2, 1), breaks = seq(0.2, 1, 0.2)) +
+  labs(x = expression(bold("60-day mean daily soil moisture (mm)")),
+       y = expression(bold(chi)),
+       fill = "Functional group") +
+  theme_bw(base_size = 18) +
+  theme(legend.text.align = 0,
+        panel.border = element_rect(size = 1.25))
+  
+chi.h2o.int <- ggplot(data = subset(df, !is.na(pft)), 
+                       aes(x = wn.60, y = chi)) +
+  geom_jitter(aes(fill = pft),
+              width = 0.1, size = 3, alpha = 0.7, shape = 21) +
+  geom_ribbon(data = subset(chi.h2o.inter, group == "c3_legume"), 
+              aes(x = x, y = predicted, ymin = conf.low, 
+                  ymax = conf.high), alpha = 0.25, fill = cbbPalette3[1]) +
+  geom_line(data = subset(chi.h2o.inter, group == "c3_legume"), size = 1,
+            aes(x = x, y = predicted), color = cbbPalette3[1]) +
+  geom_ribbon(data = subset(chi.h2o.inter, group == "c4_nonlegume"), 
+              aes(x = x, y = predicted, ymin = conf.low, 
+                  ymax = conf.high), alpha = 0.25, fill = cbbPalette3[2]) +
+  geom_line(data = subset(chi.h2o.inter, group == "c4_nonlegume"), size = 1,
+            aes(x = x, y = predicted), color = cbbPalette3[2], lty = 2) +
+  geom_ribbon(data = subset(chi.h2o.inter, group == "c3_nonlegume"), 
+              aes(x = x, y = predicted, ymin = conf.low, 
+                  ymax = conf.high), alpha = 0.25, fill = cbbPalette3[3]) +
+  geom_line(data = subset(chi.h2o.inter, group == "c3_nonlegume"), size = 1,
+            aes(x = x, y = predicted), color = cbbPalette3[3]) +
+  scale_fill_manual(values = cbbPalette3, 
+                    labels = c(expression("C"[3]~"legume"),
+                               expression("C"[4]~"non-legume"),
+                               expression("C"[3]~"non-legume"))) +
+  scale_x_continuous(limits = c(20, 120), breaks = seq(20, 120, 20)) +
+  scale_y_continuous(limits = c(0.2, 1), breaks = seq(0.2, 1, 0.2)) +
+  labs(x = expression(bold("60-day mean daily soil moisture (mm)")),
+       y = expression(bold(ln~beta)),
+       fill = "Functional group") +
+  theme_bw(base_size = 18) +
+  theme(legend.text.align = 0,
+        panel.border = element_rect(size = 1.25))
+chi.h2o.int
+
+
+
+png("../working_drafts/TXeco_chi_h2o_int.png",
+    width = 8, height = 5, units = 'in', res = 600)
+chi.h2o.int
 dev.off()
 
+png("../working_drafts/TXeco_chi_h2o_ind.png",
+    width = 8, height = 5, units = 'in', res = 600)
+chi.h2o.ind
+dev.off()
+
+png("../working_drafts/TXeco_chi_no3n_int.png",
+    width = 8, height = 5, units = 'in', res = 600)
+chi.no3n.int
+dev.off()
+
+png("../working_drafts/TXeco_chi_no3n_ind.png",
+    width = 8, height = 5, units = 'in', res = 600)
+chi.no3n.ind
+dev.off()
 
 ##########################################################################
-## Nmass
+## Narea
 ##########################################################################
-df$narea[c(20, 21, 227, 228, 400, 509)] <- NA
+df <- read.csv("../data_sheets/TXeco_compiled_datasheet.csv",
+               na.strings = c("NA", "NaN")) %>%
+  filter(site != "Bell_2020_05" & 
+           site != "Russel_2020_01") %>%
+  mutate(pft = ifelse(pft == "c4_graminoid", 
+                      "c4_nonlegume",
+                      ifelse(pft == "c3_graminoid" | pft == "c3_forb" | pft == "c3_shrub",
+                             "c3_nonlegume", 
+                             ifelse(pft == "legume", 
+                                    "c3_legume", 
+                                    NA))),
+         chi = ifelse(chi > 0.95 | chi < 0.20, NA, chi))
+df$pft <- factor(df$pft, levels = c("c3_legume", "c4_nonlegume", "c3_nonlegume"))
 
-narea <- lmer(log(narea) ~ ((wn.30 * soil.no3n) * (n.fixer + photo)) + chi + 
-                log(beta) + marea + n.leaf + (1 | NCRS.code),
+
+df$narea[c(80, 156, 273, 509)] <- NA
+
+narea <- lmer(log(narea) ~ wn.60 * soil.no3n * pft + chi + beta + (1 | NCRS.code),
               data = df)
 
 # Check model assumptions
@@ -310,83 +443,71 @@ summary(narea)
 Anova(narea)
 r.squaredGLMM(narea)
 
-# Marginal interaction between wn.30 and photo
+## Individual beta effect
 test(emtrends(narea, ~1, "beta"))
-emmeans(narea, ~1, "beta", at = list(beta=0))
 
-
-
+## Individual chi effect
+test(emtrends(narea, ~1, "chi"))
 
 
 ##########################################################################
 ## Narea plots
 ##########################################################################
-chi.water.plot <- ggplot(data = subset(df, !is.na(photo)), 
-                         aes(x = log(beta), y = log(narea))) +
-  geom_jitter(aes(fill = photo),width = 0.5, size = 3, alpha = 0.3, shape = 21) +
-  stat_function(fun = function(x) 0.0076*x + 0.364, lwd = 2,
-                xlim = c(25, 125), color = cbbPalette2[2]) + #c3
-  stat_function(fun = function(x) 0.00235*x + 0.198, lwd = 2,
-                xlim = c(25, 125), color = cbbPalette2[5], lty = 2) + #c4
-  scale_fill_manual(values = c(cbbPalette2[c(2,5)]), labels = c(expression("C"[3]),
-                                                                expression("C"[4]))) +
-  scale_x_continuous(limits = c(25, 130), breaks = seq(25, 130, 35)) +
-  scale_y_continuous(limits = c(-1, 2), breaks = seq(-1, 2, 1)) +
-  labs(x = expression(bold("30-day soil moisture (mm day"^-1~")")),
-       y = expression(bold(ln~"(N"[mass]~")")),
-       fill = "Photo. pathway") +
+narea.beta.pred <- as.data.frame(get_model_data(narea, type = "pred", 
+                                                terms = "beta"))
+
+
+narea.chi.pred <- data.frame(get_model_data(narea, type = "pred", terms = "chi"))
+
+narea.beta.plot <- ggplot(data = subset(df, !is.na(pft)), 
+                         aes(x = beta, y = log(narea))) +
+  geom_jitter(aes(fill = pft),width = 0.5, size = 3, alpha = 0.7, shape = 21) +
+  geom_ribbon(data = narea.beta.pred,
+              aes(x = x, y = log(predicted), ymin = log(conf.low), 
+                  ymax = log(conf.high)), alpha = 0.25) +
+  geom_line(data = narea.beta.pred, size = 1,
+            aes(x = x, y = log(predicted))) +
+  scale_fill_manual(values = c(cbbPalette3), 
+                    labels = c(expression("C"[3]~"legume"),
+                               expression("C"[4]~"non-legume"),
+                               expression("C"[3]~"non-legume"))) +
+  scale_x_continuous(limits = c(0, 750), breaks = seq(0, 750, 250)) +
+  scale_y_continuous(limits = c(-1, 3), breaks = seq(-1, 3, 1)) +
+  labs(x = expression(bold(beta)),
+       y = expression(ln~" N"[area]),
+       fill = "Funtional group") +
   theme_bw(base_size = 18) +
   theme(legend.text.align = 0)
 
-chi.soilN.plot <- ggplot(data = subset(df, !is.na(photo)), 
-                         aes(x = wn.30, y = log(n.leaf))) +
-  geom_jitter(aes(fill = photo),width = 0.5, size = 3, alpha = 0.3, shape = 21) +
-  stat_function(fun = function(x) 0.0076*x + 0.364, lwd = 2,
-                xlim = c(25, 125), color = cbbPalette2[2]) + #c3
-  stat_function(fun = function(x) 0.00235*x + 0.198, lwd = 2,
-                xlim = c(25, 125), color = cbbPalette2[5], lty = 2) + #c4
-  scale_fill_manual(values = c(cbbPalette2[c(2,5)]), labels = c(expression("C"[3]),
-                                                                expression("C"[4]))) +
-  scale_x_continuous(limits = c(25, 130), breaks = seq(25, 130, 35)) +
-  scale_y_continuous(limits = c(-1, 2), breaks = seq(-1, 2, 1)) +
-  labs(x = expression(bold("30-day soil moisture (mm day"^-1~")")),
-       y = expression(bold(ln~"(N"[mass]~")")),
-       fill = "Photo. pathway") +
-  theme_bw(base_size = 18) +
-  theme(legend.text.align = 0)
-
-
-
-
-
-
-
-
-narea.plot <- ggplot(data = df, aes(x = beta, y = narea)) +
-  geom_vline(xintercept = 146, lty = 2, lwd = 1) +
-  geom_jitter(aes(fill = pft),
-              width = 0.02, size = 3, alpha = 0.3, shape = 21) +
-  stat_function(fun = function(x) exp(-0.00158*x + 0.798), lwd = 2,
-                xlim = c(0, 600), color = cbbPalette2[1]) +
-  stat_function(fun = function(x) exp(-0.00140*x + 0.093), lwd = 2, lty = 2,
-                xlim = c(0, 600), color = cbbPalette2[2]) +
-  stat_function(fun = function(x) exp(-0.00124*x + 1.295), lwd = 2, lty = 2,
-                xlim = c(0, 600), color = cbbPalette2[3]) +
-  scale_fill_manual(values = cbbPalette2, labels = c(expression("C"[3]~"forb"),
-                                                     expression("C"[4]~"graminoid"),
-                                                     expression("C"[3]~"legume"))) +
-  scale_x_continuous(limits = c(0, 600), breaks = seq(0, 600, 150)) +
-  scale_y_continuous(limits = c(0, 7.5), breaks = seq(0, 7.5, 2.5)) +
-  labs(x = expression(beta),
-       y = expression("Leaf N"[area]~"(gN m"^-2~")"),
-       fill = "Plant functional type") +
+narea.chi.plot <- ggplot(data = subset(df, !is.na(pft)), 
+                         aes(x = chi, y = log(narea))) +
+  geom_jitter(aes(fill = pft), width = 0.01, size = 3, alpha = 0.7, shape = 21) +
+  geom_ribbon(data = narea.chi.pred,
+              aes(x = x, y = predicted, ymin = log(conf.low), 
+                  ymax = log(conf.high)), alpha = 0.25) +
+  geom_line(data = narea.chi.pred, size = 1,
+            aes(x = x, y = log(predicted)), lty = 2) +
+  scale_fill_manual(values = c(cbbPalette3), 
+                    labels = c(expression("C"[3]~"legume"),
+                               expression("C"[4]~"non-legume"),
+                               expression("C"[3]~"non-legume"))) +
+  scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.2)) +
+  scale_y_continuous(limits = c(-1, 3), breaks = seq(-1, 3, 1)) +
+  labs(x = expression(bold(chi)),
+       y = expression(bold(ln~"N"[area])),
+       fill = "Functional type") +
   theme_bw(base_size = 18) +
   theme(legend.text.align = 0)
 
 
-png("../working_drafts/TXeco_chi_b.png",
-    width = 8, height = 4, units = 'in', res = 600)
-chi.plot
+png("../working_drafts/TXeco_narea_beta.png",
+    width = 8, height = 5, units = 'in', res = 600)
+narea.beta.plot
+dev.off()
+
+png("../working_drafts/TXeco_narea_chi.png",
+    width = 8, height = 5, units = 'in', res = 600)
+narea.chi.plot
 dev.off()
 
 ##########################################################################
