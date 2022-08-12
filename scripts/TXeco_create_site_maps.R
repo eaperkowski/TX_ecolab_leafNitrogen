@@ -11,6 +11,7 @@ library(patchwork)
 library(terra)
 library(plotbiomes)
 library(viridis)
+library(ggsn)
 
 # Load Ecolab site coords
 ecosites <- read.csv("../data_sheets/TXeco_sitecoords.csv") %>%
@@ -19,7 +20,25 @@ ecosites <- distinct(ecosites, property, .keep_all = TRUE) # remove duplicate si
 eco.coords <- dplyr::select(ecosites, x = longitude, y = latitude) # select only lat/long data, code as xy
 
 # Set PRISM directory (put folder where prism data will be stored here)
-prism_set_dl_dir("../climate_data/prism/prism_monthly/")
+prism_set_dl_dir("../climate_data/prism/prism_normal/")
+
+## Iridescent palette: 
+iridescent <- c("#FEFBE9", "#FCF7D5", "#F5F3C1", "#EAF0B5",
+                "#DDECBF", "#D0E7CA", "#C2E3D2", "#B5DDD8",
+                "#A8D8DC", "#9BD2E1", "#8DCBE4", "#81C4E7",
+                "#7BBCE7", "#7EB2E4", "#88A5DD", "#9398D2",
+                "#9B8AC4", "#9D7DB2", "#9A709E", "#906388",
+                "#805770", "#684957", "#46353A", "#000000")
+iridescent.reverse <- c("#000000", "#46353A", "#684957", "#805770",
+                        "#906388", "#9A709E", "#9D7DB2", "#9B8AC4",
+                        "#9398D2", "#88A5DD", "#7EB2E4", "#7BBCE7",
+                        "#81C4E7", "#8DCBE4", "#9BD2E1", "#A8D8DC", 
+                        "#B5DDD8", "#C2E3D2", "#D0E7CA", "#DDECBF", 
+                        "#EAF0B5", "#F5F3C1", "#FCF7D5", "#FEFBE9")
+
+
+
+
 
 ###############################################################################
 ## Download temp/precip normal data from PRISM
@@ -51,351 +70,131 @@ texas <- us[match(toupper("texas"), toupper(us$NAME_1)), ]
 ###############################################################################
 # Precipitation (pd_stack stacks all monthly climate normal data into single 
 # RasterStack)
-pd.precip <- pd_stack(prism_archive_subset("ppt", "monthly"))
+
+pd.precip <- pd_stack(prism_archive_subset("ppt", "annual normals", resolution = "4km"))
 precip.masked <- mask(pd.precip, texas) # turns to rasterBrick file
 precip.masked.df <- as.data.frame(rasterToPoints(precip.masked))
 
-# Temperature
-pd.temp <- pd_stack(prism_archive_subset("tmean", "monthly"))
-temp.masked <- mask(pd.temp, texas)
-temp.masked.df <- as.data.frame(rasterToPoints(temp.masked))
-
-###############################################################################
-## Extract grids for prcp/temp within each field site, join to central df
-###############################################################################
-# Note: eco.coords is a file containing xy coordinate data for sites. Data frame
-# should only contain xy data (x = longitude, y = latitude) and must have longitude
-# as the first column
-
-# Precipitation
-df.sites.precip <- as.data.frame(terra::extract(precip.masked,
+df.sites.precip <- as.data.frame(terra::extract(pd.precip,
                                                 SpatialPoints(eco.coords),
                                                 sp = F))
 df.sites.precip$latitude = eco.coords$y
 df.sites.precip$longitude = eco.coords$x
 df.sites.precip$site = ecosites$property
 
-names(df.sites.precip[4:363]) <- gsub("PRISM_ppt_stable_4kmM3_", "prcp_", 
-                                      x = names(df.sites.precip[4:363]))
-
-
-
-
-
 # Temperature
-df.sites.temp <- as.data.frame(terra::extract(temp.masked,
-                                              SpatialPoints(eco.coords),
-                                              sp = F))
+pd.temp <- pd_stack(prism_archive_subset("tmean", "annual normals", resolution = "4km"))
+temp.masked <- mask(pd.temp, texas)
+temp.masked.df <- as.data.frame(rasterToPoints(temp.masked))
+
+df.sites.temp <- as.data.frame(terra::extract(pd.temp,
+                                                SpatialPoints(eco.coords),
+                                                sp = F))
 df.sites.temp$latitude = eco.coords$y
 df.sites.temp$longitude = eco.coords$x
 df.sites.temp$site = ecosites$property
 
-# Join extracted grids for each field site
-df.sites <- df.sites.precip %>%
-  full_join(df.sites.temp) %>%
-  dplyr::select(site, latitude, longitude, everything())
-
-# Rename column names
-names(df.sites) <- c("site","latitude", "longitude", "jan.prcp.norm01", 
-                     "prcp.norm02", "prcp.norm03", "prcp.norm04", 
-                     "prcp.norm05", "prcp.norm06", "prcp.norm07", 
-                     "prcp.norm08", "prcp.norm09", "prcp.norm10", 
-                     "prcp.norm11", "prcp.norm12", "tmean.norm01", 
-                     "tmean.norm02", "tmean.norm03", "tmean.norm04", 
-                     "tmean.norm05", "tmean.norm06", "tmean.norm07", 
-                     "tmean.norm08", "tmean.norm09", "tmean.norm10", 
-                     "tmean.norm11", "tmean.norm12")
-
-# Add mean annual temp and mean annual precip column
-df.sites <- df.sites %>%
-  dplyr::mutate(map = jan.precip.norm + feb.precip.norm + mar.precip.norm + apr.precip.norm +
-                  may.precip.norm + jun.precip.norm + jul.precip.norm + aug.precip.norm + 
-                  sep.precip.norm + oct.precip.norm + nov.precip.norm + dec.precip.norm,
-                mat = (jan.temp.norm + feb.temp.norm + mar.temp.norm + apr.temp.norm +
-                         may.temp.norm + jun.temp.norm + jul.temp.norm + aug.temp.norm + 
-                         sep.temp.norm + oct.temp.norm + nov.temp.norm + dec.temp.norm) / 12)
-
-# Write climate normal file to .csv
-write.csv(df.sites, "climate_data/TXeco_PRISM_sitenorms.csv", row.names = FALSE)
-
-
-###############################################################################
-## Merge temperature and precipitation data to single data frame. This is for 
-## a map of Texas MAP and MAT, not site specific
-###############################################################################
-df <- precip.masked.df %>%
+df.normals <- precip.masked.df %>%
   full_join(temp.masked.df) %>%
-  tidyr::pivot_longer(cols = PRISM_ppt_stable_4kmM3_199102_bil:PRISM_ppt_stable_4kmM3_202012_bil,
-               names_to = "month_year", values_to = "monthly_precip") %>%
-  tidyr::pivot_longer(cols = PRISM_tmean_stable_4kmM3_199102_bil:PRISM_tmean_stable_4kmM3_202012_bil,
-                      names_to = "month_year", values_to = "monthly_tmean")
+  dplyr::select(latitude = y, longitude = x, 
+                map = PRISM_ppt_30yr_normal_4kmM3_annual_bil,
+                mat = PRISM_tmean_30yr_normal_4kmM3_annual_bil)
+
+df.sites <- df.sites.temp %>%
+  full_join(df.sites.precip) %>%
+  select(site, latitude, longitude, 
+         mat = PRISM_tmean_30yr_normal_4kmM3_annual_bil,
+         map = PRISM_ppt_30yr_normal_4kmM3_annual_bil)
 
 
-# Rename column names
-names(df) <- c("longitude", "latitude", "jan.precip.norm", "feb.precip.norm",
-               "mar.precip.norm", "apr.precip.norm", "may.precip.norm",
-               "jun.precip.norm", "jul.precip.norm", "aug.precip.norm",
-               "sep.precip.norm", "oct.precip.norm", "nov.precip.norm",
-               "dec.precip.norm", "jan.temp.norm", "feb.temp.norm",
-               "mar.temp.norm", "apr.temp.norm", "may.temp.norm",
-               "jun.temp.norm", "jul.temp.norm", "aug.temp.norm",
-               "sep.temp.norm", "oct.temp.norm", "nov.temp.norm",
-               "dec.temp.norm")
+ecosites$visit.freq <- 1
+ecosites$sampling.year[ecosites$property == "Brazos_2020_18" |
+                      ecosites$property == "Harris_2020_03" |
+                      ecosites$property == "Uvalde_2020_02"] <- "2020_2021"
 
-# Add mean annual temp and mean annual precip column
-df <- df %>%
-  dplyr::mutate(map = jan.precip.norm + feb.precip.norm + mar.precip.norm + apr.precip.norm +
-                  may.precip.norm + jun.precip.norm + jul.precip.norm + aug.precip.norm + 
-                  sep.precip.norm + oct.precip.norm + nov.precip.norm + dec.precip.norm,
-                mat = (jan.temp.norm + feb.temp.norm + mar.temp.norm + apr.temp.norm +
-                         may.temp.norm + jun.temp.norm + jul.temp.norm + aug.temp.norm + 
-                         sep.temp.norm + oct.temp.norm + nov.temp.norm + dec.temp.norm) / 12)
-
-###############################################################################
-## Monthly precipitation plots (general across TX, not site specific)
-###############################################################################
-# January precip normals
-jan.prcp <- ggplot() +
-  geom_raster(data = df, aes(x = longitude, y = latitude, fill = jan.precip.norm)) +
-  scale_fill_continuous(type = "viridis",
-                        limits = c(0, 200), breaks = seq(0, 200, 50)) +
-  scale_x_continuous(limits = c(-107, -92), breaks = seq(-107, -92, 3)) +
-  scale_y_continuous(limits = c(25, 37), breaks = seq(25, 37, 3)) +
-  labs(x = NULL, y = NULL,
-       fill = "Precipitation (mm)",
-       title = "January") +
-  pubtheme +
-  theme(title = element_text(face = "bold"),
-        plot.title = element_text(hjust = 0.5),
-        axis.text.x = element_blank())
-
-# February precip normals
-feb.prcp <- ggplot() +
-  geom_raster(data = df, aes(x = longitude, y = latitude, fill = feb.precip.norm)) +
-  scale_fill_continuous(type = "viridis",
-                        limits = c(0, 200), breaks = seq(0, 200, 50)) +
-  scale_x_continuous(limits = c(-107, -92), breaks = seq(-107, -92, 3)) +
-  scale_y_continuous(limits = c(25, 37), breaks = seq(25, 37, 3)) +
-  labs(x = NULL, y = NULL,
-       fill = "Precipitation (mm)",
-       title = "February") +
-  pubtheme +
-  theme(title = element_text(face = "bold"),
-        plot.title = element_text(hjust = 0.5),
-        axis.text = element_blank())
-
-# March precip normals
-mar.prcp <- ggplot() +
-  geom_raster(data = df, aes(x = longitude, y = latitude, fill = mar.precip.norm)) +
-  scale_fill_continuous(type = "viridis",
-                        limits = c(0, 200), breaks = seq(0, 200, 50)) +
-  scale_x_continuous(limits = c(-107, -92), breaks = seq(-107, -92, 3)) +
-  scale_y_continuous(limits = c(25, 37), breaks = seq(25, 37, 3)) +
-  labs(x = NULL, y = NULL,
-       fill = "Precipitation (mm)",
-       title = "March") +
-  pubtheme +
-  theme(title = element_text(face = "bold"),
-        plot.title = element_text(hjust = 0.5),
-        axis.text = element_blank())
-
-# April precip normals
-apr.prcp <- ggplot() +
-  geom_raster(data = df, aes(x = longitude, y = latitude, fill = apr.precip.norm)) +
-  scale_fill_continuous(type = "viridis",
-                        limits = c(0, 200), breaks = seq(0, 200, 50)) +
-  scale_x_continuous(limits = c(-107, -92), breaks = seq(-107, -92, 3)) +
-  scale_y_continuous(limits = c(25, 37), breaks = seq(25, 37, 3)) +
-  labs(x = NULL, y = NULL,
-       fill = "Precipitation (mm)",
-       title = "April") +
-  pubtheme +
-  theme(title = element_text(face = "bold"),
-        plot.title = element_text(hjust = 0.5),
-        axis.text = element_blank())
-
-# May precip normals
-may.prcp <- ggplot() +
-  geom_raster(data = df, aes(x = longitude, y = latitude, fill = may.precip.norm)) +
-  scale_fill_continuous(type = "viridis",
-                        limits = c(0, 200), breaks = seq(0, 200, 50)) +
-  scale_x_continuous(limits = c(-107, -92), breaks = seq(-107, -92, 3)) +
-  scale_y_continuous(limits = c(25, 37), breaks = seq(25, 37, 3)) +
-  labs(x = NULL, y = NULL,
-       fill = "Precipitation (mm)",
-       title = "May") +
-  pubtheme +
-  theme(title = element_text(face = "bold"),
-        plot.title = element_text(hjust = 0.5),
-        axis.text.x = element_blank())
-
-# June precip normals
-jun.prcp <- ggplot() +
-  geom_raster(data = df, aes(x = longitude, y = latitude, fill = jun.precip.norm)) +
-  scale_fill_continuous(type = "viridis",
-                        limits = c(0, 200), breaks = seq(0, 200, 50)) +
-  scale_x_continuous(limits = c(-107, -92), breaks = seq(-107, -92, 3)) +
-  scale_y_continuous(limits = c(25, 37), breaks = seq(25, 37, 3)) +
-  labs(x = NULL, y = NULL,
-       fill = "Precipitation (mm)",
-       title = "June") +
-  pubtheme +
-  theme(title = element_text(face = "bold"),
-        plot.title = element_text(hjust = 0.5),
-        axis.text = element_blank())
-
-# July precip normals
-jul.prcp <- ggplot() +
-  geom_raster(data = df, aes(x = longitude, y = latitude, fill = jul.precip.norm)) +
-  scale_fill_continuous(type = "viridis",
-                        limits = c(0, 200), breaks = seq(0, 200, 50)) +
-  scale_x_continuous(limits = c(-107, -92), breaks = seq(-107, -92, 3)) +
-  scale_y_continuous(limits = c(25, 37), breaks = seq(25, 37, 3)) +
-  labs(x = NULL, y = NULL,
-       fill = "Precipitation (mm)",
-       title = "July") +
-  pubtheme +
-  theme(title = element_text(face = "bold"),
-        plot.title = element_text(hjust = 0.5),
-        axis.text = element_blank())
-
-# August precip normals
-aug.prcp <- ggplot() +
-  geom_raster(data = df, aes(x = longitude, y = latitude, fill = aug.precip.norm)) +
-  scale_fill_continuous(type = "viridis",
-                        limits = c(0, 200), breaks = seq(0, 200, 50)) +
-  scale_x_continuous(limits = c(-107, -92), breaks = seq(-107, -92, 3)) +
-  scale_y_continuous(limits = c(25, 37), breaks = seq(25, 37, 3)) +
-  labs(x = NULL, y = NULL,
-       fill = "Precipitation (mm)",
-       title = "August") +
-  pubtheme +
-  theme(title = element_text(face = "bold"),
-        plot.title = element_text(hjust = 0.5),
-        axis.text = element_blank())
-
-# September precip normals
-sep.prcp <- ggplot() +
-  geom_raster(data = df, aes(x = longitude, y = latitude, fill = sep.precip.norm)) +
-  scale_fill_continuous(type = "viridis",
-                        limits = c(0, 200), breaks = seq(0, 200, 50)) +
-  scale_x_continuous(limits = c(-107, -92), breaks = seq(-107, -92, 3)) +
-  scale_y_continuous(limits = c(25, 37), breaks = seq(25, 37, 3)) +
-  labs(x = NULL, y = NULL,
-       fill = "Precipitation (mm)",
-       title = "September") +
-  pubtheme +
-  theme(title = element_text(face = "bold"),
-        plot.title = element_text(hjust = 0.5))
-
-# October precip normals
-oct.prcp <- ggplot() +
-  geom_raster(data = df, aes(x = longitude, y = latitude, fill = oct.precip.norm)) +
-  scale_fill_continuous(type = "viridis",
-                        limits = c(0, 200), breaks = seq(0, 200, 50)) +
-  scale_x_continuous(limits = c(-107, -92), breaks = seq(-107, -92, 3)) +
-  scale_y_continuous(limits = c(25, 37), breaks = seq(25, 37, 3)) +
-  labs(x = NULL, y = NULL,
-       fill = "Precipitation (mm)",
-       title = "October") +
-  pubtheme +
-  theme(title = element_text(face = "bold"),
-        plot.title = element_text(hjust = 0.5),
-        axis.text.y = element_blank())
-
-# November precip normals
-nov.prcp <- ggplot() +
-  geom_raster(data = df, aes(x = longitude, y = latitude, fill = nov.precip.norm)) +
-  scale_fill_continuous(type = "viridis",
-                        limits = c(0, 200), breaks = seq(0, 200, 50)) +
-  scale_x_continuous(limits = c(-107, -92), breaks = seq(-107, -92, 3)) +
-  scale_y_continuous(limits = c(25, 37), breaks = seq(25, 37, 3)) +
-  labs(x = NULL, y = NULL,
-       fill = "Precipitation (mm)",
-       title = "November") +
-  pubtheme +
-  theme(title = element_text(face = "bold"),
-        plot.title = element_text(hjust = 0.5),
-        axis.text.y = element_blank())
-
-# December precip normals
-dec.prcp <- ggplot() +
-  geom_raster(data = df, aes(x = longitude, y = latitude, fill = dec.precip.norm)) +
-  scale_fill_continuous(type = "viridis",
-                        limits = c(0, 200), breaks = seq(0, 200, 50)) +
-  scale_x_continuous(limits = c(-107, -92), breaks = seq(-107, -92, 3)) +
-  scale_y_continuous(limits = c(25, 37), breaks = seq(25, 37, 3)) +
-  labs(x = NULL, y = NULL,
-       fill = "Precipitation (mm)",
-       title = "December") +
-  pubtheme +
-  theme(title = element_text(face = "bold"),
-        plot.title = element_text(hjust = 0.5),
-        axis.text.y = element_blank())
-
-###############################################################################
-## Merge monthly precip plots into single fig
-###############################################################################
-ggarrange(jan.prcp, feb.prcp, mar.prcp, apr.prcp, may.prcp, jun.prcp, jul.prcp,
-          aug.prcp, sep.prcp, oct.prcp, nov.prcp, dec.prcp, ncol = 4, nrow = 3,
-          common.legend = TRUE, legend = "right") %>%
-  annotate_figure(bottom = text_grob(
-    expression(bold("Longitude (dd)")),
-    size = 15)) %>%
-  annotate_figure(left = text_grob(
-    expression(bold("Latitude (dd)")),
-    size = 15, rot = 90)) %>%
-  ggexport(filename = "monthly_normal.precip.png",
-           width = 12000, height = 9000, res = 600)
 
 ###############################################################################
 ## MAP and MAT plots (general across TX, not site specific)
 ###############################################################################
 map.plot <- ggplot() +
-  geom_raster(data = df, aes(x = longitude, y = latitude, fill = map)) +
-  geom_point(data = ecosites, aes(x = longitude, y = latitude)) +
+  geom_raster(data = df.normals, aes(x = longitude, y = latitude, fill = map)) +
+  geom_point(data = ecosites, 
+             aes(x = longitude, y = latitude, 
+                 shape = factor(sampling.year, levels = c("2020", "2021", "2020_2021"))), 
+             size = 3) +
+  ggsn::scalebar(data = df.normals, location = "bottomleft",
+                 transform = TRUE, model = "WGS84",
+                 dist_unit = "km", dist = 100, st.dist = 0.025, st.size = 2.5, border.size = 0.25) +
   coord_equal() +
-  scale_fill_continuous(type = "viridis",
-                        limits = c(-100, 1900), breaks = seq(0, 1800, 600)) +
-  #scale_fill_distiller(palette = "Greens", direction = 1,
-  #                     limits = c(100, 1700), breaks = seq(100, 1700, 500)) +
+  scale_fill_gradientn(colours = iridescent.reverse,
+                       limits = c(0, 1700), breaks = seq(0, 1500, 500),
+                       space = "Lab", 
+                       na.value = "grey50",
+                       guide = "colourbar",
+                       aesthetics = "fill") +
+  scale_shape_manual(values = c(21, 24, 16),
+                     labels = c("2020", "2021", "2020/2021")) +
   scale_x_continuous(limits = c(-107, -92), breaks = seq(-107, -92, 3)) +
   scale_y_continuous(limits = c(25, 37), breaks = seq(25, 37, 3)) +
   labs(x = "Longitude (dd)", y = "Latitude (dd)",
-       fill = "Precipitation (mm)",
-       title = "Mean annual precipitation (1981-2010)") +
-  pubtheme +
+       fill = "MAP (mm)",
+       shape = "Sampling year") +
+  theme_bw(base_size = 18) +
   theme(title = element_text(face = "bold"),
-        plot.title = element_text(hjust = 0.5))
+        plot.title = element_text(hjust = 0.5),
+        panel.grid = element_blank()) +
+  guides(fill = guide_colorbar(ticks.colour = "black",
+                               ticks.linewidth = 2,
+                               frame.linewidth = 1,
+                               frame.colour = "black",
+                               hjust = 0))
+
+map.plot
 
 ## MAT normals
 mat.plot <- ggplot() +
-  geom_raster(data = df, aes(x = longitude, y = latitude, fill = mat)) +
-  geom_point(data = ecosites, aes(x = longitude, y = latitude)) +
+  geom_raster(data = df.normals, aes(x = longitude, y = latitude, fill = mat)) +
+  geom_point(data = ecosites, 
+             aes(x = longitude, y = latitude, 
+                 shape = factor(sampling.year, levels = c("2020", "2021", "2020_2021"))), 
+             size = 3) +
+  ggsn::scalebar(data = df.normals, location = "bottomleft",
+                 transform = TRUE, model = "WGS84",
+                 dist_unit = "km", dist = 100, st.dist = 0.025, st.size = 2.5, border.size = 0.25) +
+  coord_equal() +
+  scale_fill_gradientn(colours = c("#CEFFFF", "#C6F7D6", "#A2F49B",
+                                   "#BBE453", "#D5CE04", "#E7B503",
+                                   "#F19903", "#F6790B", "#F94902",
+                                   "#E40515", "#A80003"),
+                       limits = c(11, 25), breaks = seq(12, 24, 4),
+                       space = "Lab",
+                       na.value = "grey50",
+                       guide = "colourbar",
+                       aesthetics = "fill") +
+  scale_shape_manual(values = c(21, 24, 16),
+                     labels = c("2020", "2021", "2020/2021")) +
   scale_x_continuous(limits = c(-107, -92), breaks = seq(-107, -92, 3)) +
   scale_y_continuous(limits = c(25, 37), breaks = seq(25, 37, 3)) +
-  scale_fill_distiller(palette = "YlOrRd", direction = 1,
-                       limits = c(9, 26), breaks = seq(10, 25, 5)) +
-  coord_equal() +
   #scale_fill_continuous(type = "viridis",
   #                      limits = c(10, 25), breaks = seq(10, 25, 5)) +
   labs(x = "Longitude (dd)", y = "Latitude (dd)",
-       fill = expression(bold("Temperature ("~degree~"C)")),
-       title = "Mean annual temperature (1991-2020)") +
-  pubtheme +
+       fill = expression(bold("MAT ("~degree~"C)")),
+       shape = "Sampling year") +
+  theme_bw(base_size = 18) +
   theme(title = element_text(face = "bold"),
-        plot.title = element_text(hjust = 0.5))
+        plot.title = element_text(hjust = 0.5),
+        panel.grid = element_blank()) +
+  guides(fill = guide_colorbar(ticks.colour = "black",
+                               ticks.linewidth = 2,
+                               frame.linewidth = 1,
+                               frame.colour = "black"))
 
-###############################################################################
-## Merge MAP/MAT plots
-###############################################################################
-normals.plot <- map.plot + mat.plot + plot_layout(guides = "collect")
-ggsave(plot = normals.plot, 
-       filename = "climate_normals.png",
-       dpi = 600, height = 5, width = 12)
+mat.plot
 
-ggarrange(map.plot, mat.plot, biome_mat_map, ncol = 3, nrow = 1, 
-          common.legend = TRUE, legend = "right", align = "hv")
+png("../working_drafts/TXeco_siteMaps.png", 
+    width = 16, height = 7, units = 'in', res = 600)
+ggarrange(map.plot, mat.plot, ncol = 2, nrow = 1, legend = "right", align = "hv")
+dev.off()
 
 
 ###############################################################################
@@ -412,8 +211,10 @@ biome_mat_map <- ggplot(data = df.sites, aes(x = mat, y = map / 10)) +
   labs(x = expression(bold("Mean annual temperature ("~degree~"C)")),
        y = "Mean annual precipitation (cm)",
        fill = "Biome type") +
-  pubtheme +
-  theme(legend.text = element_text(size = 10))
+  theme_bw(base_size = 18) +
+  theme(title = element_text(face = "bold"),
+        plot.title = element_text(hjust = 0.5),
+        panel.grid = element_blank())
 
 ggsave(plot = normals.plot, 
        filename = "climate_normals.png",
