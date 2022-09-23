@@ -53,69 +53,50 @@ df$vpd1 <- df$vpd1 / 10
 ## Beta
 ##########################################################################
 df$pft <- factor(df$pft, levels = c("c3_legume", "c4_nonlegume", "c3_nonlegume"))
-df$beta[c(62, 275, 315)] <- NA
+df$beta[c(84, 275, 500)] <- NA
 
-## Check soil moisture timescale
-beta.30 <- lmer(log(beta) ~ wn.30 * soil.no3n * pft + 
-                  (1 | NCRS.code), data = df)
-beta.60 <- lmer(log(beta) ~ wn.60 * soil.no3n * pft + 
-                  (1 | NCRS.code), data = df)
-beta.90 <- lmer(log(beta) ~ wn.90 * soil.no3n  * pft + 
-                  (1 | NCRS.code), data = df)
-beta.15yr <- lmer(log(beta) ~ wn.15yr * soil.no3n  * pft + 
-                    (1 | NCRS.code), data = df)
 
-## Model selection for relevant soil moisture timescale
-AICc(beta.30, beta.60, beta.90, beta.15yr) %>% arrange(AICc)
-## 60-day soil moisture estimates are the best model
+beta <- lmer(log(beta) ~ prcp365 * soil.no3n * pft + 
+               (1 | NCRS.code), data = df)
 
 # Check model assumptions
-plot(beta.60)
-qqnorm(residuals(beta.60))
-qqline(residuals(beta.60))
-densityPlot(residuals(beta.60))
-shapiro.test(residuals(beta.60))
-outlierTest(beta.60)
+plot(beta)
+qqnorm(residuals(beta))
+qqline(residuals(beta))
+densityPlot(residuals(beta))
+shapiro.test(residuals(beta))
+outlierTest(beta)
 
 # Model output
-summary(beta.60)
-Anova(beta.60)
-r.squaredGLMM(beta.60)
+summary(beta)
+Anova(beta)
+r.squaredGLMM(beta)
 
-# Two-way interaction between wn.60 and pft
-test(emtrends(beta.60, ~pft, "wn.60"))
+# Two-way interaction between map.15yr and pft
+test(emtrends(beta, ~pft, "prcp365"))
 
-# Individual effect of soil NO3-N
-test(emtrends(beta.60, ~1, "soil.no3n"))
-
-# Three-way interaction between wn.60, soil.no3n, and pft
-test(emtrends(beta.60, ~pft*soil.no3n, "wn.60", 
-              at = list(soil.no3n = c(0, 20, 40, 80))))
-## Negative effect of wn.60 on beta increases with soil NO3-N availability 
-## (makes sense because soil NO3-N generally decreases beta)
-
-test(emtrends(beta.60, ~wn.60*pft, "soil.no3n", 
-              at = list(wn.60 = c(30, 60, 90))))
-
+# Two-way interaction between pft and soil NO3-N
+test(emtrends(beta, ~pft, "soil.no3n"))
 
 # Individual effect of soil NO3-N
-test(emtrends(beta.60, ~1, "soil.no3n"))
+test(emtrends(beta, ~1, "soil.no3n"))
 
-test(emtrends(beta.60, ~pft*soil.no3n, "wn.60", at = list(soil.no3n = c(0, 20, 40, 80))))
+# Two-way interaction between soil NO3-N and pft
+test(emtrends(beta, ~pft, "soil.no3n"))
 
 ##########################################################################
 ## Beta plots
 ##########################################################################
-beta.no3n.pred <- data.frame(get_model_data(beta.60, 
+beta.no3n.pred <- data.frame(get_model_data(beta, 
                                             type = "pred", 
                                             terms = "soil.no3n"))
-beta.no3n.int <- data.frame(get_model_data(beta.60, 
+beta.no3n.int <- data.frame(get_model_data(beta, 
                                            type = "pred", 
                                            terms = c("soil.no3n", "pft")))
-beta.h2o.pred <- data.frame(get_model_data(beta.60, type = "pred", 
-                                           terms = c("wn.60")))
-beta.h2o.inter <- data.frame(get_model_data(beta.60, type = "pred", 
-                                            terms = c("wn.60", "pft")))
+beta.h2o.pred <- data.frame(get_model_data(beta, type = "pred", 
+                                           terms = c("prcp365")))
+beta.h2o.int <- data.frame(get_model_data(beta, type = "pred", 
+                                          terms = c("prcp365", "pft")))
 
 set.seed(5)
 beta.no3n.ind <- ggplot(data = subset(df, !is.na(pft)), 
@@ -147,45 +128,78 @@ png("../working_drafts/TXeco_beta_no3n_ind.png",
 beta.no3n.ind
 dev.off()
 
-beta.h2o.ind <- ggplot(data = subset(df, !is.na(pft)), 
-                       aes(x = wn.60, y = log(beta))) +
+beta.no3n.int <- ggplot(data = subset(df, !is.na(pft)), 
+                        aes(x = soil.no3n, y = log(beta))) +
   geom_jitter(aes(fill = pft),
-              width = 0.1, size = 3, alpha = 0.7, shape = 21) +
-  geom_ribbon(data = beta.h2o.pred, 
+              width = 0.5, size = 3, alpha = 0.7, shape = 21) +
+  geom_ribbon(data = subset(beta.no3n.int, group == "c3_legume"), 
               aes(x = x, y = log(predicted), ymin = log(conf.low), 
-                  ymax = log(conf.high)), alpha = 0.25) +
-  geom_line(data = subset(beta.h2o.pred), size = 1.5,
-            aes(x = x, y = log(predicted)), lty = 2) +
+                  ymax = log(conf.high)), alpha = 0.25, fill = cbbPalette3[1]) +
+  geom_line(data = subset(beta.no3n.int, group == "c3_legume"), size = 1,
+            aes(x = x, y = log(predicted)), color = cbbPalette3[1]) +
+  geom_ribbon(data = subset(beta.no3n.int, group == "c4_nonlegume"), 
+              aes(x = x, y = log(predicted), ymin = log(conf.low), 
+                  ymax = log(conf.high)), alpha = 0.25, fill = cbbPalette3[2]) +
+  geom_line(data = subset(beta.no3n.int, group == "c4_nonlegume"), size = 1,
+            aes(x = x, y = log(predicted)), color = cbbPalette3[2]) +
+  geom_ribbon(data = subset(beta.no3n.int, group == "c3_nonlegume"), 
+              aes(x = x, y = log(predicted), ymin = log(conf.low), 
+                  ymax = log(conf.high)), alpha = 0.25, fill = cbbPalette3[3]) +
+  geom_line(data = subset(beta.no3n.int, group == "c3_nonlegume"), size = 1,
+            aes(x = x, y = log(predicted)), color = cbbPalette3[3]) +
   scale_fill_manual(values = c(cbbPalette3), 
                     labels = c(expression("C"[3]~"legume"),
                                expression("C"[4]~"non-legume"),
                                expression("C"[3]~"non-legume"))) +
-  scale_x_continuous(limits = c(20, 120), breaks = seq(20, 120, 20)) +
+  scale_x_continuous(limits = c(-1, 80), breaks = seq(0, 80, 20)) +
   scale_y_continuous(limits = c(-2.5, 7.5), breaks = seq(-2.5, 7.5, 2.5)) +
-  labs(x = expression(bold("60-day mean daily soil moisture (mm)")),
+  labs(x = expression(bold("Soil nitrogen availability (ppm NO"[3]~"-N)")),
        y = expression(bold(ln~beta)),
        fill = "Functional group") +
   theme_bw(base_size = 18) +
   theme(legend.text.align = 0,
         panel.border = element_rect(size = 1.25),
         panel.grid = element_blank())
+beta.no3n.int 
+
+beta.h2o.ind <- ggplot(data = subset(df, !is.na(pft)), 
+                       aes(x = prcp365, y = log(beta))) +
+  geom_jitter(aes(fill = pft),
+              width = 2, size = 3, alpha = 0.7, shape = 21) +
+  geom_ribbon(data = beta.h2o.pred, 
+              aes(x = x, y = log(predicted), ymin = log(conf.low), 
+                  ymax = log(conf.high)), alpha = 0.25) +
+  geom_line(data = beta.h2o.pred, size = 1.5,
+            aes(x = x, y = log(predicted)), lty = 2) +
+  scale_fill_manual(values = c(cbbPalette3), 
+                    labels = c(expression("C"[3]~"legume"),
+                               expression("C"[4]~"non-legume"),
+                               expression("C"[3]~"non-legume"))) +
+  scale_x_continuous(limits = c(300, 1800), breaks = seq(300, 1800, 300)) +
+  scale_y_continuous(limits = c(-2.5, 7.5), breaks = seq(-2.5, 7.5, 2.5)) +
+  labs(x = expression(bold("Precipitation"[365]*" (mm)")),
+       y = expression(bold(ln~beta)),
+       fill = "Functional group") +
+  theme_bw(base_size = 18) +
+  theme(legend.text.align = 0,
+        panel.border = element_rect(size = 1.25))
 beta.h2o.ind
 
 beta.h2o.int <- ggplot(data = subset(df, !is.na(pft)), 
-                          aes(x = wn.60, y = log(beta))) +
+                          aes(x = prcp365, y = log(beta))) +
   geom_jitter(aes(fill = pft),
               width = 0.1, size = 3, alpha = 0.7, shape = 21) +
   geom_ribbon(data = subset(beta.h2o.inter, group == "c3_legume"), 
               aes(x = x, y = log(predicted), ymin = log(conf.low), 
                   ymax = log(conf.high)), alpha = 0.25, fill = cbbPalette3[1]) +
-  geom_line(data = subset(beta.h2o.inter, group == "c3_legume"), size = 1,
+  geom_line(data = subset(beta.h2o.int, group == "c3_legume"), size = 1,
             aes(x = x, y = log(predicted)), color = cbbPalette3[1], lty = 2) +
-  geom_ribbon(data = subset(beta.h2o.inter, group == "c4_nonlegume"), 
+  geom_ribbon(data = subset(beta.h2o.int, group == "c4_nonlegume"), 
               aes(x = x, y = log(predicted), ymin = log(conf.low), 
                   ymax = log(conf.high)), alpha = 0.25, fill = cbbPalette3[2]) +
-  geom_line(data = subset(beta.h2o.inter, group == "c4_nonlegume"), size = 1,
+  geom_line(data = subset(beta.h2o.int, group == "c4_nonlegume"), size = 1,
             aes(x = x, y = log(predicted)), color = cbbPalette3[2]) +
-  geom_ribbon(data = subset(beta.h2o.inter, group == "c3_nonlegume"), 
+  geom_ribbon(data = subset(beta.h2o.int, group == "c3_nonlegume"), 
               aes(x = x, y = log(predicted), ymin = log(conf.low), 
                   ymax = log(conf.high)), alpha = 0.25, fill = cbbPalette3[3]) +
   geom_line(data = subset(beta.h2o.inter, group == "c3_nonlegume"), size = 1,
@@ -194,9 +208,9 @@ beta.h2o.int <- ggplot(data = subset(df, !is.na(pft)),
                     labels = c(expression("C"[3]~"legume"),
                                expression("C"[4]~"non-legume"),
                                expression("C"[3]~"non-legume"))) +
-  scale_x_continuous(limits = c(20, 120), breaks = seq(20, 120, 20)) +
+  scale_x_continuous(limits = c(300, 1800), breaks = seq(300, 1800, 500)) +
   scale_y_continuous(limits = c(-2.5, 7.5), breaks = seq(-2.5, 7.5, 2.5)) +
-  labs(x = expression(bold("60-day mean daily soil moisture (mm)")),
+  labs(x = expression(bold("365-day precipitation (mm)")),
        y = expression(bold(ln~beta)),
        fill = "Functional group") +
   theme_bw(base_size = 18) +

@@ -75,7 +75,7 @@ leaf <- biomass %>%
   full_join(cn.plates) %>%
   mutate(sla = (total.leaf.area / dry.wgt),
          marea = 1/sla*10000,
-         narea = (n.leaf/100) /sla * 10000,
+         narea = (n.leaf/100) * marea,
          leaf.cn = c.leaf / n.leaf)
 
 # Separate site in leaf data.frame, merge with site.coords to get property name
@@ -89,10 +89,16 @@ full.df <- leaf %>%
   full_join(soil) %>%
   separate(col = site, into = c("sampling.year", "county", "visit.type"), sep = "_") %>%
   dplyr::mutate(sampling.year = ifelse(sampling.year == "2020eco", 
-                                as.numeric("2020"), as.numeric("2021"))) %>%
+                                       as.numeric("2020"), 
+                                       ifelse(sampling.year == "2021eco",
+                                              as.numeric("2021"),
+                                              NA))) %>%
   unite("id", county:rep, remove = FALSE) %>%
   dplyr::mutate(visit.type = ifelse(visit.type == "i",
-                                    "initial", "primary")) %>%
+                                    "initial", 
+                                    ifelse(visit.type == "p",
+                                           "primary",
+                                           NA))) %>%
   dplyr::select(site = property, id, sampling.year, visit.type, elevation.m,
                 soil.pH:soil.potassium, total.leaf.area:pft) %>%
   merge(clim, by = c("site", "sampling.year", "visit.type")) %>%
