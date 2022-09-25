@@ -55,7 +55,6 @@ df$vpd1 <- df$vpd1 / 10
 df$pft <- factor(df$pft, levels = c("c3_legume", "c4_nonlegume", "c3_nonlegume"))
 df$beta[c(84, 275, 500)] <- NA
 
-
 beta <- lmer(log(beta) ~ prcp365 * soil.no3n * pft + 
                (1 | NCRS.code), data = df)
 
@@ -119,8 +118,7 @@ beta.no3n.ind <- ggplot(data = subset(df, !is.na(pft)),
        fill = "Functional group") +
   theme_bw(base_size = 18) +
   theme(legend.text.align = 0,
-        panel.border = element_rect(size = 1.25),
-        panel.grid = element_blank())
+        panel.border = element_rect(size = 1.25))
 beta.no3n.ind
 
 png("../working_drafts/TXeco_beta_no3n_ind.png",
@@ -158,8 +156,7 @@ beta.no3n.int <- ggplot(data = subset(df, !is.na(pft)),
        fill = "Functional group") +
   theme_bw(base_size = 18) +
   theme(legend.text.align = 0,
-        panel.border = element_rect(size = 1.25),
-        panel.grid = element_blank())
+        panel.border = element_rect(size = 1.25))
 beta.no3n.int 
 
 beta.h2o.ind <- ggplot(data = subset(df, !is.na(pft)), 
@@ -175,7 +172,7 @@ beta.h2o.ind <- ggplot(data = subset(df, !is.na(pft)),
                     labels = c(expression("C"[3]~"legume"),
                                expression("C"[4]~"non-legume"),
                                expression("C"[3]~"non-legume"))) +
-  scale_x_continuous(limits = c(300, 1800), breaks = seq(300, 1800, 300)) +
+  scale_x_continuous(limits = c(375, 1650), breaks = seq(400, 1600, 400)) +
   scale_y_continuous(limits = c(-2.5, 7.5), breaks = seq(-2.5, 7.5, 2.5)) +
   labs(x = expression(bold("Precipitation"[365]*" (mm)")),
        y = expression(bold(ln~beta)),
@@ -189,7 +186,7 @@ beta.h2o.int <- ggplot(data = subset(df, !is.na(pft)),
                           aes(x = prcp365, y = log(beta))) +
   geom_jitter(aes(fill = pft),
               width = 0.1, size = 3, alpha = 0.7, shape = 21) +
-  geom_ribbon(data = subset(beta.h2o.inter, group == "c3_legume"), 
+  geom_ribbon(data = subset(beta.h2o.int, group == "c3_legume"), 
               aes(x = x, y = log(predicted), ymin = log(conf.low), 
                   ymax = log(conf.high)), alpha = 0.25, fill = cbbPalette3[1]) +
   geom_line(data = subset(beta.h2o.int, group == "c3_legume"), size = 1,
@@ -202,21 +199,20 @@ beta.h2o.int <- ggplot(data = subset(df, !is.na(pft)),
   geom_ribbon(data = subset(beta.h2o.int, group == "c3_nonlegume"), 
               aes(x = x, y = log(predicted), ymin = log(conf.low), 
                   ymax = log(conf.high)), alpha = 0.25, fill = cbbPalette3[3]) +
-  geom_line(data = subset(beta.h2o.inter, group == "c3_nonlegume"), size = 1,
+  geom_line(data = subset(beta.h2o.int, group == "c3_nonlegume"), size = 1,
             aes(x = x, y = log(predicted)), color = cbbPalette3[3], lty = 2) +
   scale_fill_manual(values = c(cbbPalette3), 
                     labels = c(expression("C"[3]~"legume"),
                                expression("C"[4]~"non-legume"),
                                expression("C"[3]~"non-legume"))) +
-  scale_x_continuous(limits = c(300, 1800), breaks = seq(300, 1800, 500)) +
+  scale_x_continuous(limits = c(375, 1650), breaks = seq(400, 1600, 400)) +
   scale_y_continuous(limits = c(-2.5, 7.5), breaks = seq(-2.5, 7.5, 2.5)) +
   labs(x = expression(bold("365-day precipitation (mm)")),
        y = expression(bold(ln~beta)),
        fill = "Functional group") +
   theme_bw(base_size = 18) +
   theme(legend.text.align = 0,
-        panel.border = element_rect(size = 1.25),
-        panel.grid = element_blank())
+        panel.border = element_rect(size = 1.25))
 beta.h2o.int
 
 png("../working_drafts/TXeco_beta_h2o_ind.png",
@@ -227,6 +223,12 @@ dev.off()
 png("../working_drafts/TXeco_beta_h2o_int.png",
     width = 8, height = 5, units = 'in', res = 600)
 beta.h2o.int
+dev.off()
+
+png("../working_drafts/TXeco_fig1_beta.png",
+    width = 14, height = 6, units = 'in', res = 600)
+ggarrange(beta.no3n.int, beta.h2o.int, ncol = 2, common.legend = TRUE,
+          legend = "right", align = "hv")
 dev.off()
 
 ##########################################################################
@@ -247,9 +249,11 @@ df <- read.csv("../data_sheets/TXeco_compiled_datasheet.csv",
 df$pft <- factor(df$pft, levels = c("c3_legume", "c4_nonlegume", "c3_nonlegume"))
 
 
-df$chi[c(11, 62, 315, 402)] <- NA
+df$chi[c(62, 114, 119, 275, 276, 315, 317, 456, 480, 481)] <- NA
+df$chi[c(117, 293, 483, 500)] <- NA
+df$chi[c(71, 402, 484, 502)] <- NA
 
-chi <- lmer(chi ~ wn.60 * soil.no3n * pft  + 
+chi <- lmer(chi ~ prcp365 * soil.no3n * pft  + 
               (1 | NCRS.code), data = df)
 
 # Check model assumptions
@@ -266,7 +270,7 @@ Anova(chi)
 r.squaredGLMM(chi)
 
 ## Single factor effect of wn.60 on chi
-test(emtrends(chi, ~1, "wn.60"))
+test(emtrends(chi, ~1, "prcp365"))
 
 ## Effect of wn.60 on chi across species
 test(emtrends(chi, ~pft, "wn.60"))
