@@ -53,7 +53,7 @@ df$vpd1 <- df$vpd1 / 10
 ## Beta
 ##########################################################################
 df$pft <- factor(df$pft, levels = c("c3_legume", "c4_nonlegume", "c3_nonlegume"))
-df$beta[c(84, 275, 500)] <- NA
+df$beta[c(275)] <- NA
 
 beta <- lmer(log(beta) ~ prcp365 * soil.no3n * pft + 
                (1 | NCRS.code), data = df)
@@ -70,6 +70,9 @@ outlierTest(beta)
 summary(beta)
 Anova(beta)
 r.squaredGLMM(beta)
+
+# Individual effect of 365-day precipitation
+test(emtrends(beta, ~1, "prcp7"))
 
 # Two-way interaction between map.15yr and pft
 test(emtrends(beta, ~pft, "prcp365"))
@@ -248,12 +251,11 @@ df <- read.csv("../data_sheets/TXeco_compiled_datasheet.csv",
          chi = ifelse(chi > 0.95 | chi < 0.20, NA, chi))
 df$pft <- factor(df$pft, levels = c("c3_legume", "c4_nonlegume", "c3_nonlegume"))
 
+df$chi[c(62, 114, 119, 315, 480)] <- NA
+df$chi[c(117, 456)] <- NA
+df$chi[c(292, 500)] <- NA
 
-df$chi[c(62, 114, 119, 275, 276, 315, 317, 456, 480, 481)] <- NA
-df$chi[c(117, 293, 483, 500)] <- NA
-df$chi[c(71, 402, 484, 502)] <- NA
-
-chi <- lmer(chi ~ prcp365 * soil.no3n * pft  + 
+chi <- lmer(chi ~ (vpd7 + tavg7 + (prcp7 * soil.no3n)) * pft + 
               (1 | NCRS.code), data = df)
 
 # Check model assumptions
@@ -269,8 +271,16 @@ summary(chi)
 Anova(chi)
 r.squaredGLMM(chi)
 
+## Single factor effect of prcp365 on chi
+test(emtrends(chi, ~1, "vpd7"))
+
+## Single factor effect of prcp365 on chi
+test(emtrends(chi, ~1, "tavg7"))
+
+
+
 ## Single factor effect of wn.60 on chi
-test(emtrends(chi, ~1, "prcp365"))
+test(emtrends(chi, ~1, "prcp7"))
 
 ## Effect of wn.60 on chi across species
 test(emtrends(chi, ~pft, "wn.60"))
@@ -456,8 +466,9 @@ df <- read.csv("../data_sheets/TXeco_compiled_datasheet.csv",
 df$pft <- factor(df$pft, levels = c("c3_legume", "c4_nonlegume", "c3_nonlegume"))
 
 df$narea[df$narea > 5] <- NA
+df$narea[c(509)] <- NA
 
-narea <- lmer(narea ~ wn.60 * soil.no3n * pft + chi + beta + (1 | NCRS.code),
+narea <- lmer(log(narea) ~ prcp365 * soil.no3n * pft + chi + beta + (1 | NCRS.code),
               data = df)
 
 # Check model assumptions
@@ -477,7 +488,6 @@ r.squaredGLMM(narea)
 ## Individual beta effect
 test(emtrends(narea, ~1, "beta"))
 emmeans(narea, ~1, at = list(beta = 0))
-
 
 ## Individual chi effect
 test(emtrends(narea, ~pft, "soil.no3n"))
@@ -557,9 +567,6 @@ narea.soilno3n.plot <- ggplot(data = subset(df, !is.na(pft)),
   theme(legend.text.align = 0,
         panel.grid = element_blank())
 
-
-
-
 png("../working_drafts/TXeco_narea_beta.png",
     width = 8, height = 5, units = 'in', res = 600)
 narea.beta.plot
@@ -581,12 +588,11 @@ narea.soilno3n.int.plot
 dev.off()
 
 ##########################################################################
-## Narea
+## Nmass
 ##########################################################################
 df$n.leaf[c(509)] <- NA
 
-
-nmass <- lmer(log(n.leaf) ~ wn.60 * soil.no3n * pft + beta + chi + 
+nmass <- lmer(log(n.leaf) ~ prcp365 * soil.no3n * pft + beta + chi + 
                 (1 | NCRS.code), data = df)
 
 # Check model assumptions
@@ -602,8 +608,34 @@ summary(nmass)
 Anova(nmass)
 r.squaredGLMM(nmass)
 
-test(emtrends(nmass, ~1, "wn.60"))
-test(emtrends(nmass, ~1, "soi.no3n"))
+test(emtrends(nmass, ~1, "prcp365"))
+test(emtrends(nmass, ~1, "soil.no3n"))
 
 test(emtrends(nmass, ~wn.60, "soil.no3n", at = list(wn.60 = c(0, 40, 80, 120))))
 
+##########################################################################
+## Marea
+##########################################################################
+df$marea[c(20, 21)] <- NA
+
+marea <- lmer(log(marea) ~ prcp365 * soil.no3n * pft + beta + chi + 
+                (1 | NCRS.code), data = df)
+
+# Check model assumptions
+plot(marea)
+qqnorm(residuals(marea))
+qqline(residuals(marea))
+hist(residuals(marea))
+shapiro.test(residuals(marea))
+outlierTest(marea)
+
+# Model output
+summary(marea)
+Anova(marea)
+r.squaredGLMM(marea)
+
+test(emtrends(marea, ~1, "prcp365"))
+test(emtrends(marea, ~1, "soil.no3n"))
+test(emtrends(marea, ~1, "beta"))
+
+test(emtrends(marea, ~wn.60, "soil.no3n", at = list(wn.60 = c(0, 40, 80, 120))))
