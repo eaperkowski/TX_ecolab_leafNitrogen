@@ -49,13 +49,17 @@ df$wn.30yr.rel <- df$wn.30yr / 150
 ## Convert VPD from hPa (PRISM units) to kPa (standard)
 df$vpd1 <- df$vpd1 / 10
 
+plot(df$soil.no3n, df$soil.cec)
+cor.test(df$soil.no3n, df$soil.pH)
+cor.test(df$soil.no3n, df$soil.cec)
+
 ##########################################################################
 ## Beta
 ##########################################################################
 df$pft <- factor(df$pft, levels = c("c3_legume", "c4_nonlegume", "c3_nonlegume"))
-df$beta[c(275)] <- NA
+df$beta[c(62, 275, 315)] <- NA
 
-beta <- lmer(log(beta) ~ prcp365 * soil.no3n * pft + 
+beta <- lmer(log(beta) ~ wn.60 * soil.cec * pft + 
                (1 | NCRS.code), data = df)
 
 # Check model assumptions
@@ -71,20 +75,17 @@ summary(beta)
 Anova(beta)
 r.squaredGLMM(beta)
 
-# Individual effect of 365-day precipitation
-test(emtrends(beta, ~1, "prcp7"))
-
 # Two-way interaction between map.15yr and pft
-test(emtrends(beta, ~pft, "prcp365"))
-
-# Two-way interaction between pft and soil NO3-N
-test(emtrends(beta, ~pft, "soil.no3n"))
+test(emtrends(beta, ~pft, "wn.60"))
 
 # Individual effect of soil NO3-N
 test(emtrends(beta, ~1, "soil.no3n"))
 
-# Two-way interaction between soil NO3-N and pft
-test(emtrends(beta, ~pft, "soil.no3n"))
+# PFT-only effect
+emmeans(beta, pairwise~pft)
+
+# Three-way interaction between NO3-N, wn.60, and pft
+test(emtrends(beta, ~wn.60*pft, "soil.no3n", at = list(wn.60 = c(50, 70, 100))))
 
 ##########################################################################
 ## Beta plots
@@ -96,9 +97,9 @@ beta.no3n.int <- data.frame(get_model_data(beta,
                                            type = "pred", 
                                            terms = c("soil.no3n", "pft")))
 beta.h2o.pred <- data.frame(get_model_data(beta, type = "pred", 
-                                           terms = c("prcp365")))
+                                           terms = c("wn.60")))
 beta.h2o.int <- data.frame(get_model_data(beta, type = "pred", 
-                                          terms = c("prcp365", "pft")))
+                                          terms = c("wn.60", "pft")))
 
 set.seed(5)
 beta.no3n.ind <- ggplot(data = subset(df, !is.na(pft)), 
@@ -141,8 +142,9 @@ beta.no3n.int <- ggplot(data = subset(df, !is.na(pft)),
   geom_ribbon(data = subset(beta.no3n.int, group == "c4_nonlegume"), 
               aes(x = x, y = log(predicted), ymin = log(conf.low), 
                   ymax = log(conf.high)), alpha = 0.25, fill = cbbPalette3[2]) +
-  geom_line(data = subset(beta.no3n.int, group == "c4_nonlegume"), size = 1,
-            aes(x = x, y = log(predicted)), color = cbbPalette3[2]) +
+  geom_line(data = subset(beta.no3n.int, group == "c4_nonlegume"),
+            aes(x = x, y = log(predicted)), 
+            color = cbbPalette3[2], size = 1, lty = 2) +
   geom_ribbon(data = subset(beta.no3n.int, group == "c3_nonlegume"), 
               aes(x = x, y = log(predicted), ymin = log(conf.low), 
                   ymax = log(conf.high)), alpha = 0.25, fill = cbbPalette3[3]) +
