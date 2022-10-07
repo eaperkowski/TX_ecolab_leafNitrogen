@@ -17,10 +17,17 @@ library(ggsn)
 ecosites <- read.csv("../data_sheets/TXeco_sitecoords.csv") %>%
   filter(site != "2020eco_Bell" & site != "2020eco_Russel") # add path to site coords file here
 ecosites <- distinct(ecosites, property, .keep_all = TRUE) # remove duplicate sites
+
+## Modify sampling year col for repeat site visits
+ecosites$sampling.year[ecosites$property == "Brazos_2020_18" |
+                         ecosites$property == "Harris_2020_03" |
+                         ecosites$property == "Uvalde_2020_02"] <- "2020_2021"
+
+
 eco.coords <- dplyr::select(ecosites, x = longitude, y = latitude) # select only lat/long data, code as xy
 
 # Set PRISM directory (put folder where prism data will be stored here)
-prism_set_dl_dir("../climate_data/prism/prism_normal/")
+prism_set_dl_dir("../climate_data/prism/prism_monthly/")
 
 ## Iridescent palette: 
 iridescent <- c("#FEFBE9", "#FCF7D5", "#F5F3C1", "#EAF0B5",
@@ -36,10 +43,6 @@ iridescent.reverse <- c("#000000", "#46353A", "#684957", "#805770",
                         "#B5DDD8", "#C2E3D2", "#D0E7CA", "#DDECBF", 
                         "#EAF0B5", "#F5F3C1", "#FCF7D5", "#FEFBE9")
 
-
-
-
-
 ###############################################################################
 ## Download temp/precip normal data from PRISM
 ###############################################################################
@@ -48,13 +51,21 @@ iridescent.reverse <- c("#000000", "#46353A", "#684957", "#805770",
 
 ## Workaround to not having PRISM 1991-2020 climate norms (download monthly
 ## and then calculate mean across years)
-get_prism_monthlys(type = "tmean", years = 1991:2020, mon = 1:12, keepZip = FALSE)
-get_prism_monthlys(type = "ppt", years = 1991:2020, mon = 1:12, keepZip = FALSE)
-get_prism_monthlys(type = "tmin", years = 1991:2020, mon = 1:12, keepZip = FALSE)
-get_prism_monthlys(type = "tmax", years = 1991:2020, mon = 1:12, keepZip = FALSE)
-get_prism_monthlys(type = "tdmean", years = 1991:2020, mon = 1:12, keepZip = FALSE)
-get_prism_monthlys(type = "vpdmin", years = 1991:2020, mon = 1:12, keepZip = FALSE)
-get_prism_monthlys(type = "vpdmax", years = 1991:2020, mon = 1:12, keepZip = FALSE)
+# get_prism_monthlys(type = "tmean", years = 1991:2020, mon = 1:12, keepZip = FALSE)
+# get_prism_monthlys(type = "ppt", years = 1991:2020, mon = 1:12, keepZip = FALSE)
+# get_prism_monthlys(type = "tmin", years = 1991:2020, mon = 1:12, keepZip = FALSE)
+# get_prism_monthlys(type = "tmax", years = 1991:2020, mon = 1:12, keepZip = FALSE)
+# get_prism_monthlys(type = "tdmean", years = 1991:2020, mon = 1:12, keepZip = FALSE)
+# get_prism_monthlys(type = "vpdmin", years = 1991:2020, mon = 1:12, keepZip = FALSE)
+# get_prism_monthlys(type = "vpdmax", years = 1991:2020, mon = 1:12, keepZip = FALSE)
+# 
+# get_prism_normals(type = "tmean", "4km", annual = TRUE, keepZip = FALSE)
+# get_prism_normals(type = "ppt", "4km", annual = TRUE, keepZip = FALSE)
+# get_prism_normals(type = "tmin", "4km", annual = TRUE, keepZip = FALSE)
+# get_prism_normals(type = "tmax", "4km", annual = TRUE, keepZip = FALSE)
+# get_prism_normals(type = "tdmean", "4km", annual = TRUE, keepZip = FALSE)
+# get_prism_normals(type = "vpdmin", "4km", annual = TRUE, keepZip = FALSE)
+# get_prism_normals(type = "vpdmax", "4km", annual = TRUE, keepZip = FALSE)
 
 ###############################################################################
 ## Create US shapefile to mask rasters to only Texas
@@ -71,10 +82,31 @@ texas <- us[match(toupper("texas"), toupper(us$NAME_1)), ]
 # Precipitation (pd_stack stacks all monthly climate normal data into single 
 # RasterStack)
 
-pd.precip <- pd_stack(prism_archive_subset("ppt", "annual normals", resolution = "4km"))
-precip.masked <- mask(pd.precip, texas) # turns to rasterBrick file
+## Stack Rasterbricks, crop and mask values to only include TX
+pd.precip <- pd_stack(prism_archive_subset("ppt", "monthly"))
+precip.masked <- mask(crop(pd.precip, extent(texas)), texas) # turns to rasterBrick file
 precip.masked.df <- as.data.frame(rasterToPoints(precip.masked))
 
+## Pivot raster columns to long format, remove prefix and group by month
+## precip. Then, in a step, calculate 2006-2020 mean annual precipitation 
+## of all grid cells 
+precip.masked.df_cleaned <- precip.masked.df %>%
+  tidyr::pivot_longer(cols = PRISM_ppt_stable_4kmM3_199101_bil:PRISM_ppt_stable_4kmM3_202012_bil,
+                      names_prefix = "PRISM_ppt_stable_4kmM3_",
+                      values_to = "monthly.prcp",
+                      names_to = "month") %>%
+  mutate(month = gsub("*_bil", "", month),
+         date = lubridate::ym(month),
+         year = lubridate::year(date),
+         month = lubridate::month(date)) %>%
+  filter(year >= 2006 & year <= 2020) %>%
+  group_by(x, y, year) %>%
+  summarize(annual.prcp = sum(monthly.prcp, na.rm = TRUE)) %>%
+  ungroup(year) %>%
+  summarize(map = mean(annual.prcp, na.rm = TRUE))
+
+## Extract monthly precipitation data from grid cell containing each site.
+## Note that grid cell is on 4km resolution
 df.sites.precip <- as.data.frame(terra::extract(pd.precip,
                                                 SpatialPoints(eco.coords),
                                                 sp = F))
@@ -82,14 +114,33 @@ df.sites.precip$latitude = eco.coords$y
 df.sites.precip$longitude = eco.coords$x
 df.sites.precip$site = ecosites$property
 
+## Pivot raster columns to long format, remove prefix and group by month
+## precip. Then, in a step, calculate 2006-2020 mean annual precipitation 
+## of all grid cells 
+df.sites.precip_cleaned <- df.sites.precip %>%
+  tidyr::pivot_longer(cols = PRISM_ppt_stable_4kmM3_199101_bil:PRISM_ppt_stable_4kmM3_202012_bil,
+               names_prefix = "PRISM_ppt_stable_4kmM3_",
+               values_to = "monthly.prcp",
+               names_to = "month") %>%
+  mutate(month = gsub("*_bil", "", month),
+         date = lubridate::ym(month),
+         year = lubridate::year(date),
+         month = lubridate::month(date)) %>%
+  filter(year >= 2006 & year <= 2020) %>%
+  group_by(site, latitude, longitude, year) %>%
+  summarize(annual.prcp = sum(monthly.prcp)) %>%
+  ungroup(year) %>%
+  summarize(map = mean(annual.prcp, na.rm = TRUE))
+
+
 # Temperature
-pd.temp <- pd_stack(prism_archive_subset("tmean", "annual normals", resolution = "4km"))
+pd.temp <- pd_stack(prism_archive_subset("tmean", "monthly"))
 temp.masked <- mask(pd.temp, texas)
 temp.masked.df <- as.data.frame(rasterToPoints(temp.masked))
 
 df.sites.temp <- as.data.frame(terra::extract(pd.temp,
-                                                SpatialPoints(eco.coords),
-                                                sp = F))
+                                              SpatialPoints(eco.coords),
+                                              sp = F))
 df.sites.temp$latitude = eco.coords$y
 df.sites.temp$longitude = eco.coords$x
 df.sites.temp$site = ecosites$property
@@ -117,17 +168,18 @@ ecosites$sampling.year[ecosites$property == "Brazos_2020_18" |
 ## MAP and MAT plots (general across TX, not site specific)
 ###############################################################################
 map.plot <- ggplot() +
-  geom_raster(data = df.normals, aes(x = longitude, y = latitude, fill = map)) +
+  geom_raster(data = precip.masked.df_cleaned, 
+              aes(x = x, y = y, fill = map)) +
   geom_point(data = ecosites, 
              aes(x = longitude, y = latitude, 
                  shape = factor(sampling.year, levels = c("2020", "2021", "2020_2021"))), 
              size = 3) +
-  ggsn::scalebar(data = df.normals, location = "bottomleft",
+  ggsn::scalebar(data = precip.masked.df_cleaned, location = "bottomleft",
                  transform = TRUE, model = "WGS84",
                  dist_unit = "km", dist = 100, st.dist = 0.025, st.size = 2.5, border.size = 0.25) +
   coord_equal() +
-  scale_fill_gradientn(colours = iridescent.reverse,
-                       limits = c(0, 1700), breaks = seq(0, 1500, 500),
+  scale_fill_gradientn(colours = iridescent,
+                       limits = c(0, 1850), breaks = seq(0, 1800, 300),
                        space = "Lab", 
                        na.value = "grey50",
                        guide = "colourbar",

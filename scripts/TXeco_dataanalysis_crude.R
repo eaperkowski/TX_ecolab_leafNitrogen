@@ -49,9 +49,23 @@ df$wn.30yr.rel <- df$wn.30yr / 150
 ## Convert VPD from hPa (PRISM units) to kPa (standard)
 df$vpd1 <- df$vpd1 / 10
 
-plot(df$soil.no3n, df$soil.cec)
-cor.test(df$soil.no3n, df$soil.pH)
-cor.test(df$soil.no3n, df$soil.cec)
+plot(df$soil.cec, df$beta)
+cor.test(df$soil.no3n, df$soil.)
+
+ggplot(data = df, aes(x = soil.cec, y = soil.no3n)) +
+  geom_point() +
+  geom_smooth(method = 'lm') +
+  theme_bw(base_size = 22)
+
+ggplot(data = df, aes(x = soil.cec, y = soil.phos)) +
+  geom_point() +
+  geom_smooth(method = 'lm') +
+  theme_bw(base_size = 22)
+
+ggplot(data = df, aes(x = soil.cec, y = soil.potassium)) +
+  geom_point() +
+  geom_smooth(method = 'lm') +
+  theme_bw(base_size = 22)
 
 ##########################################################################
 ## Beta
@@ -59,7 +73,7 @@ cor.test(df$soil.no3n, df$soil.cec)
 df$pft <- factor(df$pft, levels = c("c3_legume", "c4_nonlegume", "c3_nonlegume"))
 df$beta[c(62, 275, 315)] <- NA
 
-beta <- lmer(log(beta) ~ wn.60 * soil.cec * pft + 
+beta <- lmer(log(beta) ~ wn.60 * soil.pH * pft + 
                (1 | NCRS.code), data = df)
 
 # Check model assumptions
@@ -79,7 +93,7 @@ r.squaredGLMM(beta)
 test(emtrends(beta, ~pft, "wn.60"))
 
 # Individual effect of soil NO3-N
-test(emtrends(beta, ~1, "soil.no3n"))
+test(emtrends(beta, ~1, "soil.cec"))
 
 # PFT-only effect
 emmeans(beta, pairwise~pft)
@@ -257,7 +271,7 @@ df$chi[c(62, 114, 119, 315, 480)] <- NA
 df$chi[c(117, 456)] <- NA
 df$chi[c(292, 500)] <- NA
 
-chi <- lmer(chi ~ (vpd7 + tavg7 + (prcp7 * soil.no3n)) * pft + 
+chi <- lmer(chi ~ (vpd7 + tavg7 + (wn.60 * soil.pH)) * pft + 
               (1 | NCRS.code), data = df)
 
 # Check model assumptions
@@ -296,7 +310,6 @@ test(emtrends(chi, ~1, "beta"))
 
 ## Single factor effect of soil.no3n on chi
 cld(emmeans(chi, pairwise~pft))
-
 
 ##########################################################################
 ## Chi plots
