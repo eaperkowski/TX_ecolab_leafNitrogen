@@ -12,6 +12,7 @@ library(terra)
 library(plotbiomes)
 library(viridis)
 library(ggsn)
+library(maps)
 
 # Load Ecolab site coords
 ecosites <- read.csv("../data_sheets/TXeco_sitecoords.csv") %>%
@@ -22,7 +23,12 @@ ecosites <- distinct(ecosites, property, .keep_all = TRUE) # remove duplicate si
 ecosites$sampling.year[ecosites$property == "Brazos_2020_18" |
                          ecosites$property == "Harris_2020_03" |
                          ecosites$property == "Uvalde_2020_02"] <- "2020_2021"
-
+ecosites.short <- dplyr::select(ecosites, 
+                                site = property, 
+                                latitude,
+                                longitude,
+                                elevation.m, 
+                                sampling.year)
 
 eco.coords <- dplyr::select(ecosites, x = longitude, y = latitude) # select only lat/long data, code as xy
 
@@ -51,7 +57,7 @@ iridescent.reverse <- c("#000000", "#46353A", "#684957", "#805770",
 
 ## Workaround to not having PRISM 1991-2020 climate norms (download monthly
 ## and then calculate mean across years)
-# get_prism_monthlys(type = "tmean", years = 1991:2020, mon = 1:12, keepZip = FALSE)
+#get_prism_monthlys(type = "tmean", years = 1991:2020, mon = 1:12, keepZip = FALSE)
 # get_prism_monthlys(type = "ppt", years = 1991:2020, mon = 1:12, keepZip = FALSE)
 # get_prism_monthlys(type = "tmin", years = 1991:2020, mon = 1:12, keepZip = FALSE)
 # get_prism_monthlys(type = "tmax", years = 1991:2020, mon = 1:12, keepZip = FALSE)
@@ -75,6 +81,8 @@ iridescent.reverse <- c("#000000", "#46353A", "#684957", "#805770",
 # state
 us <- getData("GADM", country="USA", level = 1, path = "../climate_data/")
 texas <- us[match(toupper("texas"), toupper(us$NAME_1)), ]
+
+
 
 ###############################################################################
 ## Stack raster files, mask to include TX and convert to df
@@ -135,51 +143,92 @@ df.sites.precip_cleaned <- df.sites.precip %>%
 
 # Temperature
 pd.temp <- pd_stack(prism_archive_subset("tmean", "monthly"))
-temp.masked <- mask(pd.temp, texas)
+temp.masked <- mask(crop(pd.temp, extent(texas)), texas)
 temp.masked.df <- as.data.frame(rasterToPoints(temp.masked))
 
+## Pivot raster columns to long format, remove prefix and group by month
+## precip. Then, in a step, calculate 2006-2020 mean annual precipitation 
+## of all grid cells 
+temp.masked.df_cleaned <- temp.masked.df %>%
+  tidyr::pivot_longer(cols = PRISM_tmean_stable_4kmM3_199101_bil:PRISM_tmean_stable_4kmM3_202012_bil,
+                      names_prefix = "PRISM_tmean_stable_4kmM3_",
+                      values_to = "monthly.mean.temp",
+                      names_to = "month") %>%
+  mutate(month = gsub("*_bil", "", month),
+         date = lubridate::ym(month),
+         year = lubridate::year(date),
+         month = lubridate::month(date)) %>%
+  filter(year >= 2006 & year <= 2020) %>%
+  group_by(x, y, year) %>%
+  summarize(annual.mean.temp = mean(monthly.mean.temp, na.rm = TRUE)) %>%
+  ungroup(year) %>%
+  summarize(mat = mean(annual.mean.temp, na.rm = TRUE))
+
+## Extract monthly precipitation data from grid cell containing each site.
+## Note that grid cell is on 4km resolution
 df.sites.temp <- as.data.frame(terra::extract(pd.temp,
-                                              SpatialPoints(eco.coords),
-                                              sp = F))
+                                                SpatialPoints(eco.coords),
+                                                sp = F))
 df.sites.temp$latitude = eco.coords$y
 df.sites.temp$longitude = eco.coords$x
 df.sites.temp$site = ecosites$property
 
-df.normals <- precip.masked.df %>%
-  full_join(temp.masked.df) %>%
-  dplyr::select(latitude = y, longitude = x, 
-                map = PRISM_ppt_30yr_normal_4kmM3_annual_bil,
-                mat = PRISM_tmean_30yr_normal_4kmM3_annual_bil)
+## Pivot raster columns to long format, remove prefix and group by month
+## precip. Then, in a step, calculate 2006-2020 mean annual precipitation 
+## of all grid cells 
+df.sites.temp_cleaned <- df.sites.temp %>%
+  tidyr::pivot_longer(cols = PRISM_tmean_stable_4kmM3_199101_bil:PRISM_tmean_stable_4kmM3_202012_bil,
+                      names_prefix = "PRISM_tmean_stable_4kmM3_",
+                      values_to = "monthly.temp",
+                      names_to = "month") %>%
+  mutate(month = gsub("*_bil", "", month),
+         date = lubridate::ym(month),
+         year = lubridate::year(date),
+         month = lubridate::month(date)) %>%
+  filter(year >= 2006 & year <= 2020) %>%
+  group_by(site, latitude, longitude, year) %>%
+  summarize(annual.temp = mean(monthly.temp, na.rm = TRUE)) %>%
+  ungroup(year) %>%
+  summarize(mat = mean(annual.temp, na.rm = TRUE))
 
-df.sites <- df.sites.temp %>%
-  full_join(df.sites.precip) %>%
-  select(site, latitude, longitude, 
-         mat = PRISM_tmean_30yr_normal_4kmM3_annual_bil,
-         map = PRISM_ppt_30yr_normal_4kmM3_annual_bil)
+df.normals <- precip.masked.df_cleaned %>%
+  full_join(temp.masked.df_cleaned) %>%
+  dplyr::select(latitude = y, longitude = x, map, mat)
 
-
-ecosites$visit.freq <- 1
-ecosites$sampling.year[ecosites$property == "Brazos_2020_18" |
-                      ecosites$property == "Harris_2020_03" |
-                      ecosites$property == "Uvalde_2020_02"] <- "2020_2021"
-
+df.sites <- df.sites.temp_cleaned %>%
+  full_join(df.sites.precip_cleaned) %>%
+  full_join(ecosites.short) %>%
+  dplyr::select(site, latitude, longitude, elevation.m, sampling.year, map, mat)
 
 ###############################################################################
 ## MAP and MAT plots (general across TX, not site specific)
 ###############################################################################
+tx.extent <- extent(texas)
+
+texas.extent <- setExtent(pd.precip, tx.extent)
+
 map.plot <- ggplot() +
-  geom_raster(data = precip.masked.df_cleaned, 
-              aes(x = x, y = y, fill = map)) +
-  geom_point(data = ecosites, 
+  geom_raster(data = df.normals, 
+              aes(x = longitude, y = latitude, fill = map)) +
+  geom_point(data = ecosites.short, 
              aes(x = longitude, y = latitude, 
                  shape = factor(sampling.year, levels = c("2020", "2021", "2020_2021"))), 
              size = 3) +
-  ggsn::scalebar(data = precip.masked.df_cleaned, location = "bottomleft",
+  borders(database = "state", region = "texas", 
+          xlim = c(-107, -92), ylim = c(25, 37), colour = "black") +
+  ggsn::scalebar(x.min = -107, x.max = -92, y.min = 25.5, y.max = 37,
+                 location = "bottomleft",
                  transform = TRUE, model = "WGS84",
-                 dist_unit = "km", dist = 100, st.dist = 0.025, st.size = 2.5, border.size = 0.25) +
+                 dist_unit = "km", dist = 150, height = 0.05, 
+                 st.dist = 0.025, st.size = 5, border.size = 0.25) +
   coord_equal() +
-  scale_fill_gradientn(colours = iridescent,
-                       limits = c(0, 1850), breaks = seq(0, 1800, 300),
+  scale_fill_gradientn(colours = c("#A50026", "#DD3D2D",
+                                   "#F67E4B", "#FDB366",
+                                   "#FEDA8B", "#EAECCC",
+                                   "#C2E4EF", "#98E4EF",
+                                   "#98CAE1", "#6EA6CD",
+                                   "#364B9A", "#364B9A"),
+                       limits = c(0, 1850), breaks = seq(0, 1800, 600),
                        space = "Lab", 
                        na.value = "grey50",
                        guide = "colourbar",
@@ -188,10 +237,11 @@ map.plot <- ggplot() +
                      labels = c("2020", "2021", "2020/2021")) +
   scale_x_continuous(limits = c(-107, -92), breaks = seq(-107, -92, 3)) +
   scale_y_continuous(limits = c(25, 37), breaks = seq(25, 37, 3)) +
-  labs(x = "Longitude (dd)", y = "Latitude (dd)",
+  labs(x = expression(bold("Longitude ("*degree*")")), 
+       y = expression(bold("Latitude ("*degree*")")),
        fill = "MAP (mm)",
        shape = "Sampling year") +
-  theme_bw(base_size = 18) +
+  theme_classic(base_size = 22) +
   theme(title = element_text(face = "bold"),
         plot.title = element_text(hjust = 0.5),
         panel.grid = element_blank()) +
@@ -205,19 +255,26 @@ map.plot
 
 ## MAT normals
 mat.plot <- ggplot() +
-  geom_raster(data = df.normals, aes(x = longitude, y = latitude, fill = mat)) +
+  geom_raster(data = df.normals, 
+              aes(x = longitude, y = latitude, fill = mat)) +
   geom_point(data = ecosites, 
              aes(x = longitude, y = latitude, 
                  shape = factor(sampling.year, levels = c("2020", "2021", "2020_2021"))), 
              size = 3) +
-  ggsn::scalebar(data = df.normals, location = "bottomleft",
-                 transform = TRUE, model = "WGS84",
-                 dist_unit = "km", dist = 100, st.dist = 0.025, st.size = 2.5, border.size = 0.25) +
+  borders(database = "state", region = "texas", 
+          xlim = c(-107, -92), ylim = c(25, 37), colour = "black") +
+  # ggsn::scalebar(x.min = -107, x.max = -92, y.min = 25.5, y.max = 37,
+  #                location = "bottomleft",
+  #                transform = TRUE, model = "WGS84",
+  #                dist_unit = "km", dist = 150, height = 0.025, 
+  #                st.dist = 0.025, st.size = 3, border.size = 0.25) +
   coord_equal() +
-  scale_fill_gradientn(colours = c("#CEFFFF", "#C6F7D6", "#A2F49B",
-                                   "#BBE453", "#D5CE04", "#E7B503",
-                                   "#F19903", "#F6790B", "#F94902",
-                                   "#E40515", "#A80003"),
+  scale_fill_gradientn(colours = c("#FFFFFF",
+                                   "#FFFFE5", "#FFF7BC", 
+                                   "#FEE391", "#FEC44F", 
+                                   "#FB9A29", "#EC7014", 
+                                   "#CC4C02", "#993404", 
+                                   "#662506"),
                        limits = c(11, 25), breaks = seq(12, 24, 4),
                        space = "Lab",
                        na.value = "grey50",
@@ -229,10 +286,11 @@ mat.plot <- ggplot() +
   scale_y_continuous(limits = c(25, 37), breaks = seq(25, 37, 3)) +
   #scale_fill_continuous(type = "viridis",
   #                      limits = c(10, 25), breaks = seq(10, 25, 5)) +
-  labs(x = "Longitude (dd)", y = "Latitude (dd)",
-       fill = expression(bold("MAT ("~degree~"C)")),
+  labs(x = expression(bold("Longitude ("*degree*")")), 
+       y = expression(bold("Latitude ("*degree*")")),
+       fill = expression(bold("MAT ("*degree*"C)")),
        shape = "Sampling year") +
-  theme_bw(base_size = 18) +
+  theme_classic(base_size = 22) +
   theme(title = element_text(face = "bold"),
         plot.title = element_text(hjust = 0.5),
         panel.grid = element_blank()) +
@@ -244,8 +302,10 @@ mat.plot <- ggplot() +
 mat.plot
 
 png("../working_drafts/TXeco_siteMaps.png", 
-    width = 16, height = 7, units = 'in', res = 600)
-ggarrange(map.plot, mat.plot, ncol = 2, nrow = 1, legend = "right", align = "hv")
+    width = 20, height = 8, units = 'in', res = 600)
+ggarrange(map.plot, mat.plot, ncol = 2, nrow = 1, 
+          legend = "right", align = "hv", labels = "AUTO",
+          font.label = 22)
 dev.off()
 
 
