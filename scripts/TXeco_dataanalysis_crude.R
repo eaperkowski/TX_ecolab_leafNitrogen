@@ -39,33 +39,8 @@ length(df$pft[df$pft == "c3_legume"])
 length(df$pft[df$pft == "c3_nonlegume"])
 length(df$pft[df$pft == "c4_nonlegume"])
 
-## Calculate relative soil moisture metrics (based on 150 mm bucket)
-df$wn.30.rel <- df$wn.30 / 150
-df$wn.60.rel <- df$wn.60 / 150
-df$wn.90.rel <- df$wn.90 / 150
-df$wn.15yr.rel <- df$wn.15yr / 150
-df$wn.30yr.rel <- df$wn.30yr / 150
-
 ## Convert VPD from hPa (PRISM units) to kPa (standard)
 df$vpd1 <- df$vpd1 / 10
-
-plot(df$soil.cec, df$beta)
-cor.test(df$soil.no3n, df$soil.)
-
-ggplot(data = df, aes(x = soil.cec, y = soil.no3n)) +
-  geom_point() +
-  geom_smooth(method = 'lm') +
-  theme_bw(base_size = 22)
-
-ggplot(data = df, aes(x = soil.cec, y = soil.phos)) +
-  geom_point() +
-  geom_smooth(method = 'lm') +
-  theme_bw(base_size = 22)
-
-ggplot(data = df, aes(x = soil.cec, y = soil.potassium)) +
-  geom_point() +
-  geom_smooth(method = 'lm') +
-  theme_bw(base_size = 22)
 
 ##########################################################################
 ## Beta
