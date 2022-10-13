@@ -157,7 +157,9 @@ temp.masked.df_cleaned <- temp.masked.df %>%
   mutate(month = gsub("*_bil", "", month),
          date = lubridate::ym(month),
          year = lubridate::year(date),
-         month = lubridate::month(date)) %>%
+         month = lubridate::month(date))
+
+temp.masked_20062020_mat <- temp.masked.df_cleaned %>%
   filter(year >= 2006 & year <= 2020) %>%
   group_by(x, y, year) %>%
   summarize(annual.mean.temp = mean(monthly.mean.temp, na.rm = TRUE)) %>%
@@ -184,29 +186,92 @@ df.sites.temp_cleaned <- df.sites.temp %>%
   mutate(month = gsub("*_bil", "", month),
          date = lubridate::ym(month),
          year = lubridate::year(date),
-         month = lubridate::month(date)) %>%
+         month = lubridate::month(date))
+
+
+df.sites.temp_20062020_mat <- df.sites.temp_cleaned %>%
   filter(year >= 2006 & year <= 2020) %>%
   group_by(site, latitude, longitude, year) %>%
   summarize(annual.temp = mean(monthly.temp, na.rm = TRUE)) %>%
   ungroup(year) %>%
   summarize(mat = mean(annual.temp, na.rm = TRUE))
 
-df.normals <- precip.masked.df_cleaned %>%
-  full_join(temp.masked.df_cleaned) %>%
-  dplyr::select(latitude = y, longitude = x, map, mat)
+# VPD
+pd.vpdmax <- pd_stack(prism_archive_subset("vpdmax", "monthly"))
+pd.vpdmin <- pd_stack(prism_archive_subset("vpdmin", "monthly"))
 
-df.sites <- df.sites.temp_cleaned %>%
-  full_join(df.sites.precip_cleaned) %>%
+## Mask vpdmax and vpdmin, then, in a step, calculate vpdmean
+## following same procedure for tmean
+vpdmean.masked <- mask(crop(pd.vpdmean, extent(texas)), texas)
+vpdmin.masked <- mask(crop(pd.vpdmin, extent(texas)), texas)
+vpdmean.masked <- (vpdmax.masked + vpdmin.masked) / 2
+
+## Convert RasterBrick object to data frame
+vpdmean.masked.df <- as.data.frame(rasterToPoints(vpdmean.masked))
+
+## Pivot raster columns to long format, remove prefix and group by month
+## precip. Then, in a step, calculate 2006-2020 mean annual VPDmean 
+## of all grid cells. NOTE: dividing by 10 to convert VPD from
+## hPa to kPa
+vpdmean.masked.df_cleaned <- vpdmean.masked.df %>%
+  tidyr::pivot_longer(cols = layer.1:layer.360,
+                      values_to = "monthly.mean.vpd",
+                      names_to = "month") %>%
+  cbind(temp.masked.df_cleaned) %>%
+  dplyr::select(1:2, 7, 10, 9, 4) %>%
+  filter(year >= 2006 & year <= 2020) %>%
+  group_by(x, y, year) %>%
+  summarize(annual.mean.vpd = mean(monthly.mean.vpd, na.rm = TRUE) / 10) %>%
+  ungroup(year) %>%
+  summarize(mav = mean(annual.mean.vpd, na.rm = TRUE))
+
+## Extract monthly precipitation data from grid cell containing each site.
+## Note that grid cell is on 4km resolution
+df.sites.vpd <- as.data.frame(terra::extract(vpdmean.masked,
+                                              SpatialPoints(eco.coords),
+                                              sp = F))
+df.sites.temp$latitude = eco.coords$y
+df.sites.temp$longitude = eco.coords$x
+df.sites.temp$site = ecosites$property
+
+## Pivot raster columns to long format, remove prefix and group by month
+## precip. Then, in a step, calculate 2006-2020 mean annual precipitation 
+## of all grid cells 
+df.sites.vpd_cleaned <- df.sites.vpd %>%
+  tidyr::pivot_longer(cols = layer.1:layer.360,
+                      values_to = "monthly.mean.vpd",
+                      names_to = "month") %>%
+  cbind(df.sites.temp_cleaned) %>%
+  dplyr::select(5, 3:4, 6, 9, 8, 2) %>%
+  filter(year >= 2006 & year <= 2020) %>%
+  group_by(site, latitude, longitude, year) %>%
+  summarize(annual.mean.vpd = mean(monthly.mean.vpd, na.rm = TRUE) / 10) %>%
+  ungroup(year) %>%
+  summarize(mav = mean(annual.mean.vpd, na.rm = TRUE))
+
+###############################################################################
+## Merge precipitation, temperature, VPD normals into single
+## file. Two separate files: one with values extracted from
+## grid cell that contains each site, and one with all TX
+## grid cells
+###############################################################################
+df.normals <- precip.masked.df_cleaned %>%
+  full_join(temp.masked_20062020_mat) %>%
+  full_join(vpdmean.masked.df_cleaned) %>%
+  dplyr::select(latitude = y, longitude = x, map, mat, mav)
+
+df.sites <- df.sites.precip_cleaned %>%
+  full_join(df.sites.temp_20062020_mat) %>%
+  full_join(df.sites.vpd_cleaned) %>%
   full_join(ecosites.short) %>%
-  dplyr::select(site, latitude, longitude, elevation.m, sampling.year, map, mat)
+  dplyr::select(site, latitude, longitude, elevation.m, 
+                sampling.year, map, mat, mav)
+
+write.csv(df.sites, "../data_sheets/TXeco_climate_normals.csv", row.names = FALSE)
 
 ###############################################################################
 ## MAP and MAT plots (general across TX, not site specific)
 ###############################################################################
-tx.extent <- extent(texas)
-
-texas.extent <- setExtent(pd.precip, tx.extent)
-
 map.plot <- ggplot() +
   geom_raster(data = df.normals, 
               aes(x = longitude, y = latitude, fill = map)) +
@@ -305,29 +370,32 @@ png("../working_drafts/TXeco_siteMaps.png",
     width = 20, height = 8, units = 'in', res = 600)
 ggarrange(map.plot, mat.plot, ncol = 2, nrow = 1, 
           legend = "right", align = "hv", labels = "AUTO",
-          font.label = 22)
+          font.label = list(size = 25))
 dev.off()
-
 
 ###############################################################################
 ## Create MAP/MAT plot per site
 ###############################################################################
-biome_mat_map <- ggplot(data = df.sites, aes(x = mat, y = map / 10)) +
+biome_mat_map <- ggplot(df.normals, aes(x = mat, y = map)) +
   geom_polygon(data = Whittaker_biomes,
-               aes(x = temp_c, y = precp_cm, fill = factor(biome)),
+               aes(x = temp_c, y = precp_cm * 10, fill = factor(biome)),
                color = "gray98", size = 0.5) +
-  geom_point(size = 3, shape = 21, color = "black", alpha = 0.75) +
+  geom_point(size = 0.5, alpha = 0.01, color = "grey", shape = 1) +
+  geom_point(data = df.sites, aes(x = mat, y = map)) +
   scale_fill_brewer(palette = "Spectral") +
   #scale_y_continuous(limits = c(50, 150), breaks = seq(50, 150, 25)) +
   #scale_x_continuous(limits = c(18, 22), breaks = seq(18, 22, 1)) +
-  labs(x = expression(bold("Mean annual temperature ("~degree~"C)")),
-       y = "Mean annual precipitation (cm)",
+  labs(x = expression(bold("Mean annual temperature ("*degree*"C)")),
+       y = "Mean annual precipitation (mm)",
        fill = "Biome type") +
-  theme_bw(base_size = 18) +
+  theme_classic(base_size = 22) +
   theme(title = element_text(face = "bold"),
         plot.title = element_text(hjust = 0.5),
         panel.grid = element_blank())
 
-ggsave(plot = normals.plot, 
-       filename = "climate_normals.png",
+ggsave(plot = biome_mat_map, 
+       filename = "../working_drafts/TXeco_biome_plot.png",
        dpi = 600, height = 5, width = 12)
+
+
+
