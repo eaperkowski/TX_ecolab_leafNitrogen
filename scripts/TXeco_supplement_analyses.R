@@ -12,13 +12,19 @@ soil <- soil %>%
   filter(site != "2020eco_Bell_i" & site != "2020eco_Russel_i" &
            site != "2021eco_Menard_i")
 
+## Correlation matrices
 cor.test(soil$soil.no3n, soil$soil.phos)
 cor.test(soil$soil.no3n, soil$soil.cec)
 cor.test(soil$soil.no3n, soil$soil.pH)
 cor.test(soil$soil.no3n, soil$soil.potassium)
 
 ## Create soil characteristic correlation matrix
-soil.cor <- cor(soil[,2:6], method = "pearson")
+
+
+soil.cor <- rcorr(as.matrix(soil[,2:6]), type = "pearson")
+
+# Note: Pearson is for continuous vars and determines strength
+# of linear relationships between vars
 
 ## Iridescent palette: 
 iridescent <- c("#FEFBE9", "#FCF7D5", "#F5F3C1", "#EAF0B5",
@@ -28,8 +34,8 @@ iridescent <- c("#FEFBE9", "#FCF7D5", "#F5F3C1", "#EAF0B5",
                 "#9B8AC4", "#9D7DB2", "#9A709E", "#906388",
                 "#805770", "#684957", "#46353A", "#000000")
 
-soil.corrplot <- ggcorrplot(soil.cor, type = "upper", method = "square", 
-           hc.order = TRUE, 
+soil.corrplot <- ggcorrplot(soil.cor$r, type = "upper", method = "square", 
+           hc.order = TRUE,
            outline.color = "black", lab = TRUE) +
   scale_x_discrete(labels = c("pH", 
                               "Soil [K]", 
@@ -49,5 +55,7 @@ png("../working_drafts/figs/TXeco_FigS1_soil_correlations.png",
     width = 8, height = 5, units = 'in', res = 600)
 soil.corrplot
 dev.off()
+
+
 
 
