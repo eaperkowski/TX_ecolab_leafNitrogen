@@ -104,21 +104,8 @@ concat.clim <- initial.2020eco %>%
   dplyr::select(-m, -i)
 
 ###############################################################################
-## Calculate 15-year and 30-year climate normals. Will be later merged into
+## Calculate 15-year climate normals. Will be later merged into
 ## timescale dataframe
-###############################################################################
-norm.30yr <- concat.clim %>%
-  filter(year != 2021) %>%
-  group_by(site, sampling.year, visit.type, year) %>%
-  summarize(map = sum(daily.prcp, na.rm = TRUE),
-            mat = mean(daily.tmean, na.rm = TRUE),
-            mav = mean(daily.vpdmean, na.rm = TRUE),
-            matmin = mean(daily.tmin, na.rm = TRUE)) %>%
-  ungroup(year) %>%
-  summarize(map.30yr = mean(map),
-            mat.30yr = mean(mat),
-            mav.30yr = mean(mav))
-
 ###############################################################################
 norm.15yr <- concat.clim %>%
   filter(year >= 2006 & year <= 2020) %>%
@@ -132,10 +119,6 @@ norm.15yr <- concat.clim %>%
   summarize(map.15yr = mean(map),
             mat.15yr = mean(mat),
             mav.15yr = mean(mav))
-
-normals <- norm.15yr %>%
-  full_join(norm.30yr)
-  
 
 ###############################################################################
 ## Iteratively calculate mean temperature and precipitation totals from 1 day
@@ -259,7 +242,7 @@ d1 <- concat.clim %>% filter(date > sampling.date - 1 & date <= sampling.date) %
 
 ## Merge all iterative climate means with normals data frame
 ## Also merge aridity index values for single climate data file
-d <- normals %>% full_join(d365) %>% full_join(d90) %>% full_join(d60) %>%
+d <- norm.15yr %>% full_join(d365) %>% full_join(d90) %>% full_join(d60) %>%
   full_join(d30) %>% full_join(d20) %>% full_join(d15) %>% full_join(d10) %>%
   full_join(d9) %>% full_join(d8) %>% full_join(d7) %>% 
   full_join(d6) %>% full_join(d5) %>% full_join(d4) %>% full_join(d3) %>% 
@@ -269,8 +252,8 @@ d <- normals %>% full_join(d365) %>% full_join(d90) %>% full_join(d60) %>%
 splash.df <- read.csv("../climate_data/TXeco_siteAridity_SPLASH.csv")
 
 d <- d %>% full_join(splash.df) %>% 
-  dplyr::select(site:mav.30yr, 
-                ai.30:ai.30yr,
+  dplyr::select(site:mav.15yr, 
+                ai.30:ai.15yr,
                 everything())
 
 ## Write csv

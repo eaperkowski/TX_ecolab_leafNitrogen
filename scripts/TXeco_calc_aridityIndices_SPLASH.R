@@ -4659,7 +4659,7 @@ daily.clim <- sites.daily.1991 %>%
   full_join(sites.daily.2020) %>% full_join(sites.daily.2021) %>%
   full_join(sites) %>%
   dplyr::select(site, date, year, month, day, latitude, longitude, elv_m,
-         sampling.year:primary.2021, sf:aet, ro) %>%
+         sampling.year:primary.2021, sf:aet) %>%
   mutate(initial.2020 = ymd(initial.2020),
          primary.2020 = ymd(primary.2020),
          initial.2021 = ymd(initial.2021),
@@ -4802,34 +4802,63 @@ site.gs.aridity <- txeco.splash.30day %>%
   full_join(txeco.splash.90day)
 
 ###############################################################################
+## Determine 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 30, 60, 90 day soil moisture
+###############################################################################
+d1 <- concat.clim %>% group_by(site, sampling.year, visit.type) %>% 
+  filter(date > sampling.date - 1  & date <= sampling.date) %>%
+  summarize(wn1 = soil.moisture)
+d2 <- concat.clim %>% group_by(site, sampling.year, visit.type) %>% 
+  filter(date > sampling.date - 2  & date <= sampling.date) %>%
+  summarize(wn2 = mean(soil.moisture, na.rm = TRUE))
+d3 <- concat.clim %>% group_by(site, sampling.year, visit.type) %>% 
+  filter(date > sampling.date - 3  & date <= sampling.date) %>%
+  summarize(wn3 = mean(soil.moisture, na.rm = TRUE))
+d4 <- concat.clim %>% group_by(site, sampling.year, visit.type) %>% 
+  filter(date > sampling.date - 4  & date <= sampling.date) %>%
+  summarize(wn4 = mean(soil.moisture, na.rm = TRUE))
+d5 <- concat.clim %>% group_by(site, sampling.year, visit.type) %>% 
+  filter(date > sampling.date - 5  & date <= sampling.date) %>%
+  summarize(wn5 = mean(soil.moisture, na.rm = TRUE))
+d6 <- concat.clim %>% group_by(site, sampling.year, visit.type) %>% 
+  filter(date > sampling.date - 6  & date <= sampling.date) %>%
+  summarize(wn6 = mean(soil.moisture, na.rm = TRUE))
+d7 <- concat.clim %>% group_by(site, sampling.year, visit.type) %>% 
+  filter(date > sampling.date - 7  & date <= sampling.date) %>%
+  summarize(wn7 = mean(soil.moisture, na.rm = TRUE))
+d8 <- concat.clim %>% group_by(site, sampling.year, visit.type) %>% 
+  filter(date > sampling.date - 8  & date <= sampling.date) %>%
+  summarize(wn8 = mean(soil.moisture, na.rm = TRUE))
+d9 <- concat.clim %>% group_by(site, sampling.year, visit.type) %>% 
+  filter(date > sampling.date - 9  & date <= sampling.date) %>%
+  summarize(wn9 = mean(soil.moisture, na.rm = TRUE))
+d10 <- concat.clim %>% group_by(site, sampling.year, visit.type) %>% 
+  filter(date > sampling.date - 10  & date <= sampling.date) %>%
+  summarize(wn10 = mean(soil.moisture, na.rm = TRUE))
+d15 <- concat.clim %>% group_by(site, sampling.year, visit.type) %>% 
+  filter(date > sampling.date - 15  & date <= sampling.date) %>%
+  summarize(wn15 = mean(soil.moisture, na.rm = TRUE))
+d20 <- concat.clim %>% group_by(site, sampling.year, visit.type) %>% 
+  filter(date > sampling.date - 20  & date <= sampling.date) %>%
+  summarize(wn20 = mean(soil.moisture, na.rm = TRUE))
+d30 <- concat.clim %>% group_by(site, sampling.year, visit.type) %>% 
+  filter(date > sampling.date - 30  & date <= sampling.date) %>%
+  summarize(wn30 = mean(soil.moisture, na.rm = TRUE))
+d60 <- concat.clim %>% group_by(site, sampling.year, visit.type) %>% 
+  filter(date > sampling.date - 60  & date <= sampling.date) %>%
+  summarize(wn60 = mean(soil.moisture, na.rm = TRUE))
+d90 <- concat.clim %>% group_by(site, sampling.year, visit.type) %>% 
+  filter(date > sampling.date - 90  & date <= sampling.date) %>%
+  summarize(wn90 = mean(soil.moisture, na.rm = TRUE))
+
+sm.timescales <- d1 %>% full_join(d2) %>% full_join(d3) %>% full_join(d4) %>% full_join(d5) %>%
+  full_join(d6) %>% full_join(d7) %>% full_join(d8) %>% full_join(d9) %>%
+  full_join(d10) %>% full_join(d15) %>% full_join(d20) %>% full_join(d30) %>% 
+  full_join(d60) %>% full_join(d90) 
+
+###############################################################################
 ## Calculate normal site Priestley-Taylor coefficient and aridity
 ## index (P/PET)
 ###############################################################################
-txeco.splash.30yr.aridity <- concat.clim %>%
-  filter(year != 2021) %>%
-  dplyr::group_by(site, year) %>%
-  dplyr::summarize(ho = mean(ho, na.rm = TRUE),
-                   hn = mean(hn, na.rm = TRUE),
-                   ppfd = mean(ppfd, na.rm = TRUE),
-                   cond = sum(cond, na.rm = TRUE),
-                   eet = sum(eet, na.rm = TRUE),
-                   pet = sum(pet, na.rm = TRUE),
-                   aet = sum(aet, na.rm = TRUE),
-                   wn = mean(soil.moisture, na.rm = TRUE),
-                   ai = sum(pn, na.rm = TRUE) / sum(pet, na.rm = TRUE),
-                   pt = sum(aet, na.rm = TRUE) / sum(eet, na.rm = TRUE)) %>%
-  dplyr::ungroup(year) %>%
-  dplyr::summarize(ho.30yr = mean(ho, na.rm = TRUE),
-                   hn.30yr = mean(hn, na.rm = TRUE),
-                   ppfd.30yr = mean(ppfd, na.rm = TRUE),
-                   cond.30yr = mean(cond, na.rm = TRUE),
-                   eet.30yr = mean(eet, na.rm = TRUE),
-                   pet.30yr = mean(pet, na.rm = TRUE),
-                   aet.30yr = mean(aet, na.rm = TRUE),
-                   wn.30yr = mean(wn, na.rm = TRUE),
-                   ai.30yr = mean(ai, na.rm = TRUE),
-                   pt.30yr = mean(pt, na.rm = TRUE))
-    
 txeco.splash.15yr.aridity <- concat.clim %>%
   filter(year >= 2006 & year <= 2020) %>%
   dplyr::group_by(site, year) %>%
@@ -4860,7 +4889,7 @@ sites.aridity.indices <- txeco.splash.30day %>%
   full_join(txeco.splash.60day) %>%
   full_join(txeco.splash.90day) %>%
   full_join(txeco.splash.15yr.aridity, by = "site") %>%
-  full_join(txeco.splash.30yr.aridity, by = "site")
+  full_join(sm.timescales)
 
 ## Write 30, 60, 90 day and 15/30 year SPLASH results
 write.csv(sites.aridity.indices, "../climate_data/TXeco_siteAridity_SPLASH.csv",
