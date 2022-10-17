@@ -46,9 +46,9 @@ df$vpd1 <- df$vpd1 / 10
 ## Beta
 ##########################################################################
 df$pft <- factor(df$pft, levels = c("c3_legume", "c4_nonlegume", "c3_nonlegume"))
-df$beta[c(62, 275, 315)] <- NA
+df$beta[c(84)] <- NA
 
-beta <- lmer(log(beta) ~ wn.60 * soil.pH * pft + 
+beta <- lmer(log(beta) ~ wn3 * soil.no3n * pft + 
                (1 | NCRS.code), data = df)
 
 # Check model assumptions
@@ -64,17 +64,18 @@ summary(beta)
 Anova(beta)
 r.squaredGLMM(beta)
 
-# Two-way interaction between map.15yr and pft
-test(emtrends(beta, ~pft, "wn.60"))
+# Two-way interaction between wn3 and pft
+test(emtrends(beta, ~pft, "wn3"))
+
+# Individual effect of wn3 
+test(emtrends(beta, ~1, "wn3"))
 
 # Individual effect of soil NO3-N
-test(emtrends(beta, ~1, "soil.cec"))
+test(emtrends(beta, ~1, "soil.no3n"))
 
 # PFT-only effect
 emmeans(beta, pairwise~pft)
 
-# Three-way interaction between NO3-N, wn.60, and pft
-test(emtrends(beta, ~wn.60*pft, "soil.no3n", at = list(wn.60 = c(50, 70, 100))))
 
 ##########################################################################
 ## Beta plots
@@ -458,7 +459,7 @@ df$pft <- factor(df$pft, levels = c("c3_legume", "c4_nonlegume", "c3_nonlegume")
 df$narea[df$narea > 5] <- NA
 df$narea[c(509)] <- NA
 
-narea <- lmer(log(narea) ~ prcp365 * soil.no3n * pft + chi + beta + (1 | NCRS.code),
+narea <- lmer(log(narea) ~ wn60 * soil.no3n * pft + chi + beta + (1 | NCRS.code),
               data = df)
 
 # Check model assumptions
