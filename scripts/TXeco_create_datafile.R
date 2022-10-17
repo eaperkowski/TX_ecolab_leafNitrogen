@@ -115,5 +115,7 @@ full.df$chi[full.df$chi < 0.2 | full.df$chi > 0.95] <- NA
 full.df$beta <- calc_beta(chi = full.df$chi, temp = full.df$tavg7, 
                           vpd = full.df$vpd7 * 10, z = full.df$elevation.m)
 
+hist(full.df$beta)
+
 ## Write csv
 write.csv(full.df, "../data_sheets/TXeco_compiled_datasheet.csv")
