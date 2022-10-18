@@ -64,6 +64,7 @@ summary(beta)
 Anova(beta)
 r.squaredGLMM(beta)
 
+
 # Two-way interaction between wn3 and pft
 test(emtrends(beta, ~pft, "wn3"))
 
@@ -76,6 +77,23 @@ test(emtrends(beta, ~1, "soil.no3n"))
 # PFT-only effect
 emmeans(beta, pairwise~pft)
 
+table1 <- data.frame(Anova(beta)) %>%
+  mutate(treatment = row.names(.),
+         Chisq = round(Chisq, 3),
+         P_value = ifelse(Pr..Chisq. < 0.001, 
+                          "<0.001", 
+                          round(Pr..Chisq., 3))) %>%
+  dplyr::select(treatment, df = Df, χ = Chisq, P_value)
+
+table1$treatment <- c("Soil moisture (SM)",
+                      "Soil NO3-N (N)",
+                      "PFT",
+                      "SM * N",
+                      "SM * PFT",
+                      "N * PFT",
+                      "SM * N * PFT")
+
+write.csv(table1, "../working_drafts/tables/TXeco_table1_beta.csv", row.names = FALSE)
 
 ##########################################################################
 ## Beta plots
@@ -84,12 +102,12 @@ beta.no3n.pred <- data.frame(get_model_data(beta,
                                             type = "pred", 
                                             terms = "soil.no3n"))
 beta.no3n.int <- data.frame(get_model_data(beta, 
-                                           type = "pred", 
+                                           type = "int", 
                                            terms = c("soil.no3n", "pft")))
 beta.h2o.pred <- data.frame(get_model_data(beta, type = "pred", 
-                                           terms = c("wn.60")))
-beta.h2o.int <- data.frame(get_model_data(beta, type = "pred", 
-                                          terms = c("wn.60", "pft")))
+                                           terms = c("wn3")))
+beta.h2o.int <- data.frame(get_model_data(beta, type = "int", 
+                                          terms = c("wn3", "pft")))
 
 set.seed(5)
 beta.no3n.ind <- ggplot(data = subset(df, !is.na(pft)), 
@@ -114,11 +132,6 @@ beta.no3n.ind <- ggplot(data = subset(df, !is.na(pft)),
   theme(legend.text.align = 0,
         panel.border = element_rect(size = 1.25))
 beta.no3n.ind
-
-png("../working_drafts/TXeco_beta_no3n_ind.png",
-    width = 8, height = 5, units = 'in', res = 600)
-beta.no3n.ind
-dev.off()
 
 beta.no3n.int <- ggplot(data = subset(df, !is.na(pft)), 
                         aes(x = soil.no3n, y = log(beta))) +
@@ -155,7 +168,7 @@ beta.no3n.int <- ggplot(data = subset(df, !is.na(pft)),
 beta.no3n.int 
 
 beta.h2o.ind <- ggplot(data = subset(df, !is.na(pft)), 
-                       aes(x = prcp365, y = log(beta))) +
+                       aes(x = wn3, y = log(beta))) +
   geom_jitter(aes(fill = pft),
               width = 2, size = 3, alpha = 0.7, shape = 21) +
   geom_ribbon(data = beta.h2o.pred, 
@@ -167,18 +180,18 @@ beta.h2o.ind <- ggplot(data = subset(df, !is.na(pft)),
                     labels = c(expression("C"[3]~"legume"),
                                expression("C"[4]~"non-legume"),
                                expression("C"[3]~"non-legume"))) +
-  scale_x_continuous(limits = c(375, 1650), breaks = seq(400, 1600, 400)) +
+  scale_x_continuous(limits = c(0, 150), breaks = seq(0, 150, 30)) +
   scale_y_continuous(limits = c(-2.5, 7.5), breaks = seq(-2.5, 7.5, 2.5)) +
   labs(x = expression(bold("Precipitation"[365]*" (mm)")),
        y = expression(bold(ln~beta)),
        fill = "Functional group") +
-  theme_bw(base_size = 18) +
+  theme_bw(base_size = 22) +
   theme(legend.text.align = 0,
         panel.border = element_rect(size = 1.25))
 beta.h2o.ind
 
 beta.h2o.int <- ggplot(data = subset(df, !is.na(pft)), 
-                          aes(x = prcp365, y = log(beta))) +
+                          aes(x = wn3, y = log(beta))) +
   geom_jitter(aes(fill = pft),
               width = 0.1, size = 3, alpha = 0.7, shape = 21) +
   geom_ribbon(data = subset(beta.h2o.int, group == "c3_legume"), 
@@ -200,9 +213,9 @@ beta.h2o.int <- ggplot(data = subset(df, !is.na(pft)),
                     labels = c(expression("C"[3]~"legume"),
                                expression("C"[4]~"non-legume"),
                                expression("C"[3]~"non-legume"))) +
-  scale_x_continuous(limits = c(375, 1650), breaks = seq(400, 1600, 400)) +
+  scale_x_continuous(limits = c(0, 150), breaks = seq(0, 150, 30)) +
   scale_y_continuous(limits = c(-2.5, 7.5), breaks = seq(-2.5, 7.5, 2.5)) +
-  labs(x = expression(bold("365-day precipitation (mm)")),
+  labs(x = expression(bold("Soil moisture (mm)")),
        y = expression(bold(ln~beta)),
        fill = "Functional group") +
   theme_bw(base_size = 18) +
@@ -210,20 +223,11 @@ beta.h2o.int <- ggplot(data = subset(df, !is.na(pft)),
         panel.border = element_rect(size = 1.25))
 beta.h2o.int
 
-png("../working_drafts/TXeco_beta_h2o_ind.png",
-    width = 8, height = 5, units = 'in', res = 600)
-beta.h2o.ind
-dev.off()
-
-png("../working_drafts/TXeco_beta_h2o_int.png",
-    width = 8, height = 5, units = 'in', res = 600)
-beta.h2o.int
-dev.off()
-
-png("../working_drafts/TXeco_fig1_beta.png",
-    width = 14, height = 6, units = 'in', res = 600)
-ggarrange(beta.no3n.int, beta.h2o.int, ncol = 2, common.legend = TRUE,
-          legend = "right", align = "hv")
+png("../working_drafts/figs/TXeco_fig2_beta.png",
+    width = 12, height = 4, units = 'in', res = 600)
+ggarrange(beta.h2o.int, beta.no3n.ind, ncol = 2, common.legend = TRUE,
+          legend = "right", align = "hv", labels = "AUTO",
+          font.label = list(size = 18))
 dev.off()
 
 ##########################################################################
@@ -243,11 +247,11 @@ df <- read.csv("../data_sheets/TXeco_compiled_datasheet.csv",
          chi = ifelse(chi > 0.95 | chi < 0.20, NA, chi))
 df$pft <- factor(df$pft, levels = c("c3_legume", "c4_nonlegume", "c3_nonlegume"))
 
-df$chi[c(62, 114, 119, 315, 480)] <- NA
-df$chi[c(117, 456)] <- NA
-df$chi[c(292, 500)] <- NA
+df$chi[c(62, 117, 315, 317, 481)] <- NA
+df$chi[c(456, 483)] <- NA
+df$chi[c(284, 292, 484)] <- NA
 
-chi <- lmer(chi ~ (vpd7 + tavg7 + (wn.60 * soil.pH)) * pft + 
+chi <- lmer(chi ~ (vpd4 + tavg4 + (wn3 * soil.no3n)) * pft + 
               (1 | NCRS.code), data = df)
 
 # Check model assumptions
@@ -263,29 +267,45 @@ summary(chi)
 Anova(chi)
 r.squaredGLMM(chi)
 
-## Single factor effect of prcp365 on chi
-test(emtrends(chi, ~1, "vpd7"))
+## Single factor effect of 3-day soil moisture on chi
+test(emtrends(chi, ~pft, "wn3"))
 
-## Single factor effect of prcp365 on chi
-test(emtrends(chi, ~1, "tavg7"))
+## Single factor effect of 4 day temperature on chi
+test(emtrends(chi, ~pft, "tavg4"))
 
-
-
-## Single factor effect of wn.60 on chi
-test(emtrends(chi, ~1, "prcp7"))
-
-## Effect of wn.60 on chi across species
-test(emtrends(chi, ~pft, "wn.60"))
-emmeans(chi, ~pft, "wn.60", at = list(wn.60=0))
+## Single factor effect of 4 day VPD on chi
+test(emtrends(chi, ~pft, "vpd4"))
 
 ## Single factor effect of soil.no3n on chi
-test(emtrends(chi, ~1, "soil.no3n"))
+test(emtrends(chi, ~pft, "soil.no3n"))
 
 ## Single factor effect of beta on chi
 test(emtrends(chi, ~1, "beta"))
 
 ## Single factor effect of soil.no3n on chi
 cld(emmeans(chi, pairwise~pft))
+
+table2 <- data.frame(Anova(chi)) %>%
+  mutate(treatment = row.names(.),
+         Chisq = round(Chisq, 3),
+         P_value = ifelse(Pr..Chisq. < 0.001, 
+                          "<0.001", 
+                          round(Pr..Chisq., 3))) %>%
+  dplyr::select(treatment, df = Df, χ = Chisq, P_value)
+
+table2$treatment <- c("VPD",
+                      "Temperature (T)",
+                      "Soil moisture (SM)",
+                      "Soil NO3-N (N)",
+                      "PFT",
+                      "SM * N",
+                      "VPD * PFT",
+                      "T * PFT",
+                      "SM * PFT",
+                      "N * PFT",
+                      "SM * N * PFT")
+
+write.csv(table2, "../working_drafts/tables/TXeco_table2_chi.csv", row.names = FALSE)
 
 ##########################################################################
 ## Chi plots
@@ -438,6 +458,73 @@ png("../working_drafts/TXeco_chi_no3n_ind.png",
     width = 8, height = 5, units = 'in', res = 600)
 chi.no3n.ind
 dev.off()
+
+##########################################################################
+## Chi w/ beta
+##########################################################################
+df <- read.csv("../data_sheets/TXeco_compiled_datasheet.csv",
+               na.strings = c("NA", "NaN")) %>%
+  filter(site != "Bell_2020_05" & 
+           site != "Russel_2020_01") %>%
+  mutate(pft = ifelse(pft == "c4_graminoid", 
+                      "c4_nonlegume",
+                      ifelse(pft == "c3_graminoid" | pft == "c3_forb" | pft == "c3_shrub",
+                             "c3_nonlegume", 
+                             ifelse(pft == "legume", 
+                                    "c3_legume", 
+                                    NA))),
+         chi = ifelse(chi > 0.95 | chi < 0.20, NA, chi))
+df$pft <- factor(df$pft, levels = c("c3_legume", "c4_nonlegume", "c3_nonlegume"))
+
+df$chi[c(114, 119, 402, 456)] <- NA
+df$chi[c(406)] <- NA
+df$chi[c(220, 402, 484)] <- NA
+
+log(df$beta)
+
+chi.beta <- lmer(chi ~ (vpd4 + tavg4 + log(beta)) * pft + 
+              (1 | NCRS.code), data = df)
+
+# Check model assumptions
+plot(chi.beta)
+qqnorm(residuals(chi.beta))
+qqline(residuals(chi.beta))
+densityPlot(residuals(chi.beta))
+shapiro.test(residuals(chi.beta))
+outlierTest(chi.beta)
+
+# Model output
+summary(chi.beta)
+Anova(chi.beta)
+r.squaredGLMM(chi.beta)
+
+# Two way interaction between vpd and pft
+test(emtrends(chi.beta, ~pft, "vpd4"))
+
+# Two way interaction between vpd and pft
+test(emtrends(chi.beta, ~pft, "tavg4"))
+
+# Two way interaction between vpd and pft
+test(emtrends(chi.beta, pairwise~pft, "beta"))
+
+
+table3 <- data.frame(Anova(chi.beta)) %>%
+  mutate(treatment = row.names(.),
+         Chisq = round(Chisq, 3),
+         P_value = ifelse(Pr..Chisq. < 0.001, 
+                          "<0.001", 
+                          round(Pr..Chisq., 3))) %>%
+  dplyr::select(treatment, df = Df, Chisq, P_value)
+
+table3$treatment <- c("VPD",
+                      "Temperature (T)",
+                      "beta",
+                      "PFT",
+                      "VPD * PFT",
+                      "T * PFT",
+                      "Beta * PFT")
+
+write.csv(table3, "../working_drafts/tables/TXeco_table3_chibeta.csv", row.names = FALSE)
 
 ##########################################################################
 ## Narea

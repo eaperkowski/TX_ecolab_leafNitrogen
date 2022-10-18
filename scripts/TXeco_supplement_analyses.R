@@ -19,8 +19,6 @@ cor.test(soil$soil.no3n, soil$soil.pH)
 cor.test(soil$soil.no3n, soil$soil.potassium)
 
 ## Create soil characteristic correlation matrix
-
-
 soil.cor <- rcorr(as.matrix(soil[,2:6]), type = "pearson")
 
 # Note: Pearson is for continuous vars and determines strength
