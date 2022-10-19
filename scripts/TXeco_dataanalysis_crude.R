@@ -11,6 +11,7 @@ library(multcomp)
 library(multcompView)
 library(ggpubr)
 library(sjPlot)
+library(lavaan)
 
 # Turn off digit rounding in emmean args
 emm_options(opt.digits = FALSE)
@@ -233,20 +234,6 @@ dev.off()
 ##########################################################################
 ## Chi
 ##########################################################################
-df <- read.csv("../data_sheets/TXeco_compiled_datasheet.csv",
-               na.strings = c("NA", "NaN")) %>%
-  filter(site != "Bell_2020_05" & 
-           site != "Russel_2020_01") %>%
-  mutate(pft = ifelse(pft == "c4_graminoid", 
-                      "c4_nonlegume",
-                      ifelse(pft == "c3_graminoid" | pft == "c3_forb" | pft == "c3_shrub",
-                             "c3_nonlegume", 
-                             ifelse(pft == "legume", 
-                                    "c3_legume", 
-                                    NA))),
-         chi = ifelse(chi > 0.95 | chi < 0.20, NA, chi))
-df$pft <- factor(df$pft, levels = c("c3_legume", "c4_nonlegume", "c3_nonlegume"))
-
 df$chi[c(62, 117, 315, 317, 481)] <- NA
 df$chi[c(456, 483)] <- NA
 df$chi[c(284, 292, 484)] <- NA
@@ -529,20 +516,6 @@ write.csv(table3, "../working_drafts/tables/TXeco_table3_chibeta.csv", row.names
 ##########################################################################
 ## Narea
 ##########################################################################
-df <- read.csv("../data_sheets/TXeco_compiled_datasheet.csv",
-               na.strings = c("NA", "NaN")) %>%
-  filter(site != "Bell_2020_05" & 
-           site != "Russel_2020_01") %>%
-  mutate(pft = ifelse(pft == "c4_graminoid", 
-                      "c4_nonlegume",
-                      ifelse(pft == "c3_graminoid" | pft == "c3_forb" | pft == "c3_shrub",
-                             "c3_nonlegume", 
-                             ifelse(pft == "legume", 
-                                    "c3_legume", 
-                                    NA))),
-         chi = ifelse(chi > 0.95 | chi < 0.20, NA, chi))
-df$pft <- factor(df$pft, levels = c("c3_legume", "c4_nonlegume", "c3_nonlegume"))
-
 df$narea[df$narea > 5] <- NA
 df$narea[c(509)] <- NA
 
@@ -666,54 +639,41 @@ narea.soilno3n.int.plot
 dev.off()
 
 ##########################################################################
-## Nmass
+## Structural equation model
 ##########################################################################
-df$n.leaf[c(509)] <- NA
+library(tidySEM)
 
-nmass <- lmer(log(n.leaf) ~ prcp365 * soil.no3n * pft + beta + chi + 
-                (1 | NCRS.code), data = df)
+models <- ' # regressions
+            narea ~ beta + chi + soil.no3n + pft
+            beta ~ wn3 + soil.no3n + pft
+            chi ~ vpd4 + tavg4 + pft
+            chi ~~ beta
+            vpd4 ~~ tavg4
+            wn3 ~ pft
+            soil.no3n ~ pft'
 
-# Check model assumptions
-plot(nmass)
-qqnorm(residuals(nmass))
-qqline(residuals(nmass))
-hist(residuals(nmass))
-shapiro.test(residuals(nmass))
-outlierTest(nmass)
 
-# Model output
-summary(nmass)
-Anova(nmass)
-r.squaredGLMM(nmass)
+test_fit <- sem(models, data = df)
+lavaan::summary(test_fit, fit.measures = TRUE)
 
-test(emtrends(nmass, ~1, "prcp365"))
-test(emtrends(nmass, ~1, "soil.no3n"))
+summary(test_fit, standardized = TRUE)
 
-test(emtrends(nmass, ~wn.60, "soil.no3n", at = list(wn.60 = c(0, 40, 80, 120))))
+fitmeasures(test_fit)
 
-##########################################################################
-## Marea
-##########################################################################
-df$marea[c(20, 21)] <- NA
+sem.layout <- get_layout("wn3",   "pft",   "vpd4",    "tavg4",
+                         "",      "beta",  "chi",      "",
+                         "soil.no3n", "", "", "narea", rows = 3)
+test_fig <- graph_sem(test_fit, 
+                      layout = sem.layout)
+?graph_sem
 
-marea <- lmer(log(marea) ~ prcp365 * soil.no3n * pft + beta + chi + 
-                (1 | NCRS.code), data = df)
+semPaths(test_fit, "std", nCharNodes = 9, nCharEdges = 3,
+         style = "OpenMx", layout = "tree2")
 
-# Check model assumptions
-plot(marea)
-qqnorm(residuals(marea))
-qqline(residuals(marea))
-hist(residuals(marea))
-shapiro.test(residuals(marea))
-outlierTest(marea)
+?semPaths
 
-# Model output
-summary(marea)
-Anova(marea)
-r.squaredGLMM(marea)
 
-test(emtrends(marea, ~1, "prcp365"))
-test(emtrends(marea, ~1, "soil.no3n"))
-test(emtrends(marea, ~1, "beta"))
-
-test(emtrends(marea, ~wn.60, "soil.no3n", at = list(wn.60 = c(0, 40, 80, 120))))
+png(filename = "../working_drafts/figs/TXeco_SEM_testfig.png",
+    width = 12, height = 12, units = "in", res = 600)
+test_fig
+dev.off()
