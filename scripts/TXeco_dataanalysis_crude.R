@@ -463,13 +463,11 @@ df <- read.csv("../data_sheets/TXeco_compiled_datasheet.csv",
          chi = ifelse(chi > 0.95 | chi < 0.20, NA, chi))
 df$pft <- factor(df$pft, levels = c("c3_legume", "c4_nonlegume", "c3_nonlegume"))
 
-df$chi[c(114, 119, 402, 456)] <- NA
-df$chi[c(406)] <- NA
-df$chi[c(220, 402, 484)] <- NA
+df$chi[c(62, 84, 86, 308, 315, 317)] <- NA
+df$chi[c(304, 456, 483)] <- NA
+df$chi[c(402, 481, 484)] <- NA
 
-log(df$beta)
-
-chi.beta <- lmer(chi ~ (vpd4 + tavg4 + log(beta)) * pft + 
+chi.beta <- lmer(chi ~ (vpd4 + tavg4 + beta) * pft + 
               (1 | NCRS.code), data = df)
 
 # Check model assumptions
@@ -511,15 +509,16 @@ table3$treatment <- c("VPD",
                       "T * PFT",
                       "Beta * PFT")
 
-write.csv(table3, "../working_drafts/tables/TXeco_table3_chibeta.csv", row.names = FALSE)
+write.csv(table3, "../working_drafts/tables/TXeco_table3b_chibeta.csv", row.names = FALSE)
 
 ##########################################################################
-## Narea
+## Narea - direct effects
 ##########################################################################
-df$narea[df$narea > 5] <- NA
-df$narea[c(509)] <- NA
+df$narea[df$narea > 10] <- NA
+df$narea[c(76, 80, 156, 273, 382)] <- NA
+df$narea[509] <- NA
 
-narea <- lmer(log(narea) ~ wn60 * soil.no3n * pft + chi + beta + (1 | NCRS.code),
+narea <- lmer(log(narea) ~ (beta + chi + soil.no3n) * pft + (1 | NCRS.code),
               data = df)
 
 # Check model assumptions
@@ -541,44 +540,71 @@ test(emtrends(narea, ~1, "beta"))
 emmeans(narea, ~1, at = list(beta = 0))
 
 ## Individual chi effect
-test(emtrends(narea, ~pft, "soil.no3n"))
+test(emtrends(narea, ~1, "chi"))
+emmeans(narea, ~1, at = list(beta = 0))
+
+## Individual beta effect
+test(emtrends(narea, ~pft, "beta"))
+emmeans(narea, ~1, at = list(beta = 0))
+
+## Individual soil N effect
+test(emtrends(narea, ~1, "soil.no3n"))
+
+table4 <- data.frame(Anova(narea)) %>%
+  mutate(treatment = row.names(.),
+         Chisq = round(Chisq, 3),
+         P_value = ifelse(Pr..Chisq. < 0.001, 
+                          "<0.001", 
+                          round(Pr..Chisq., 3))) %>%
+  dplyr::select(treatment, df = Df, Chisq, P_value)
+
+table4$treatment <- c("Unit cost ratio (beta)",
+                      "chi",
+                      "Soil NO3-N (N)",
+                      "PFT",
+                      "beta * PFT",
+                      "chi * PFT",
+                      "N * PFT")
+
+write.csv(table4, "../working_drafts/tables/TXeco_table4_leafN.csv", 
+          row.names = FALSE)
 
 ##########################################################################
 ## Narea plots
 ##########################################################################
-narea.beta.pred <- as.data.frame(get_model_data(narea, type = "pred", 
-                                                terms = "beta"))
+narea.beta.pred <- as.data.frame(get_model_data(narea, type = "int", 
+                                                terms = c("beta", "pft")))
 narea.chi.pred <- data.frame(get_model_data(narea, type = "pred", 
                                             terms = "chi"))
 narea.soiln.pred <- data.frame(get_model_data(narea, type = "pred", 
                                               terms = "soil.no3n"))
 
 narea.beta.plot <- ggplot(data = subset(df, !is.na(pft)), 
-                         aes(x = log(beta), y = log(narea))) +
+                         aes(x = beta, y = log(narea))) +
   geom_jitter(aes(fill = pft), width = 0.5, size = 3, alpha = 0.7, shape = 21) +
   geom_ribbon(data = narea.beta.pred,
-              aes(x = log(x), y = log(predicted), 
+              aes(x = x, y = log(predicted), 
                   ymin = log(conf.low), 
                   ymax = log(conf.high)), alpha = 0.25) +
   geom_line(data = narea.beta.pred, size = 1,
-            aes(x = log(x), y = log(predicted))) +
+            aes(x = x, y = log(predicted))) +
   scale_fill_manual(values = c(cbbPalette3), 
                     labels = c(expression("C"[3]~"legume"),
                                expression("C"[4]~"non-legume"),
                                expression("C"[3]~"non-legume"))) +
-  scale_x_continuous(limits = c(-2.5, 7.5), breaks = seq(-2.5, 7.5, 2.5)) +
-  scale_y_continuous(limits = c(-1, 2), breaks = seq(-1, 2, 1)) +
-  labs(x = expression(bold(ln~beta)),
+  scale_x_continuous(limits = c(0, 600), breaks = seq(0, 600, 150)) +
+  scale_y_continuous(limits = c(-1.5, 2), breaks = seq(-1, 2, 1)) +
+  labs(x = expression(bold(beta)),
        y = expression(bold(ln)~"N"[area]),
        fill = "Funtional group") +
   theme_bw(base_size = 18) +
-  theme(legend.text.align = 0,
-        panel.grid = element_blank())
+  theme(legend.text.align = 0)
 narea.beta.plot
 
 narea.chi.plot <- ggplot(data = subset(df, !is.na(pft)), 
-                         aes(x = chi, y = log(narea))) +
-  geom_jitter(aes(fill = pft), width = 0.01, size = 3, alpha = 0.7, shape = 21) +
+                         aes(x = chi, y = narea)) +
+  geom_jitter(aes(fill = pft), width = 0.01, size = 3, 
+              alpha = 0.7, shape = 21) +
   geom_ribbon(data = narea.chi.pred,
               aes(x = x, y = log(predicted), ymin = log(conf.low), 
                   ymax = log(conf.high)), alpha = 0.25) +
@@ -589,7 +615,7 @@ narea.chi.plot <- ggplot(data = subset(df, !is.na(pft)),
                                expression("C"[4]~"non-legume"),
                                expression("C"[3]~"non-legume"))) +
   scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.2)) +
-  scale_y_continuous(limits = c(-1, 2), breaks = seq(-1, 2, 1)) +
+  scale_y_continuous(limits = c(-1.5, 2), breaks = seq(-1, 2, 1)) +
   labs(x = expression(bold(chi)),
        y = expression(bold(ln)~"N"[area]),
        fill = "Functional type") +
@@ -643,37 +669,49 @@ dev.off()
 ##########################################################################
 library(tidySEM)
 
+df <- read.csv("../data_sheets/TXeco_compiled_datasheet.csv",
+               na.strings = c("NA", "NaN")) %>%
+  filter(site != "Bell_2020_05" & 
+           site != "Russel_2020_01") %>%
+  mutate(pft = ifelse(pft == "c4_graminoid", 
+                      "c4_nonlegume",
+                      ifelse(pft == "c3_graminoid" | pft == "c3_forb" | pft == "c3_shrub",
+                             "c3_nonlegume", 
+                             ifelse(pft == "legume", 
+                                    "c3_legume", 
+                                    NA))),
+         chi = ifelse(chi > 0.95 | chi < 0.20, NA, chi))
+
+df$narea[df$narea > 10] <- NA
+df$narea[c(76, 80, 156, 273, 382, 509)] <- NA
+df$chi[c(62, 84, 86, 308, 315, 317, 304, 456, 483,
+         402, 481, 484)] <- NA
+df$beta[c(84)] <- NA
+
+## Fxn to standardize things
+standardize = function(x){ 
+  z <- (x - mean(x)) / sd(x) 
+  return( z)
+  }
+
+
 models <- ' # regressions
-            narea ~ beta + chi + soil.no3n + pft
-            beta ~ wn3 + soil.no3n + pft
-            chi ~ vpd4 + tavg4 + pft
+            narea ~ (beta + chi + soil.no3n) * pft
+            beta ~ (wn3 + soil.no3n) * pft
+            chi ~ (vpd4 + tavg4) * pft
             chi ~~ beta
             vpd4 ~~ tavg4
             wn3 ~ pft
             soil.no3n ~ pft'
-
+?sem
 
 test_fit <- sem(models, data = df)
 lavaan::summary(test_fit, fit.measures = TRUE)
 
-summary(test_fit, standardized = TRUE)
+summary.coefs <- summary(test_fit)$pe[c(1:14),]
+summary.coefs$linesize <- abs(summary.coefs$z)
+summary.coefs$linesize_std <- scale(summary.coefs$linesize) * 2 + 4
 
-fitmeasures(test_fit)
+summary.coefs[,5:10] <- round(summary.coefs[,5:10], digits = 3)
 
-sem.layout <- get_layout("wn3",   "pft",   "vpd4",    "tavg4",
-                         "",      "beta",  "chi",      "",
-                         "soil.no3n", "", "", "narea", rows = 3)
-test_fig <- graph_sem(test_fit, 
-                      layout = sem.layout)
-?graph_sem
-
-semPaths(test_fit, "std", nCharNodes = 9, nCharEdges = 3,
-         style = "OpenMx", layout = "tree2")
-
-?semPaths
-
-
-png(filename = "../working_drafts/figs/TXeco_SEM_testfig.png",
-    width = 12, height = 12, units = "in", res = 600)
-test_fig
-dev.off()
+write.csv(summary.coefs, "../working_drafts/tables/TXeco_SEM_results.csv", row.names = FALSE)
