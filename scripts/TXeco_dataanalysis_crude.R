@@ -252,7 +252,7 @@ shapiro.test(residuals(chi))
 outlierTest(chi)
 
 # Model output
-summary(chi)
+round(summary(chi)$coefficients, digits = 3)
 Anova(chi)
 r.squaredGLMM(chi)
 
@@ -481,7 +481,7 @@ shapiro.test(residuals(chi.beta))
 outlierTest(chi.beta)
 
 # Model output
-summary(chi.beta)
+round(summary(chi.beta)$coefficients, digits = 3)
 Anova(chi.beta)
 r.squaredGLMM(chi.beta)
 
@@ -574,12 +574,15 @@ write.csv(table4, "../working_drafts/tables/TXeco_table4_leafN.csv",
 ##########################################################################
 ## Narea plots
 ##########################################################################
-narea.beta.pred <- as.data.frame(get_model_data(narea, type = "int", 
-                                                terms = c("beta", "pft")))
+narea.beta.pred <- as.data.frame(get_model_data(narea, type = "pred", 
+                                                terms = "beta"))
 narea.chi.pred <- data.frame(get_model_data(narea, type = "pred", 
                                             terms = "chi"))
 narea.soiln.pred <- data.frame(get_model_data(narea, type = "pred", 
                                               terms = "soil.no3n"))
+
+test(emtrends(narea, ~1, "beta"))
+
 
 narea.beta.plot <- ggplot(data = subset(df, !is.na(pft)), 
                          aes(x = beta, y = log(narea))) +
@@ -602,29 +605,6 @@ narea.beta.plot <- ggplot(data = subset(df, !is.na(pft)),
   theme_bw(base_size = 18) +
   theme(legend.text.align = 0)
 narea.beta.plot
-
-narea.chi.plot <- ggplot(data = subset(df, !is.na(pft)), 
-                         aes(x = chi, y = narea)) +
-  geom_jitter(aes(fill = pft), width = 0.01, size = 3, 
-              alpha = 0.7, shape = 21) +
-  geom_ribbon(data = narea.chi.pred,
-              aes(x = x, y = log(predicted), ymin = log(conf.low), 
-                  ymax = log(conf.high)), alpha = 0.25) +
-  geom_line(data = narea.chi.pred, size = 1,
-            aes(x = x, y = log(predicted)), lty = 2) +
-  scale_fill_manual(values = c(cbbPalette3), 
-                    labels = c(expression("C"[3]~"legume"),
-                               expression("C"[4]~"non-legume"),
-                               expression("C"[3]~"non-legume"))) +
-  scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.2)) +
-  scale_y_continuous(limits = c(-1.5, 2), breaks = seq(-1, 2, 1)) +
-  labs(x = expression(bold(chi)),
-       y = expression(bold(ln)~"N"[area]),
-       fill = "Functional type") +
-  theme_bw(base_size = 18) +
-  theme(legend.text.align = 0,
-        panel.grid = element_blank())
-narea.chi.plot
 
 narea.soilno3n.plot <- ggplot(data = subset(df, !is.na(pft)), 
                                   aes(x = soil.no3n, y = log(narea))) +
