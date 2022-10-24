@@ -72,8 +72,6 @@ test(emtrends(beta, ~pft, "wn3"))
 # Individual effect of wn3 
 test(emtrends(beta, ~1, "wn3"))
 
-exp(-0.00689)
-
 # Individual effect of soil NO3-N
 test(emtrends(beta, ~1, "soil.no3n"))
 
@@ -83,13 +81,12 @@ emmeans(beta, pairwise~pft)
 beta.coefs <- round(summary(beta)$coefficients, digits = 4)
 
 table1 <- data.frame(Anova(beta)) %>%
-
   mutate(treatment = row.names(.),
          Chisq = round(Chisq, 3),
          P_value = ifelse(Pr..Chisq. < 0.001, 
                           "<0.001", 
                           round(Pr..Chisq., 3))) %>%
-  dplyr::select(treatment, df = Df, χ = Chisq, P_value)
+  dplyr::select(treatment, df = Df, chi = Chisq, P_value)
 
 table1$treatment <- c("Soil moisture (SM)",
                       "Soil NO3-N (N)",
@@ -237,7 +234,7 @@ ggarrange(beta.h2o.int, beta.no3n.ind, ncol = 2, common.legend = TRUE,
 dev.off()
 
 ##########################################################################
-## Chi
+## Chi w/o beta
 ##########################################################################
 df$chi[c(62, 117, 315, 317, 481)] <- NA
 df$chi[c(456, 483)] <- NA
@@ -673,6 +670,7 @@ dev.off()
 ## Structural equation model
 ##########################################################################
 library(tidySEM)
+library(lavaan)
 
 df <- read.csv("../data_sheets/TXeco_compiled_datasheet.csv",
                na.strings = c("NA", "NaN")) %>%
@@ -701,18 +699,16 @@ standardize = function(x){
 
 
 models <- ' # regressions
-            narea ~ (beta + chi + soil.no3n) * pft
-            beta ~ (wn3 + soil.no3n) * pft
-            chi ~ (vpd4 + tavg4) * pft
-            chi ~~ beta
-            vpd4 ~~ tavg4
-            wn3 ~ pft
-            soil.no3n ~ pft'
+            narea ~ beta + chi + soil.no3n + pft
+            beta ~ wn3 + soil.no3n + pft
+            chi ~ vpd4 + beta + tavg4 + pft
+            vpd4 ~ tavg4
+            soil.no3n ~ wn3'
 
 test_fit <- sem(models, data = df)
 lavaan::summary(test_fit, fit.measures = TRUE)
 
-summary.coefs <- summary(test_fit)$pe[c(1:14),]
+summary.coefs <- summary(test_fit)$pe[c(1:13),]
 summary.coefs$linesize <- abs(summary.coefs$z)
 summary.coefs$linesize_std <- scale(summary.coefs$linesize) * 2 + 4
 
