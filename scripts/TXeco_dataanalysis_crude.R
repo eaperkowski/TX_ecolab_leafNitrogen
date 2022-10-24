@@ -72,13 +72,18 @@ test(emtrends(beta, ~pft, "wn3"))
 # Individual effect of wn3 
 test(emtrends(beta, ~1, "wn3"))
 
+exp(-0.00689)
+
 # Individual effect of soil NO3-N
 test(emtrends(beta, ~1, "soil.no3n"))
 
 # PFT-only effect
 emmeans(beta, pairwise~pft)
 
+beta.coefs <- round(summary(beta)$coefficients, digits = 4)
+
 table1 <- data.frame(Anova(beta)) %>%
+
   mutate(treatment = row.names(.),
          Chisq = round(Chisq, 3),
          P_value = ifelse(Pr..Chisq. < 0.001, 
@@ -703,7 +708,6 @@ models <- ' # regressions
             vpd4 ~~ tavg4
             wn3 ~ pft
             soil.no3n ~ pft'
-?sem
 
 test_fit <- sem(models, data = df)
 lavaan::summary(test_fit, fit.measures = TRUE)
