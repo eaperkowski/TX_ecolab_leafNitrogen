@@ -82,8 +82,6 @@ iridescent.reverse <- c("#000000", "#46353A", "#684957", "#805770",
 us <- getData("GADM", country="USA", level = 1, path = "../climate_data/")
 texas <- us[match(toupper("texas"), toupper(us$NAME_1)), ]
 
-
-
 ###############################################################################
 ## Stack raster files, mask to include TX and convert to df
 ###############################################################################
@@ -112,6 +110,9 @@ precip.masked.df_cleaned <- precip.masked.df %>%
   summarize(annual.prcp = sum(monthly.prcp, na.rm = TRUE)) %>%
   ungroup(year) %>%
   summarize(map = mean(annual.prcp, na.rm = TRUE))
+
+min(precip.masked.df_cleaned$map)
+
 
 ## Extract monthly precipitation data from grid cell containing each site.
 ## Note that grid cell is on 4km resolution
@@ -166,6 +167,9 @@ temp.masked_20062020_mat <- temp.masked.df_cleaned %>%
   ungroup(year) %>%
   summarize(mat = mean(annual.mean.temp, na.rm = TRUE))
 
+max(temp.masked_20062020_mat$mat)
+min(temp.masked_20062020_mat$mat)
+
 ## Extract monthly precipitation data from grid cell containing each site.
 ## Note that grid cell is on 4km resolution
 df.sites.temp <- as.data.frame(terra::extract(pd.temp,
@@ -188,7 +192,6 @@ df.sites.temp_cleaned <- df.sites.temp %>%
          year = lubridate::year(date),
          month = lubridate::month(date))
 
-
 df.sites.temp_20062020_mat <- df.sites.temp_cleaned %>%
   filter(year >= 2006 & year <= 2020) %>%
   group_by(site, latitude, longitude, year) %>%
@@ -202,7 +205,7 @@ pd.vpdmin <- pd_stack(prism_archive_subset("vpdmin", "monthly"))
 
 ## Mask vpdmax and vpdmin, then, in a step, calculate vpdmean
 ## following same procedure for tmean
-vpdmean.masked <- mask(crop(pd.vpdmean, extent(texas)), texas)
+vpdmax.masked <- mask(crop(pd.vpdmax, extent(texas)), texas)
 vpdmin.masked <- mask(crop(pd.vpdmin, extent(texas)), texas)
 vpdmean.masked <- (vpdmax.masked + vpdmin.masked) / 2
 
@@ -224,6 +227,9 @@ vpdmean.masked.df_cleaned <- vpdmean.masked.df %>%
   summarize(annual.mean.vpd = mean(monthly.mean.vpd, na.rm = TRUE) / 10) %>%
   ungroup(year) %>%
   summarize(mav = mean(annual.mean.vpd, na.rm = TRUE))
+
+min(vpdmean.masked.df_cleaned$mav)
+max(vpdmean.masked.df_cleaned$mav)
 
 ## Extract monthly precipitation data from grid cell containing each site.
 ## Note that grid cell is on 4km resolution

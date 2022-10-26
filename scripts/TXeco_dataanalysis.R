@@ -43,6 +43,8 @@ length(df$pft[df$pft == "c4_nonlegume"])
 ## Convert VPD from hPa (PRISM units) to kPa (standard)
 df$vpd4 <- df$vpd4 / 10
 
+53+353+11
+
 ##########################################################################
 ## Beta
 ##########################################################################
@@ -122,158 +124,6 @@ test(emtrends(chi, ~1, "beta"))
 cld(emmeans(chi, pairwise~pft))
 
 ##########################################################################
-## Chi plots
-##########################################################################
-chi.no3n.pred <- data.frame(get_model_data(chi, 
-                                           type = "pred", 
-                                           terms = "soil.no3n"))
-chi.no3n.inter <- data.frame(get_model_data(chi, 
-                                            type = "pred", 
-                                            terms = c("soil.no3n", "pft")))
-chi.h2o.pred <- data.frame(get_model_data(chi, type = "pred", 
-                                          terms = c("wn.60")))
-chi.h2o.inter <- data.frame(get_model_data(chi, type = "pred", 
-                                           terms = c("wn.60", "pft")))
-
-set.seed(5)
-chi.no3n.ind <- ggplot(data = subset(df, !is.na(pft)), 
-                      aes(x = soil.no3n, y = chi)) +
-  geom_jitter(aes(fill = pft),width = 0.7, size = 3, 
-              alpha = 0.7, shape = 21) +
-  geom_ribbon(data = chi.no3n.pred, 
-              aes(x = x, y = predicted, ymin = conf.low, 
-                  ymax = conf.high), alpha = 0.25) +
-  geom_line(data = chi.no3n.pred, size = 1.5,
-            aes(x = x, y = predicted)) +
-  scale_fill_manual(values = cbbPalette3, 
-                    labels = c(expression("C"[3]~"legume"),
-                               expression("C"[4]~"non-legume"),
-                               expression("C"[3]~"non-legume"))) +
-  scale_x_continuous(limits = c(0, 80), breaks = seq(0, 80, 20)) +
-  scale_y_continuous(limits = c(0.2, 1), breaks = seq(0.2, 1, 0.2)) +
-  labs(x = expression(bold("Soil nitrogen availability (ppm NO"[3]~"-N)")),
-       y = expression(bold(chi)),
-       fill = "Functional group") +
-  theme_bw(base_size = 18) +
-  theme(legend.text.align = 0,
-        panel.border = element_rect(size = 1.25),
-        panel.grid = element_blank())
-chi.no3n.ind
-
-chi.no3n.int <- ggplot(data = subset(df, !is.na(pft)), 
-                      aes(x = soil.no3n, y = chi)) +
-  geom_jitter(aes(fill = pft),
-              width = 0.7, size = 3, alpha = 0.7, shape = 21) +
-  
-  geom_ribbon(data = subset(chi.no3n.inter, group == "c3_legume"), 
-              aes(x = x, y = predicted, ymin = conf.low, 
-                  ymax = conf.high), alpha = 0.25, fill = cbbPalette3[1]) +
-  geom_line(data = subset(chi.no3n.inter, group == "c3_legume"), size = 1,
-            aes(x = x, y = predicted), color = cbbPalette3[1]) +
-  geom_ribbon(data = subset(chi.no3n.inter, group == "c4_nonlegume"), 
-              aes(x = x, y = predicted, ymin = conf.low, 
-                  ymax = conf.high), alpha = 0.25, fill = cbbPalette3[2]) +
-  geom_line(data = subset(chi.no3n.inter, group == "c4_nonlegume"), size = 1,
-            aes(x = x, y = predicted), color = cbbPalette3[2]) +
-  geom_ribbon(data = subset(chi.no3n.inter, group == "c3_nonlegume"), 
-              aes(x = x, y = predicted, ymin = conf.low, 
-                  ymax = conf.high), alpha = 0.25, fill = cbbPalette3[3]) +
-  geom_line(data = subset(chi.no3n.inter, group == "c3_nonlegume"), size = 1,
-            aes(x = x, y = predicted), color = cbbPalette3[3]) +
-  scale_fill_manual(values = cbbPalette3, 
-                    labels = c(expression("C"[3]~"legume"),
-                               expression("C"[4]~"non-legume"),
-                               expression("C"[3]~"non-legume"))) +
-  scale_x_continuous(limits = c(0, 80), breaks = seq(0, 80, 20)) +
-  scale_y_continuous(limits = c(0.2, 1), breaks = seq(0.2, 1, 0.2)) +
-  labs(x = expression(bold("Soil nitrogen availability (ppm NO"[3]~"-N)")),
-       y = expression(bold(chi)),
-       fill = "Functional group") +
-  theme_bw(base_size = 18) +
-  theme(legend.text.align = 0,
-        panel.border = element_rect(size = 1.25),
-        panel.grid = element_blank())
-chi.no3n.int  
-
-chi.h2o.ind <- ggplot(data = subset(df, !is.na(pft)), 
-                      aes(x = wn.60, y = chi)) +
-  geom_jitter(aes(fill = pft),width = 0.7, size = 3, 
-              alpha = 0.7, shape = 21) +
-  geom_ribbon(data = chi.h2o.pred, 
-              aes(x = x, y = predicted, ymin = conf.low, 
-                  ymax = conf.high), alpha = 0.25) +
-  geom_line(data = chi.h2o.pred, size = 1.5,
-            aes(x = x, y = predicted)) +
-  scale_fill_manual(values = cbbPalette3, 
-                    labels = c(expression("C"[3]~"legume"),
-                               expression("C"[4]~"non-legume"),
-                               expression("C"[3]~"non-legume"))) +
-  scale_x_continuous(limits = c(20, 120), breaks = seq(20, 120, 20)) +
-  scale_y_continuous(limits = c(0.2, 1), breaks = seq(0.2, 1, 0.2)) +
-  labs(x = expression(bold("60-day mean daily soil moisture (mm)")),
-       y = expression(bold(chi)),
-       fill = "Functional group") +
-  theme_bw(base_size = 18) +
-  theme(legend.text.align = 0,
-        panel.border = element_rect(size = 1.25),
-        panel.grid = element_blank())
-chi.h2o.ind
-
-chi.h2o.int <- ggplot(data = subset(df, !is.na(pft)), 
-                       aes(x = wn.60, y = chi)) +
-  geom_jitter(aes(fill = pft),
-              width = 0.7, size = 3, alpha = 0.7, shape = 21) +
-  geom_ribbon(data = subset(chi.h2o.inter, group == "c3_legume"), 
-              aes(x = x, y = predicted, ymin = conf.low, 
-                  ymax = conf.high), alpha = 0.25, fill = cbbPalette3[1]) +
-  geom_line(data = subset(chi.h2o.inter, group == "c3_legume"), size = 1,
-            aes(x = x, y = predicted), color = cbbPalette3[1]) +
-  geom_ribbon(data = subset(chi.h2o.inter, group == "c4_nonlegume"), 
-              aes(x = x, y = predicted, ymin = conf.low, 
-                  ymax = conf.high), alpha = 0.25, fill = cbbPalette3[2]) +
-  geom_line(data = subset(chi.h2o.inter, group == "c4_nonlegume"), size = 1,
-            aes(x = x, y = predicted), color = cbbPalette3[2]) +
-  geom_ribbon(data = subset(chi.h2o.inter, group == "c3_nonlegume"), 
-              aes(x = x, y = predicted, ymin = conf.low, 
-                  ymax = conf.high), alpha = 0.25, fill = cbbPalette3[3]) +
-  geom_line(data = subset(chi.h2o.inter, group == "c3_nonlegume"), size = 1,
-            aes(x = x, y = predicted), color = cbbPalette3[3]) +
-  scale_fill_manual(values = cbbPalette3, 
-                    labels = c(expression("C"[3]~"legume"),
-                               expression("C"[4]~"non-legume"),
-                               expression("C"[3]~"non-legume"))) +
-  scale_x_continuous(limits = c(20, 120), breaks = seq(20, 120, 20)) +
-  scale_y_continuous(limits = c(0.2, 1), breaks = seq(0.2, 1, 0.2)) +
-  labs(x = expression(bold("60-day mean daily soil moisture (mm)")),
-       y = expression(bold(chi)),
-       fill = "Functional group") +
-  theme_bw(base_size = 18) +
-  theme(legend.text.align = 0,
-        panel.border = element_rect(size = 1.25),
-        panel.grid = element_blank())
-chi.h2o.int
-
-png("../working_drafts/TXeco_chi_h2o_int.png",
-    width = 8, height = 5, units = 'in', res = 600)
-chi.h2o.int
-dev.off()
-
-png("../working_drafts/TXeco_chi_h2o_ind.png",
-    width = 8, height = 5, units = 'in', res = 600)
-chi.h2o.ind
-dev.off()
-
-png("../working_drafts/TXeco_chi_no3n_int.png",
-    width = 8, height = 5, units = 'in', res = 600)
-chi.no3n.int
-dev.off()
-
-png("../working_drafts/TXeco_chi_no3n_ind.png",
-    width = 8, height = 5, units = 'in', res = 600)
-chi.no3n.ind
-dev.off()
-
-##########################################################################
 ## Chi w/ beta
 ##########################################################################
 df.chi.beta <- df
@@ -308,119 +158,78 @@ test(emtrends(chi.beta, ~pft, "tavg4"))
 test(emtrends(chi.beta, pairwise~pft, "beta"))
 
 ##########################################################################
-## Narea - direct effects
+## Narea with beta
 ##########################################################################
+df.narea.beta <- df
+
 # Remove outliers (Bonferroni p<0.05 condition)
-df$narea[df$narea > 10] <- NA
-df$narea[c(76, 80, 156, 273, 382)] <- NA
-df$narea[509] <- NA
+df.narea.beta$narea[df$narea > 10] <- NA
+df.narea.beta$narea[c(76, 80, 156, 273, 382)] <- NA
+df.narea.beta$narea[509] <- NA
 
 # Fit model
-narea <- lmer(log(narea) ~ (beta + chi + soil.no3n) * pft + (1 | NCRS.code),
-              data = df)
+narea.beta <- lmer(log(narea) ~ (beta + chi + soil.no3n) * pft + (1 | NCRS.code),
+              data = df.narea.beta)
 
 # Check model assumptions
-plot(narea)
-qqnorm(residuals(narea))
-qqline(residuals(narea))
-hist(residuals(narea))
-densityPlot(residuals(narea))
-shapiro.test(residuals(narea))
-outlierTest(narea)
+plot(narea.beta)
+qqnorm(residuals(narea.beta))
+qqline(residuals(narea.beta))
+hist(residuals(narea.beta))
+densityPlot(residuals(narea.beta))
+shapiro.test(residuals(narea.beta))
+outlierTest(narea.beta)
 
 # Model output
-round(summary(narea)$coefficients, digits = 3)
-Anova(narea)
-r.squaredGLMM(narea)
+round(summary(narea.beta)$coefficients, digits = 3)
+Anova(narea.beta)
+r.squaredGLMM(narea.beta)
 
 ## Individual beta effect
-test(emtrends(narea, ~1, "beta"))
-emmeans(narea, ~1, at = list(beta = 0))
+test(emtrends(narea.beta, ~1, "beta"))
+emmeans(narea.beta, ~1, at = list(beta = 0))
 
 ## Individual chi effect
-test(emtrends(narea, ~1, "chi"))
-emmeans(narea, ~1, at = list(beta = 0))
+test(emtrends(narea.beta, ~1, "chi"))
+emmeans(narea.beta, ~1, at = list(beta = 0))
 
 ## Individual beta effect
-test(emtrends(narea, ~pft, "beta"))
-emmeans(narea, ~1, at = list(beta = 0))
+test(emtrends(narea.beta, ~pft, "beta"))
+emmeans(narea.beta, ~1, at = list(beta = 0))
 
 ## Individual soil N effect
-test(emtrends(narea, ~1, "soil.no3n"))
+test(emtrends(narea.beta, ~1, "soil.no3n"))
+
 
 
 ##########################################################################
-## Narea plots
+## Narea without beta
 ##########################################################################
-narea.beta.pred <- as.data.frame(get_model_data(narea, type = "pred", 
-                                                terms = "beta"))
-narea.chi.pred <- data.frame(get_model_data(narea, type = "pred", 
-                                            terms = "chi"))
-narea.soiln.pred <- data.frame(get_model_data(narea, type = "pred", 
-                                              terms = "soil.no3n"))
+df.narea.nobeta <- df
 
+# Remove outliers (Bonferroni p<0.05 condition)
+df.narea.nobeta$narea[df$narea > 10] <- NA
+df.narea.nobeta$narea[509] <- NA
 
-narea.beta.plot <- ggplot(data = subset(df, !is.na(pft)), 
-                         aes(x = beta, y = log(narea))) +
-  geom_jitter(aes(fill = pft), width = 0.5, size = 3, alpha = 0.7, shape = 21) +
-  geom_ribbon(data = narea.beta.pred,
-              aes(x = x, y = log(predicted), 
-                  ymin = log(conf.low), 
-                  ymax = log(conf.high)), alpha = 0.25) +
-  geom_line(data = narea.beta.pred, size = 1,
-            aes(x = x, y = log(predicted))) +
-  scale_fill_manual(values = c(cbbPalette3), 
-                    labels = c(expression("C"[3]~"legume"),
-                               expression("C"[4]~"non-legume"),
-                               expression("C"[3]~"non-legume"))) +
-  scale_x_continuous(limits = c(0, 600), breaks = seq(0, 600, 150)) +
-  scale_y_continuous(limits = c(-1.5, 2), breaks = seq(-1, 2, 1)) +
-  labs(x = expression(bold(beta)),
-       y = expression(bold(ln)~"N"[area]),
-       fill = "Funtional group") +
-  theme_bw(base_size = 18) +
-  theme(legend.text.align = 0)
-narea.beta.plot
+# Fit model
+narea.nobeta <- lmer(log(narea) ~ (chi + (soil.no3n * wn3)) * 
+                       pft + (1 | NCRS.code), data = df.narea.nobeta)
 
-narea.soilno3n.plot <- ggplot(data = subset(df, !is.na(pft)), 
-                                  aes(x = soil.no3n, y = log(narea))) +
-  geom_jitter(aes(fill = pft), width = 0.01, size = 3, alpha = 0.7, shape = 21) +
-  geom_ribbon(data = narea.soiln.pred,
-              aes(x = x, y = log(predicted), ymin = log(conf.low),
-                  ymax = log(conf.high)), alpha = 0.25) +
-  geom_line(data = narea.soiln.pred, 
-            size = 1, aes(x = x, y = log(predicted)), lty = 2) +
-  scale_fill_manual(values = cbbPalette3, 
-                    labels = c(expression("C"[3]~"legume"),
-                               expression("C"[4]~"non-legume"),
-                               expression("C"[3]~"non-legume"))) +
-  scale_y_continuous(limits = c(-1, 2), breaks = seq(-1, 2, 1)) +
-  labs(x = expression(bold("Soil nitrogen availability (ppm NO"[3]~"-N)")),
-       y = expression(bold(ln)~"N"[area]),
-       fill = "Functional type") +
-  theme_bw(base_size = 18) +
-  theme(legend.text.align = 0,
-        panel.grid = element_blank())
+# Check model assumptions
+plot(narea.nobeta)
+qqnorm(residuals(narea.nobeta))
+qqline(residuals(narea.nobeta))
+hist(residuals(narea.nobeta))
+densityPlot(residuals(narea.nobeta))
+shapiro.test(residuals(narea.nobeta))
+outlierTest(narea.nobeta)
 
-png("../working_drafts/TXeco_narea_beta.png",
-    width = 8, height = 5, units = 'in', res = 600)
-narea.beta.plot
-dev.off()
+# Model output
+round(summary(narea.nobeta)$coefficients, digits = 3)
+Anova(narea.nobeta)
+r.squaredGLMM(narea.nobeta)
 
-png("../working_drafts/TXeco_narea_chi.png",
-    width = 8, height = 5, units = 'in', res = 600)
-narea.chi.plot
-dev.off()
-
-png("../working_drafts/TXeco_narea_soiln.png",
-    width = 8, height = 5, units = 'in', res = 600)
-narea.soilno3n.plot
-dev.off()
-
-png("../working_drafts/TXeco_narea_soiln_int.png",
-    width = 8, height = 5, units = 'in', res = 600)
-narea.soilno3n.int.plot
-dev.off()
+ 
 
 ##########################################################################
 ## Structural equation model
@@ -434,6 +243,8 @@ df.sem$narea[c(76, 80, 156, 273, 382, 509)] <- NA
 df.sem$chi[c(62, 84, 86, 308, 315, 317, 304, 456, 483,
          402, 481, 484)] <- NA
 df.sem$beta[c(84)] <- NA
+
+df$wn3 <- df$wn3/150
 
 models <- ' # regressions
             narea ~ beta + chi + soil.no3n + pft
@@ -585,23 +396,52 @@ write.csv(table3, "../working_drafts/tables/TXeco_table3_chi.csv",
 
 
 ## Table 4 (Coefficients + model results summary)
-narea.coefs <- data.frame(summary(narea)$coefficient) %>%
+narea.nobeta.coefs <- data.frame(summary(narea.nobeta)$coefficient) %>%
   mutate(treatment = row.names(.),
-         coef = round(Estimate, digits = 3),
-         se = round(Std..Error, digits = 3)) %>%
-  dplyr::select(treatment, coef, se, t.value) %>%
+         coef.nobeta = round(Estimate, digits = 3),
+         se.nobeta = round(Std..Error, digits = 3),
+         t.value.nobeta = round(t.value, digits = 3)) %>%
+  dplyr::select(treatment, coef.nobeta, se.nobeta, t.value.nobeta) %>%
+  filter(treatment == "(Intercept)" | treatment == "chi" | 
+           treatment == "soil.no3n" | treatment == "wn3" | 
+           treatment == "soil.no3n:wn3") %>%
+  mutate(coef.nobeta = ifelse(coef.nobeta <0.001 & coef.nobeta >= 0, 
+                              "<0.001", coef.nobeta)) %>%
+  print(., row.names = FALSE)
+
+narea.nobeta.table4 <- data.frame(Anova(narea.nobeta)) %>%
+  mutate(treatment = row.names(.),
+         Chisq.nobeta = round(Chisq, 3),
+         P_value.nobeta = ifelse(Pr..Chisq. < 0.001, "<0.001",
+                          round(Pr..Chisq., 3))) %>%
+  full_join(narea.nobeta.coefs) %>%
+  mutate(treatment = factor(treatment, levels = c("(Intercept)",
+                                                  "chi",
+                                                  "soil.no3n",
+                                                  "wn3",
+                                                  "pft",
+                                                  "soil.no3n:wn3",
+                                                  "chi:pft",
+                                                  "soil.no3n:pft",
+                                                  "wn3:pft",
+                                                  "soil.no3n:wn3:pft"))) %>%
+  dplyr::select(treatment, df = Df, coef.nobeta, Chisq.nobeta, P_value.nobeta) %>%
+  arrange(treatment)
+
+narea.beta.coefs <- data.frame(summary(narea.beta)$coefficient) %>%
+  mutate(treatment = row.names(.),
+         coef.beta = round(Estimate, digits = 3),
+         se.beta = round(Std..Error, digits = 3)) %>%
+  dplyr::select(treatment, coef.beta, se.beta, t.value.beta = t.value) %>%
   filter(treatment == c("(Intercept)", "beta", "chi", "soil.no3n")) %>%
   print(., row.names = FALSE)
 
-table4 <- data.frame(Anova(narea)) %>%
-  mutate(treatment = factor(row.names(.), 
-                            levels = c("(Intercept)", "beta", "chi",
-                                       "soil.no3n", "pft", "beta:pft",
-                                       "chi:pft", "soil.no3n:pft")),
-         Chisq = round(Chisq, 3),
-         P_value = ifelse(Pr..Chisq. < 0.001, "<0.001",
+narea.beta.table4 <- data.frame(Anova(narea.beta)) %>%
+  mutate(treatment = row.names(.),
+         Chisq.beta = round(Chisq, 3),
+         P_value.beta = ifelse(Pr..Chisq. < 0.001, "<0.001",
                           round(Pr..Chisq., 3))) %>%
-  full_join(narea.coefs) %>%
+  full_join(narea.beta.coefs) %>%
   mutate(treatment = factor(treatment, levels = c("(Intercept)",
                                                   "beta",
                                                   "chi",
@@ -610,16 +450,35 @@ table4 <- data.frame(Anova(narea)) %>%
                                                   "beta:pft",
                                                   "chi:pft",
                                                   "soil.no3n:pft"))) %>%
-  dplyr::select(treatment, df = Df, coef, Chisq, P_value) %>%
-  arrange(treatment) %>%
+  dplyr::select(treatment, df = Df, coef.beta, Chisq.beta, P_value.beta) %>%
+  arrange(treatment)
+
+
+table4 <- narea.beta.table4 %>% full_join(narea.nobeta.table4) %>%
   mutate(df = replace(df, is.na(df), "-"),
-         coef = replace(coef, is.na(coef), "-"),
-         Chisq = replace(Chisq, is.na(Chisq), "-"),
-         P_value = replace(P_value, is.na(P_value), "-"))
+         coef.beta = replace(coef.beta, is.na(coef.beta), "-"),
+         coef.nobeta = replace(coef.nobeta, is.na(coef.nobeta), "-"),
+         Chisq.beta = replace(Chisq.beta, is.na(Chisq.beta), "-"),
+         Chisq.nobeta = replace(Chisq.nobeta, is.na(Chisq.nobeta), "-"),
+         P_value.beta = replace(P_value.beta, is.na(P_value.beta), "-"),
+         P_value.nobeta = replace(P_value.nobeta, is.na(P_value.nobeta), "-"),
+         treatment = factor(treatment, levels = c("(Intercept)",
+                                                  "beta", "chi", "soil.no3n",
+                                                  "wn3", "pft", "soil.no3n:wn3",
+                                                  "beta:pft", "chi:pft",
+                                                  "soil.no3n:pft", "wn3:pft",
+                                                  "soil.no3n:wn3:pft"))) %>%
+  arrange(treatment)
+
+
+
+table4
+
 
 table4$treatment <- c("Intercept", "Unit cost ratio (beta)", "chi",
-                      "Soil N (N)", "PFT", "beta * PFT",
-                      "chi * PFT", "N * PFT")
+                      "Soil N (N)", "Soil moisture (SM)", "PFT", "SM * N",
+                      "beta * PFT", "chi * PFT", "N * PFT", "SM * PFT",
+                      "SM * N * PFT")
 
 write.csv(table4, "../working_drafts/tables/TXeco_table4_leafN.csv", 
           row.names = FALSE)
