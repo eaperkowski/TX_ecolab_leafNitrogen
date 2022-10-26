@@ -256,13 +256,23 @@ models <- ' # regressions
 test_fit <- sem(models, data = df.sem)
 lavaan::summary(test_fit, fit.measures = TRUE)
 
-summary.coefs <- summary(test_fit)$pe[c(1:13),]
+summary.coefs <- data.frame(summary(test_fit)$pe[c(1:13),])
 summary.coefs$linesize <- abs(summary.coefs$z)
 summary.coefs$linesize_std <- scale(summary.coefs$linesize) * 2 + 4
 
-summary.coefs[,5:10] <- round(summary.coefs[,5:10], digits = 3)
+summary.coefs[,c(5, 6, 7, 8)]
+
+summary.coefs[,5:8] <- round(summary.coefs[, c(5:8)], digits = 3)
+summary.coefs <- summary.coefs %>% 
+  mutate(se = ifelse(se < 0.001 & se >= 0, "<0.001", se),
+         pvalue = ifelse(pvalue < 0.001 & pvalue >= 0, "<0.001", pvalue))
+
+
+
+
+
 write.csv(summary.coefs,
-          "../working_drafts/tables/TXeco_SEM_results.csv",
+          "../working_drafts/tables/TXeco_tableS2_SEMresults.csv",
           row.names = FALSE)
 
 ##########################################################################
@@ -482,5 +492,9 @@ table4$treatment <- c("Intercept", "Unit cost ratio (beta)", "chi",
 
 write.csv(table4, "../working_drafts/tables/TXeco_table4_leafN.csv", 
           row.names = FALSE)
+
+## supplemental table with SEM results
+
+
 
 
