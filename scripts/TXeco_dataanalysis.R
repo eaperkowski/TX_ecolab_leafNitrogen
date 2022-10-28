@@ -9,8 +9,6 @@ library(tidyverse)
 library(MuMIn)
 library(multcomp)
 library(multcompView)
-library(ggpubr)
-library(sjPlot)
 library(lavaan)
 
 # Turn off digit rounding in emmean args
