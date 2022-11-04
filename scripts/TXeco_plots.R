@@ -33,7 +33,7 @@ df <- read.csv("../data_sheets/TXeco_compiled_datasheet.csv",
 ## Add colorblind friendly palette
 cbbPalette <- c("#0077BB", "#33BBEE", "#009988", "#EE7733", "#CC3311")
 cbbPalette2 <- c("#CC3311", "#EE7733", "#009988", "#33BBEE", "#0077BB")
-cbbPalette3 <- c("#DDAA33", "#BB5566", "#004488")
+cbbPalette3 <- c("#DDAA33", "#004488", "#BB5566")
 
 ## Figure out sample sizes within each pft class
 length(df$pft[df$pft == "c3_legume"])
@@ -42,6 +42,7 @@ length(df$pft[df$pft == "c4_nonlegume"])
 
 ## Convert VPD from hPa (PRISM units) to kPa (standard)
 df$vpd4 <- df$vpd4 / 10
+df$wn3 <- df$wn3 / 150 # relative to maximum bucket size
 
 ## Remove outliers from statistical models
 df$beta[c(84)] <- NA
@@ -59,9 +60,9 @@ narea <- lmer(log(narea) ~ (beta + chi + soil.no3n) * pft + (1 | NCRS.code),
 ##########################################################################
 ## Beta plots
 ##########################################################################
-beta.soiln.bivariate <- lmer(log(beta) ~ soil.no3n + wn3 + pft + (1 | NCRS.code), 
+beta.soiln.bivariate <- lmer(log(beta) ~ soil.no3n * pft + (1 | NCRS.code), 
                              data = df)
-beta.sm.bivariate <- lmer(log(beta) ~ wn3 + (1 | NCRS.code), 
+beta.sm.bivariate <- lmer(log(beta) ~ wn3 * pft + (1 | NCRS.code), 
                           data = df)
 
 ## Extract data for slopes/intercepts
@@ -84,11 +85,11 @@ beta.no3n.ind <- ggplot(data = subset(df, !is.na(pft)),
             aes(x = x, y = log(predicted))) +
   scale_fill_manual(values = c(cbbPalette3), 
                     labels = c(expression("C"[3]~"legume"),
-                               expression("C"[4]~"non-legume"),
-                               expression("C"[3]~"non-legume"))) +
+                               expression("C"[3]~"non-legume"),
+                               expression("C"[4]~"non-legume"))) +
   scale_x_continuous(limits = c(-1, 80), breaks = seq(0, 80, 20)) +
   scale_y_continuous(limits = c(-2.5, 7.5), breaks = seq(-2.5, 7.5, 2.5)) +
-  labs(x = expression(bold("Soil nitrogen availability (ppm NO"[3]~"-N)")),
+  labs(x = expression(bold("Soil N availability (ppm NO"[3]~"-N)")),
        y = expression(bold(ln~beta)),
        fill = "Functional group") +
   theme_bw(base_size = 18) +
@@ -113,21 +114,21 @@ beta.h2o.int <- ggplot(data = subset(df, !is.na(pft)),
             aes(x = x, y = log(predicted)), color = cbbPalette3[1], lty = 2) +
   geom_ribbon(data = subset(beta.h2o.inter, group == "c4_nonlegume"), 
               aes(x = x, y = log(predicted), ymin = log(conf.low), 
-                  ymax = log(conf.high)), alpha = 0.25, fill = cbbPalette3[2]) +
+                  ymax = log(conf.high)), alpha = 0.25, fill = cbbPalette3[3]) +
   geom_line(data = subset(beta.h2o.inter, group == "c4_nonlegume"), size = 1,
-            aes(x = x, y = log(predicted)), color = cbbPalette3[2]) +
+            aes(x = x, y = log(predicted)), color = cbbPalette3[3]) +
   geom_ribbon(data = subset(beta.h2o.inter, group == "c3_nonlegume"), 
               aes(x = x, y = log(predicted), ymin = log(conf.low), 
-                  ymax = log(conf.high)), alpha = 0.25, fill = cbbPalette3[3]) +
+                  ymax = log(conf.high)), alpha = 0.25, fill = cbbPalette3[2]) +
   geom_line(data = subset(beta.h2o.inter, group == "c3_nonlegume"), size = 1,
-            aes(x = x, y = log(predicted)), color = cbbPalette3[3], lty = 2) +
+            aes(x = x, y = log(predicted)), color = cbbPalette3[2], lty = 2) +
   scale_fill_manual(values = c(cbbPalette3), 
                     labels = c(expression("C"[3]~"legume"),
-                               expression("C"[4]~"non-legume"),
-                               expression("C"[3]~"non-legume"))) +
-  scale_x_continuous(limits = c(0, 150), breaks = seq(0, 150, 30)) +
+                               expression("C"[3]~"non-legume"),
+                               expression("C"[4]~"non-legume"))) +
+  scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.25)) +
   scale_y_continuous(limits = c(-2.5, 7.5), breaks = seq(-2.5, 7.5, 2.5)) +
-  labs(x = expression(bold("Soil moisture (mm)")),
+  labs(x = expression(bold("Soil moisture (%)")),
        y = expression(bold(ln~beta)),
        fill = "Functional group") +
   theme_bw(base_size = 18) +
@@ -137,7 +138,7 @@ beta.h2o.int
 
 # Write plot
 png("../working_drafts/figs/TXeco_fig2_beta.png",
-    width = 12, height = 4, units = 'in', res = 600)
+    width = 11, height = 4.5, units = 'in', res = 600)
 ggarrange(beta.h2o.int, beta.no3n.ind, ncol = 2, common.legend = TRUE,
           legend = "right", align = "hv", labels = "AUTO",
           font.label = list(size = 18))
@@ -151,6 +152,7 @@ dev.off()
 
 chi.no.inter <- lmer(chi~ vpd4 + tavg4 + soil.no3n + wn3 + pft + (1 | NCRS.code), data = df)
 
+
 ## Extract data for slopes/intercepts
 chi.vpd.pred <- data.frame(get_model_data(chi.no.inter, 
                                           type = "pred", 
@@ -159,7 +161,19 @@ chi.vpd.inter <- data.frame(get_model_data(chi,
                                            type = "pred", 
                                            terms = c("vpd4", "pft")))
 
+chi.temp.pred <- data.frame(get_model_data(chi.no.inter, 
+                                          type = "pred", 
+                                          terms = "tavg4"))
+chi.temp.inter <- data.frame(get_model_data(chi, 
+                                           type = "pred", 
+                                           terms = c("tavg4", "pft")))
 
+chi.sm.pred <- data.frame(get_model_data(chi.no.inter, 
+                                           type = "pred", 
+                                           terms = "wn3"))
+chi.sm.inter <- data.frame(get_model_data(chi, 
+                                            type = "pred", 
+                                            terms = c("wn3", "pft")))
 
 
 chi.no3n.pred <- data.frame(get_model_data(chi.no.inter, 
@@ -168,14 +182,6 @@ chi.no3n.pred <- data.frame(get_model_data(chi.no.inter,
 chi.no3n.inter <- data.frame(get_model_data(chi, 
                                            type = "pred", 
                                            terms = c("soil.no3n", "pft")))
-
-
-
-chi.h2o.pred <- data.frame(get_model_data(chi.no.inter, 
-                                           type = "pred", 
-                                           terms = "wn3"))
-chi.h2o.inter <- data.frame(get_model_data(chi, type = "pred", 
-                                            terms = "wn3"))
 
 
 chi.vpd.plot <- ggplot(data = df, aes(x = vpd4, y = chi)) +
@@ -193,18 +199,18 @@ chi.vpd.plot <- ggplot(data = df, aes(x = vpd4, y = chi)) +
             aes(x = x, y = predicted), color = cbbPalette3[1], lty = 2) +
   geom_ribbon(data = subset(chi.vpd.inter, group == "c4_nonlegume"), 
               aes(x = x, y = predicted, ymin = conf.low, 
-                  ymax = conf.high), alpha = 0.25, fill = cbbPalette3[2]) +
+                  ymax = conf.high), alpha = 0.25, fill = cbbPalette3[3]) +
   geom_line(data = subset(chi.vpd.inter, group == "c4_nonlegume"), size = 1,
-            aes(x = x, y = predicted), color = cbbPalette3[2]) +
+            aes(x = x, y = predicted), color = cbbPalette3[3]) +
   geom_ribbon(data = subset(chi.vpd.inter, group == "c3_nonlegume"), 
               aes(x = x, y = predicted, ymin = conf.low, 
-                  ymax = conf.high), alpha = 0.25, fill = cbbPalette3[3]) +
+                  ymax = conf.high), alpha = 0.25, fill = cbbPalette3[2]) +
   geom_line(data = subset(chi.vpd.inter, group == "c3_nonlegume"), size = 1,
-            aes(x = x, y = predicted), color = cbbPalette3[3], lty = 1) +
-  scale_fill_manual(values = c(cbbPalette3[1], cbbPalette3[3], cbbPalette3[2]), 
-                    labels = c(expression("C"[3]~"legume"),
-                               expression("C"[3]~"non-legume"),
-                               expression("C"[4]~"non-legume"))) +
+            aes(x = x, y = predicted), color = cbbPalette3[2], lty = 1) +
+  scale_fill_manual(values = cbbPalette3, 
+                                      labels = c(expression("C"[3]~"legume"),
+                                                 expression("C"[3]~"non-legume"),
+                                                 expression("C"[4]~"non-legume"))) +
   scale_x_continuous(limits = c(0.8, 1.41), breaks = seq(0.8, 1.4, 0.2)) +
   scale_y_continuous(limits = c(0.2, 1), breaks = seq(0.2, 1, 0.2)) +
   labs(x = expression(bold("Vapor pressure deficit (kPa)")),
@@ -214,6 +220,129 @@ chi.vpd.plot <- ggplot(data = df, aes(x = vpd4, y = chi)) +
   theme(legend.text.align = 0,
         panel.border = element_rect(size = 1.25))
 chi.vpd.plot  
+
+chi.temp.plot <- ggplot(data = df, aes(x = tavg4, y = chi)) +
+  geom_jitter(aes(fill = pft),
+              width = 0.1, size = 3, alpha = 0.7, shape = 21) +
+  geom_ribbon(data = chi.temp.pred, 
+              aes(x = x, y = predicted, ymin = conf.low, 
+                  ymax = conf.high), alpha = 0.25, fill = "black") +
+  geom_line(data = chi.temp.pred, size = 1,
+            aes(x = x, y = predicted), color = "black") +
+  geom_ribbon(data = subset(chi.temp.inter, group == "c3_legume"), 
+              aes(x = x, y = predicted, ymin = conf.low, 
+                  ymax = conf.high), alpha = 0.25, fill = cbbPalette3[1]) +
+  geom_line(data = subset(chi.temp.inter, group == "c3_legume"), size = 1,
+            aes(x = x, y = predicted), color = cbbPalette3[1], lty = 2) +
+  geom_ribbon(data = subset(chi.temp.inter, group == "c4_nonlegume"), 
+              aes(x = x, y = predicted, ymin = conf.low, 
+                  ymax = conf.high), alpha = 0.25, fill = cbbPalette3[3]) +
+  geom_line(data = subset(chi.temp.inter, group == "c4_nonlegume"), size = 1,
+            aes(x = x, y = predicted), color = cbbPalette3[3]) +
+  geom_ribbon(data = subset(chi.temp.inter, group == "c3_nonlegume"), 
+              aes(x = x, y = predicted, ymin = conf.low, 
+                  ymax = conf.high), alpha = 0.25, fill = cbbPalette3[2]) +
+  geom_line(data = subset(chi.temp.inter, group == "c3_nonlegume"), size = 1,
+            aes(x = x, y = predicted), color = cbbPalette3[2], lty = 1) +
+  scale_fill_manual(values = cbbPalette3, 
+                    labels = c(expression("C"[3]~"legume"),
+                               expression("C"[3]~"non-legume"),
+                               expression("C"[4]~"non-legume"))) +
+  scale_x_continuous(limits = c(18, 21.5), breaks = seq(18, 21.5, 1)) +
+  scale_y_continuous(limits = c(0.2, 1), breaks = seq(0.2, 1, 0.2)) +
+  labs(x = expression(bold("Air temperature ("*degree*"C)")),
+       y = expression(bold(chi)),
+       fill = "Functional group") +
+  theme_bw(base_size = 18) +
+  theme(legend.text.align = 0,
+        panel.border = element_rect(size = 1.25))
+chi.temp.plot  
+
+chi.sm.plot <- ggplot(data = df, aes(x = wn3, y = chi)) +
+  geom_jitter(aes(fill = pft),
+              width = 0.1, size = 3, alpha = 0.7, shape = 21) +
+  geom_ribbon(data = chi.sm.pred, 
+              aes(x = x, y = predicted, ymin = conf.low, 
+                  ymax = conf.high), alpha = 0.25, fill = "black") +
+  geom_line(data = chi.sm.pred, size = 1,
+            aes(x = x, y = predicted), color = "black") +
+  geom_ribbon(data = subset(chi.sm.inter, group == "c3_legume"), 
+              aes(x = x, y = predicted, ymin = conf.low, 
+                  ymax = conf.high), alpha = 0.25, fill = cbbPalette3[1]) +
+  geom_line(data = subset(chi.sm.inter, group == "c3_legume"), size = 1,
+            aes(x = x, y = predicted), color = cbbPalette3[1], lty = 2) +
+  geom_ribbon(data = subset(chi.sm.inter, group == "c4_nonlegume"), 
+              aes(x = x, y = predicted, ymin = conf.low, 
+                  ymax = conf.high), alpha = 0.25, fill = cbbPalette3[3]) +
+  geom_line(data = subset(chi.sm.inter, group == "c4_nonlegume"), size = 1,
+            aes(x = x, y = predicted), color = cbbPalette3[3]) +
+  geom_ribbon(data = subset(chi.sm.inter, group == "c3_nonlegume"), 
+              aes(x = x, y = predicted, ymin = conf.low, 
+                  ymax = conf.high), alpha = 0.25, fill = cbbPalette3[2]) +
+  geom_line(data = subset(chi.sm.inter, group == "c3_nonlegume"), size = 1,
+            aes(x = x, y = predicted), color = cbbPalette3[2], lty = 1) +
+  scale_fill_manual(values = cbbPalette3, 
+                    labels = c(expression("C"[3]~"legume"),
+                               expression("C"[3]~"non-legume"),
+                               expression("C"[4]~"non-legume"))) +
+  scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.25)) +
+  scale_y_continuous(limits = c(0.2, 1), breaks = seq(0.2, 1, 0.2)) +
+  labs(x = expression(bold("Soil moisture (%)")),
+       y = expression(bold(chi)),
+       fill = "Functional group") +
+  theme_bw(base_size = 18) +
+  theme(legend.text.align = 0,
+        panel.border = element_rect(size = 1.25))
+chi.sm.plot  
+
+
+chi.no3n.plot <- ggplot(data = df, aes(x = soil.no3n, y = chi)) +
+  geom_jitter(aes(fill = pft),
+              width = 0.1, size = 3, alpha = 0.7, shape = 21) +
+  geom_ribbon(data = chi.no3n.pred, 
+              aes(x = x, y = predicted, ymin = conf.low, 
+                  ymax = conf.high), alpha = 0.25, fill = "black") +
+  geom_line(data = chi.no3n.pred, size = 1,
+            aes(x = x, y = predicted), color = "black") +
+  geom_ribbon(data = subset(chi.no3n.inter, group == "c3_legume"), 
+              aes(x = x, y = predicted, ymin = conf.low, 
+                  ymax = conf.high), alpha = 0.25, fill = cbbPalette3[1]) +
+  geom_line(data = subset(chi.no3n.inter, group == "c3_legume"), size = 1,
+            aes(x = x, y = predicted), color = cbbPalette3[1], lty = 2) +
+  geom_ribbon(data = subset(chi.no3n.inter, group == "c4_nonlegume"), 
+              aes(x = x, y = predicted, ymin = conf.low, 
+                  ymax = conf.high), alpha = 0.25, fill = cbbPalette3[3]) +
+  geom_line(data = subset(chi.no3n.inter, group == "c4_nonlegume"), size = 1,
+            aes(x = x, y = predicted), color = cbbPalette3[3]) +
+  geom_ribbon(data = subset(chi.no3n.inter, group == "c3_nonlegume"), 
+              aes(x = x, y = predicted, ymin = conf.low, 
+                  ymax = conf.high), alpha = 0.25, fill = cbbPalette3[2]) +
+  geom_line(data = subset(chi.no3n.inter, group == "c3_nonlegume"), size = 1,
+            aes(x = x, y = predicted), color = cbbPalette3[2], lty = 1) +
+  scale_fill_manual(values = cbbPalette3, 
+                    labels = c(expression("C"[3]~"legume"),
+                               expression("C"[3]~"non-legume"),
+                               expression("C"[4]~"non-legume"))) +
+  #scale_x_continuous(limits = c(0.8, 1.41), breaks = seq(0.8, 1.4, 0.2)) +
+  scale_y_continuous(limits = c(0.2, 1), breaks = seq(0.2, 1, 0.2)) +
+  labs(x = expression(bold("Soil N availability (ppm NO"[3]*"-N)")),
+       y = expression(bold(chi)),
+       fill = "Functional group") +
+  theme_bw(base_size = 18) +
+  theme(legend.text.align = 0,
+        panel.border = element_rect(size = 1.25))
+chi.no3n.plot  
+
+png("../working_drafts/figs/TXeco_fig3_chi.png",
+    width = 11, height = 9, units = 'in', res = 600)
+ggarrange(chi.vpd.plot, chi.temp.plot,
+          chi.sm.plot, chi.no3n.plot,
+          ncol = 2, nrow = 2,
+          common.legend = TRUE,
+          legend = "right", align = "hv", 
+          labels = "AUTO",
+          font.label = list(size = 18))
+dev.off()
 
 
 
