@@ -13,6 +13,11 @@ library(ggpubr)
 library(sjPlot)
 library(lavaan)
 
+
+install.packages("stat")
+
+??lme4::predict.merMod
+
 # Turn off digit rounding in emmean args
 emm_options(opt.digits = FALSE)
 
@@ -192,19 +197,19 @@ chi.vpd.plot <- ggplot(data = df, aes(x = vpd4, y = chi)) +
                   ymax = conf.high), alpha = 0.25, fill = "black") +
   geom_line(data = chi.vpd.pred, size = 1,
             aes(x = x, y = predicted), color = "black") +
-  geom_ribbon(data = subset(chi.vpd.inter, group == "c3_legume"), 
-              aes(x = x, y = predicted, ymin = conf.low, 
-                  ymax = conf.high), alpha = 0.25, fill = cbbPalette3[1]) +
+  # geom_ribbon(data = subset(chi.vpd.inter, group == "c3_legume"), 
+  #             aes(x = x, y = predicted, ymin = conf.low, 
+  #                 ymax = conf.high), alpha = 0.25, fill = cbbPalette3[1]) +
   geom_line(data = subset(chi.vpd.inter, group == "c3_legume"), size = 1,
             aes(x = x, y = predicted), color = cbbPalette3[1], lty = 2) +
-  geom_ribbon(data = subset(chi.vpd.inter, group == "c4_nonlegume"), 
-              aes(x = x, y = predicted, ymin = conf.low, 
-                  ymax = conf.high), alpha = 0.25, fill = cbbPalette3[3]) +
+  # geom_ribbon(data = subset(chi.vpd.inter, group == "c4_nonlegume"), 
+  #             aes(x = x, y = predicted, ymin = conf.low, 
+  #                 ymax = conf.high), alpha = 0.25, fill = cbbPalette3[3]) +
   geom_line(data = subset(chi.vpd.inter, group == "c4_nonlegume"), size = 1,
             aes(x = x, y = predicted), color = cbbPalette3[3]) +
-  geom_ribbon(data = subset(chi.vpd.inter, group == "c3_nonlegume"), 
-              aes(x = x, y = predicted, ymin = conf.low, 
-                  ymax = conf.high), alpha = 0.25, fill = cbbPalette3[2]) +
+  # geom_ribbon(data = subset(chi.vpd.inter, group == "c3_nonlegume"), 
+  #             aes(x = x, y = predicted, ymin = conf.low, 
+  #                 ymax = conf.high), alpha = 0.25, fill = cbbPalette3[2]) +
   geom_line(data = subset(chi.vpd.inter, group == "c3_nonlegume"), size = 1,
             aes(x = x, y = predicted), color = cbbPalette3[2], lty = 1) +
   scale_fill_manual(values = cbbPalette3, 
@@ -343,6 +348,49 @@ ggarrange(chi.vpd.plot, chi.temp.plot,
           labels = "AUTO",
           font.label = list(size = 18))
 dev.off()
+
+
+##########################################################################
+## Leaf nitrogen content
+##########################################################################
+
+
+
+## Extract data for slopes/intercepts
+narea.vpd.pred <- data.frame(get_model_data(chi.no.inter, 
+                                          type = "pred", 
+                                          terms = "vpd4"))
+chi.vpd.inter <- data.frame(get_model_data(chi, 
+                                           type = "pred", 
+                                           terms = c("vpd4", "pft")))
+
+chi.temp.pred <- data.frame(get_model_data(chi.no.inter, 
+                                           type = "pred", 
+                                           terms = "tavg4"))
+chi.temp.inter <- data.frame(get_model_data(chi, 
+                                            type = "pred", 
+                                            terms = c("tavg4", "pft")))
+
+chi.sm.pred <- data.frame(get_model_data(chi.no.inter, 
+                                         type = "pred", 
+                                         terms = "wn3"))
+chi.sm.inter <- data.frame(get_model_data(chi, 
+                                          type = "pred", 
+                                          terms = c("wn3", "pft")))
+
+
+chi.no3n.pred <- data.frame(get_model_data(chi.no.inter, 
+                                           type = "pred", 
+                                           terms = "soil.no3n"))
+chi.no3n.inter <- data.frame(get_model_data(chi, 
+                                            type = "pred", 
+                                            terms = c("soil.no3n", "pft")))
+
+
+
+
+
+
 
 
 
