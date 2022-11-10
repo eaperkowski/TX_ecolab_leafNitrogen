@@ -226,7 +226,13 @@ round(summary(narea.nobeta)$coefficients, digits = 3)
 Anova(narea.nobeta)
 r.squaredGLMM(narea.nobeta)
 
- 
+# Pairwise comparisons
+## Two-way interaction between chi and pft
+test(emtrends(narea.nobeta, ~pft, "chi"))
+
+## Two-way interactio nbetween soil moisture and soil N
+test(emtrends(narea.nobeta, ~wn3, "soil.no3n",
+              at = list(wn3 = c(0, 0.25, 0.5, 0.75, 1))))
 
 ##########################################################################
 ## Structural equation model
