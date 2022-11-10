@@ -37,20 +37,17 @@ cbbPalette3 <- c("#DDAA33", "#BB5566", "#004488")
 length(df$pft[df$pft == "c3_legume"])
 length(df$pft[df$pft == "c3_nonlegume"])
 length(df$pft[df$pft == "c4_nonlegume"])
+df$pft <- factor(df$pft, levels = c("c3_legume", "c4_nonlegume", "c3_nonlegume"))
 
 ## Convert VPD from hPa (PRISM units) to kPa (standard)
 df$vpd4 <- df$vpd4 / 10
 
-53+353+11
-
 ##########################################################################
 ## Beta
 ##########################################################################
-df$pft <- factor(df$pft, levels = c("c3_legume", "c4_nonlegume", "c3_nonlegume"))
 df$beta[c(84)] <- NA
 
-beta <- lmer(log(beta) ~ wn3 * soil.no3n * pft + 
-               (1 | NCRS.code), data = df)
+beta <- lmer(log(beta) ~ wn3 * soil.no3n * pft + (1 | NCRS.code), data = df)
 
 # Check model assumptions
 plot(beta)
@@ -74,6 +71,8 @@ emmeans(beta, ~1, "wn3", at = list(wn = 0))
 
 # Individual effect of soil NO3-N
 test(emtrends(beta, ~1, "soil.no3n"))
+
+test(emtrends(beta, ~soil.no3n, "wn3"))
 
 # PFT-only effect
 emmeans(beta, pairwise~pft)
@@ -237,22 +236,33 @@ library(lavaan)
 
 df.sem <- df
 df.sem$narea[df$narea > 10] <- NA
-df.sem$narea[c(76, 80, 156, 273, 382, 509)] <- NA
-df.sem$chi[c(62, 84, 86, 308, 315, 317, 304, 456, 483,
-         402, 481, 484)] <- NA
-df.sem$beta[c(84)] <- NA
-
 df$wn3 <- df$wn3/150
 
+df.sem$beta.std <- scale(df.sem$beta)
+df.sem$no3n.std <- scale(df.sem$soil.no3n)
+df.sem$wn3.std <- scale(df.sem$wn3)
+df.sem$vpd4.std <- scale(df.sem$vpd4)
+df.sem$tavg4.std <- scale(df.sem$tavg4)
+df.sem$chi.std <- scale(df.sem$chi)
+
 models <- ' # regressions
-            narea ~ beta + chi + soil.no3n + pft
-            beta ~ wn3 + soil.no3n + pft
-            chi ~ vpd4 + beta + tavg4 + pft
-            vpd4 ~ tavg4
-            soil.no3n ~ wn3'
+            narea ~ b*beta.std + chi.std + no3n.std + pft
+            beta.std ~ c*wn3.std + a*no3n.std + pft
+            chi.std ~ vpd4.std + beta.std + tavg4.std + pft
+            vpd4.std ~ tavg4.std
+            no3n.std ~ d*wn3.std
+
+            # covariates
+            beta.std ~~ chi.std
+
+            # indirect effect of soil N on leaf N through beta
+            soiln.indirect:=a*b
+            moisture.indirect:=c*b
+            moisture.indirect2:=d*a*b'
 
 test_fit <- sem(models, data = df.sem)
-lavaan::summary(test_fit, fit.measures = TRUE)
+summary(test_fit, standardized = TRUE,
+        ci = TRUE, fit.measures = TRUE)
 
 summary.coefs <- data.frame(summary(test_fit)$pe[c(1:13),])
 summary.coefs$linesize <- abs(summary.coefs$z)
