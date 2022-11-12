@@ -27,6 +27,7 @@ df <- read.csv("../data_sheets/TXeco_compiled_datasheet.csv",
                                     "c3_legume", 
                                     NA))),
          chi = ifelse(chi > 0.95 | chi < 0.20, NA, chi))
+df.sem <- df
 
 ## Add colorblind friendly palette
 cbbPalette <- c("#0077BB", "#33BBEE", "#009988", "#EE7733", "#CC3311")
@@ -231,11 +232,6 @@ r.squaredGLMM(narea.nobeta)
 ##########################################################################
 ## Structural equation model
 ##########################################################################
-library(tidySEM)
-library(lavaan)
-
-df.sem <- df
-df.sem$narea[df$narea > 10] <- NA
 df$wn3 <- df$wn3/150
 
 df.sem$beta.std <- scale(df.sem$beta)
@@ -248,14 +244,14 @@ df.sem$chi.std <- scale(df.sem$chi)
 models <- ' # regressions
             narea ~ b*beta.std + chi.std + no3n.std + pft
             beta.std ~ c*wn3.std + a*no3n.std + pft
-            chi.std ~ vpd4.std + beta.std + tavg4.std + pft
+            chi.std ~ vpd4.std + tavg4.std + pft
             vpd4.std ~ tavg4.std
             no3n.std ~ d*wn3.std
 
             # covariates
             beta.std ~~ chi.std
 
-            # indirect effect of soil N on leaf N through beta
+            # indirect effect of soil N and soil moisture on leaf N
             soiln.indirect:=a*b
             moisture.indirect:=c*b
             moisture.indirect2:=d*a*b'
@@ -263,6 +259,8 @@ models <- ' # regressions
 test_fit <- sem(models, data = df.sem)
 summary(test_fit, standardized = TRUE,
         ci = TRUE, fit.measures = TRUE)
+fitMeasures(test_fit, c("cfi", "rmsea", "srmr"))
+
 
 summary.coefs <- data.frame(summary(test_fit)$pe[c(1:13),])
 summary.coefs$linesize <- abs(summary.coefs$z)
