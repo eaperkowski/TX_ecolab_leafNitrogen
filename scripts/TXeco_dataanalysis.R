@@ -227,13 +227,20 @@ round(summary(narea.nobeta)$coefficients, digits = 3)
 Anova(narea.nobeta)
 r.squaredGLMM(narea.nobeta)
 
- 
+# Pairwise comparisons
+## Two-way interaction between chi and pft
+test(emtrends(narea.nobeta, ~pft, "chi"))
+
+## Two-way interactio nbetween soil moisture and soil N
+test(emtrends(narea.nobeta, ~wn3, "soil.no3n",
+              at = list(wn3 = c(0, 0.25, 0.5, 0.75, 1))))
 
 ##########################################################################
 ## Structural equation model
 ##########################################################################
 df$wn3 <- df$wn3/150
 
+## Standardize and center vars
 df.sem$beta.std <- scale(df.sem$beta)
 df.sem$no3n.std <- scale(df.sem$soil.no3n)
 df.sem$wn3.std <- scale(df.sem$wn3)
@@ -241,6 +248,7 @@ df.sem$vpd4.std <- scale(df.sem$vpd4)
 df.sem$tavg4.std <- scale(df.sem$tavg4)
 df.sem$chi.std <- scale(df.sem$chi)
 
+## Add models to be tested in SEM
 models <- ' # regressions
             narea ~ b*beta.std + chi.std + no3n.std + pft
             beta.std ~ c*wn3.std + a*no3n.std + pft
@@ -262,20 +270,17 @@ summary(test_fit, standardized = TRUE,
 fitMeasures(test_fit, c("cfi", "rmsea", "srmr"))
 
 
-summary.coefs <- data.frame(summary(test_fit)$pe[c(1:13),])
-summary.coefs$linesize <- abs(summary.coefs$z)
-summary.coefs$linesize_std <- scale(summary.coefs$linesize) * 2 + 4
+summary.coefs <- data.frame(summary(test_fit, standardized = TRUE,
+                                    ci = TRUE, fit.measures = TRUE)$pe[c(1:13),])
+summary.coefs$line <- abs(summary.coefs$est)
+summary.coefs$line_std <- scale(summary.coefs$line) * 2 + 4
 
-summary.coefs[,c(5, 6, 7, 8)]
-
-summary.coefs[,5:8] <- round(summary.coefs[, c(5:8)], digits = 3)
+summary.coefs[,c(5:16)] <- round(summary.coefs[, c(5:16)], digits = 3)
 summary.coefs <- summary.coefs %>% 
   mutate(se = ifelse(se < 0.001 & se >= 0, "<0.001", se),
-         pvalue = ifelse(pvalue < 0.001 & pvalue >= 0, "<0.001", pvalue))
-
-
-
-
+         pvalue = ifelse(pvalue < 0.001 & pvalue >= 0, "<0.001", pvalue)) %>%
+  dplyr::select(resp = lhs, pred = rhs, everything(),
+                -op, -label, -exo, -std.nox)
 
 write.csv(summary.coefs,
           "../working_drafts/tables/TXeco_tableS2_SEMresults.csv",
