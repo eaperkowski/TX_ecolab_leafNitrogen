@@ -54,6 +54,23 @@ png("../working_drafts/figs/TXeco_FigS1_soil_correlations.png",
 soil.corrplot
 dev.off()
 
-
+## Create species summary table
+spp <- read.csv("../data_sheets/TXeco_compiled_datasheet.csv",
+               na.strings = c("NA", "NaN")) %>%
+  filter(site != "Bell_2020_05" & 
+           site != "Russel_2020_01") %>%
+  mutate(pft = ifelse(pft == "c4_graminoid", 
+                      "c4_nonlegume",
+                      ifelse(pft == "c3_graminoid" | pft == "c3_forb" | pft == "c3_shrub",
+                             "c3_nonlegume", 
+                             ifelse(pft == "legume", 
+                                    "c3_legume", 
+                                    NA))),
+         chi = ifelse(chi > 0.95 | chi < 0.20, NA, chi)) %>%
+  dplyr::select(pft:NCRS.code) %>%
+  group_by(NCRS.code, photo, duration, n.fixer, pft) %>%
+  summarize(no.sampled = length(NCRS.code))
+write.csv(spp, "../working_drafts/tables/TXeco_tableS1_spp_data.csv",
+          row.names = FALSE)
 
 
