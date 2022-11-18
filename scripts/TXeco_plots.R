@@ -62,7 +62,6 @@ narea <- lmer(log(narea) ~ (beta + chi + soil.no3n) * pft + (1 | NCRS.code),
 ##########################################################################
 test(emtrends(beta, ~pft, "soil.no3n"))
 
-
 beta.no3n.pft <- data.frame(emmeans(beta, ~pft, "soil.no3n",
                                     at = list(soil.no3n = seq(0,80,1))))
 
@@ -71,7 +70,6 @@ beta.no3n <- data.frame(emmeans(beta, ~1, "soil.no3n",
   dplyr::select(pft = X1, everything()) %>%
   full_join(beta.no3n.pft) %>%
   mutate(linetype = "dashed")
-
 
 beta.no3n.ind <- ggplot(data = subset(df, !is.na(pft)), 
                         aes(x = soil.no3n, y = log(beta))) +
@@ -408,73 +406,37 @@ dev.off()
 ##########################################################################
 ## Narea - soil N
 ##########################################################################
-narea.0ppmN <- data.frame(soil.no3n = 0,
-                          emmeans(narea, ~pft, at = list(soil.no3n = 0), 
-                                  type = "response"))
-narea.20ppmN <- data.frame(soil.no3n = 20,
-                           emmeans(narea, ~pft, at = list(soil.no3n = 20), 
-                                   type = "response"))
-narea.40ppmN <- data.frame(soil.no3n = 40,
-                           emmeans(narea, ~pft, at = list(soil.no3n = 40), 
-                                   type = "response"))
-narea.60ppmN <- data.frame(soil.no3n = 60,
-                           emmeans(narea, ~pft, at = list(soil.no3n = 60), 
-                                   type = "response"))
-narea.80ppmN <- data.frame(soil.no3n = 80,
-                           emmeans(narea, ~pft, at = list(soil.no3n = 80), 
-                                   type = "response"))
-narea.0ppmN.nopft <- data.frame(soil.no3n = 0,
-                                emmeans(narea, ~1, at = list(soil.no3n = 0), 
-                                        type = "response"))
-narea.20ppmN.nopft <- data.frame(soil.no3n = 20,
-                                 emmeans(narea, ~1, at = list(soil.no3n = 20), 
-                                         type = "response"))
-narea.40ppmN.nopft <- data.frame(soil.no3n = 40,
-                                 emmeans(narea, ~1, at = list(soil.no3n = 40), 
-                                         type = "response"))
-narea.60ppmN.nopft <- data.frame(soil.no3n = 60,
-                                 emmeans(narea, ~1, at = list(soil.no3n = 60), 
-                                         type = "response"))
-narea.80ppmN.nopft <- data.frame(soil.no3n = 80,
-                                 emmeans(narea, ~1, at = list(soil.no3n = 80), 
-                                         type = "response"))
-
-narea.no3n.pft <- narea.0ppmN %>% full_join(narea.20ppmN) %>% full_join(narea.40ppmN) %>%
-  full_join(narea.60ppmN) %>% full_join(narea.80ppmN)
-narea.no3n <- narea.0ppmN.nopft %>% full_join(narea.20ppmN.nopft) %>% 
-  full_join(narea.40ppmN.nopft) %>% full_join(narea.60ppmN.nopft) %>% 
-  full_join(narea.80ppmN.nopft) %>% dplyr::select(soil.no3n, pft = X1, everything()) %>%
-  full_join(narea.no3n.pft) %>% dplyr::select(soil.no3n, pft, emmean = response, everything())
-
 test(emtrends(narea, ~pft, "soil.no3n"))
+car::Anova(narea)
+
+narea.no3n.pft <- data.frame(emmeans(narea, ~pft, "soil.no3n",
+                                   at = list(soil.no3n = seq(0, 80, 1))))
+
+narea.no3n <- data.frame(emmeans(narea, ~1, "soil.no3n",
+                               at = list(soil.no3n = seq(0, 80, 1)))) %>%
+  dplyr::select(pft = X1, everything()) %>%
+  full_join(narea.no3n.pft) %>%
+  mutate(linetype = "dashed")
+
 
 narea.no3n.ind <- ggplot(data = subset(df, !is.na(pft)), 
-                        aes(x = soil.no3n, y = narea)) +
+                        aes(x = soil.no3n, y = log(narea))) +
   geom_jitter(aes(fill = pft),
               width = 0.5, size = 4, alpha = 0.7, shape = 21) +
-  # geom_ribbon(data = narea.no3n, 
-  #             aes(x = soil.no3n, y = emmean, ymin = lower.CL, 
-  #                 ymax = upper.CL, fill = pft), alpha = 0.25) +
-  # geom_line(data = narea.no3n, size = 1,
-  #           aes(x = soil.no3n, y = emmean, color = pft)) +
-  geom_ribbon(data = subset(narea.no3n, pft == "overall"), 
-              aes(x = soil.no3n, y = emmean, ymin = lower.CL, 
-                  ymax = upper.CL), alpha = 0.25, fill = "black") +
-  geom_line(data = subset(narea.no3n, pft == "overall"),
-            aes(x = soil.no3n, y = emmean),
-            color = "black", size = 1, lty = "dashed") +
+  geom_ribbon(data = subset(narea.no3n, pft == "overall"),
+              aes(y = emmean, ymin = lower.CL, ymax = upper.CL), 
+              alpha = 0.25) +
+  geom_smooth(data = subset(narea.no3n, pft == "overall"),
+              aes(y = emmean), linetype = "dashed", color = "black",
+              size = 1) +
   scale_fill_manual(values = c(cbbPalette3), 
                     labels = c(expression("C"[3]~"legume"),
                                expression("C"[3]~"non-legume"),
                                expression("C"[4]~"non-legume"))) +
-  scale_color_manual(values = c(cbbPalette3), 
-                     labels = c(expression("C"[3]~"legume"),
-                                expression("C"[3]~"non-legume"),
-                                expression("C"[4]~"non-legume"))) +
   scale_x_continuous(limits = c(-1, 80), breaks = seq(0, 80, 20)) +
-  scale_y_continuous(limits = c(0, 10), breaks = seq(0, 10, 2)) +
+  scale_y_continuous(limits = c(-1, 3), breaks = seq(-1, 3, 1)) +
   labs(x = expression(bold("Soil N availability (ppm NO"[3]*"-N)")),
-       y = expression(bold(italic("N")["area"]*" (gN m"^"-2"~")")),
+       y = expression(bold(ln*" N"["area"]*" (gN m"^"-2"~")")),
        fill = "Functional group") +
   theme_bw(base_size = 18) +
   theme(legend.text.align = 0,
@@ -482,119 +444,75 @@ narea.no3n.ind <- ggplot(data = subset(df, !is.na(pft)),
         panel.grid.minor.y = element_blank())
 narea.no3n.ind
 
-narea.no3n.int <- ggplot(data = subset(df, !is.na(pft)), 
-                         aes(x = soil.no3n, y = narea)) +
+##########################################################################
+## Narea - chi
+##########################################################################
+test(emtrends(narea, ~pft, "chi"))
+car::Anova(narea)
+
+narea.chi.pft <- data.frame(emmeans(narea, ~pft, "chi",
+                                     at = list(chi = seq(0.0, 1, 0.01))))
+
+narea.chi <- data.frame(emmeans(narea, ~1, "chi",
+                                 at = list(chi = seq(0.0, 1, 0.01)))) %>%
+  dplyr::select(pft = X1, everything()) %>%
+  full_join(narea.chi.pft) %>%
+  mutate(linetype = ifelse(pft == "c3_nonlegume", "solid", "dashed"))
+
+narea.chi.ind <- ggplot(data = subset(df, !is.na(pft)), 
+                         aes(x = chi, y = log(narea))) +
   geom_jitter(aes(fill = pft),
               width = 0.5, size = 4, alpha = 0.7, shape = 21) +
-  geom_ribbon(data = subset(narea.no3n, pft != "overall"), 
-              aes(x = soil.no3n, y = emmean, ymin = lower.CL, 
+  geom_ribbon(data = subset(narea.chi, pft != "overall"),
+              aes(x = chi, y = emmean, ymin = lower.CL,
                   ymax = upper.CL, fill = pft), alpha = 0.25) +
-  geom_line(data = subset(narea.no3n, pft != "overall"),
-            aes(x = soil.no3n, y = emmean, color = pft),
-            size = 1, lty = 2) +
-  # geom_ribbon(data = subset(narea.no3n, pft == "overall"), 
-  #             aes(x = soil.no3n, y = emmean, ymin = lower.CL, 
-  #                 ymax = upper.CL), alpha = 0.25, fill = "black") +
-  # geom_line(data = subset(narea.no3n, pft == "overall"),
-  #           aes(x = soil.no3n, y = emmean),
-  #           color = "black", size = 1, lty = "dashed") +
+  geom_line(data = subset(narea.chi, pft != "overall"),
+            aes(x = chi, y = emmean, color = pft, linetype = linetype),
+            size = 1) +
   scale_fill_manual(values = c(cbbPalette3), 
                     labels = c(expression("C"[3]~"legume"),
                                expression("C"[3]~"non-legume"),
                                expression("C"[4]~"non-legume"))) +
   scale_color_manual(values = c(cbbPalette3), 
-                     labels = c(expression("C"[3]~"legume"),
-                                expression("C"[3]~"non-legume"),
-                                expression("C"[4]~"non-legume"))) +
-  scale_x_continuous(limits = c(-1, 80), breaks = seq(0, 80, 20)) +
-  scale_y_continuous(limits = c(0, 10), breaks = seq(0, 10, 2)) +
-  labs(x = expression(bold("Soil N availability (ppm NO"[3]*"-N)")),
-       y = expression(bold(italic("N")["area"]*" (gN m"^"-2"~")")),
-       fill = "Functional group") +
+                    labels = c(expression("C"[3]~"legume"),
+                               expression("C"[3]~"non-legume"),
+                               expression("C"[4]~"non-legume"))) +
+  scale_linetype_manual(values = c("dashed", "solid")) +
+  scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.2)) +
+  scale_y_continuous(limits = c(-1, 3), breaks = seq(-1, 3, 1)) +
+  labs(x = expression(bold(chi)),
+       y = expression(bold(ln*" N"["area"]*" (gN m"^"-2"~")")),
+       fill = "Functional group",
+       color = "Functional group") +
+  guides(linetype = "none") +
   theme_bw(base_size = 18) +
   theme(legend.text.align = 0,
         panel.border = element_rect(size = 1.25),
         panel.grid.minor.y = element_blank())
-narea.no3n.int
+narea.chi.ind
 
 ##########################################################################
 ## Narea - beta
 ##########################################################################
-narea.beta0 <- data.frame(beta = 0,
-                          emmeans(narea, ~pft, at = list(beta = 0), 
-                                  type = "response"))
-narea.beta100 <- data.frame(beta = 100,
-                            emmeans(narea, ~pft, at = list(beta = 100), 
-                                    type = "response"))
-narea.beta200 <- data.frame(beta = 200,
-                            emmeans(narea, ~pft, at = list(beta = 200), 
-                                    type = "response"))
-narea.beta300 <- data.frame(beta = 300,
-                            emmeans(narea, ~pft, at = list(beta = 300), 
-                                    type = "response"))
-narea.beta400 <- data.frame(beta = 400,
-                            emmeans(narea, ~pft, at = list(beta = 400), 
-                                    type = "response"))
-narea.beta500 <- data.frame(beta = 500,
-                            emmeans(narea, ~pft, at = list(beta = 500), 
-                                    type = "response"))
-narea.beta600 <- data.frame(beta = 600,
-                            emmeans(narea, ~pft, at = list(beta = 600), 
-                                    type = "response"))
-narea.beta0.nopft <- data.frame(beta = 0,
-                                emmeans(narea, ~1, at = list(beta = 0), 
-                                        type = "response"))
-narea.beta100.nopft <- data.frame(beta = 100,
-                                  emmeans(narea, ~1, at = list(beta = 100), 
-                                          type = "response"))
-narea.beta200.nopft <- data.frame(beta = 200,
-                                  emmeans(narea, ~1, at = list(beta = 200), 
-                                          type = "response"))
-narea.beta300.nopft <- data.frame(beta = 300,
-                                  emmeans(narea, ~1, at = list(beta = 300), 
-                                          type = "response"))
-narea.beta400.nopft <- data.frame(beta = 400,
-                                  emmeans(narea, ~1, at = list(beta = 400), 
-                                          type = "response"))
-narea.beta500.nopft <- data.frame(beta = 500,
-                                  emmeans(narea, ~1, at = list(beta = 500), 
-                                          type = "response"))
-narea.beta600.nopft <- data.frame(beta = 600,
-                                  emmeans(narea, ~1, at = list(beta = 600), 
-                                          type = "response"))
-narea.beta.pft <- narea.beta0 %>% full_join(narea.beta100) %>% 
-  full_join(narea.beta200) %>% full_join(narea.beta300) %>% 
-  full_join(narea.beta400) %>% full_join(narea.beta500) %>% 
-  full_join(narea.beta600)
-narea.beta <- narea.beta0.nopft %>% full_join(narea.beta100.nopft) %>% 
-  full_join(narea.beta200.nopft) %>% full_join(narea.beta300.nopft) %>% 
-  full_join(narea.beta400.nopft) %>% full_join(narea.beta500.nopft) %>% 
-  full_join(narea.beta600.nopft)%>% dplyr::select(beta, pft = X1, everything()) %>%
-  full_join(narea.beta.pft) %>% dplyr::select(beta, pft, emmean = response, everything())
+test(emtrends(narea, ~pft, "soil.no3n"))
+car::Anova(narea)
+
+narea.beta.pft <- data.frame(emmeans(narea, ~pft, "beta",
+                                     at = list(beta = seq(0, 600, 1))))
+
+narea.beta <- data.frame(emmeans(narea, ~1, "beta",
+                                 at = list(beta = seq(0, 600, 1)))) %>%
+  dplyr::select(pft = X1, everything()) %>%
+  full_join(narea.beta.pft) %>%
+  mutate(linetype = "dashed")
 
 narea.beta.ind <- ggplot(data = subset(df, !is.na(pft)), 
-                         aes(x = beta, y = narea)) +
+                         aes(x = beta, y = log(narea))) +
   geom_jitter(aes(fill = pft),
               width = 0.5, size = 4, alpha = 0.7, shape = 21) +
-  # geom_ribbon(data = subset(narea.beta, pft =="c4_nonlegume" & beta < 300),
-  #             aes(x = beta, y = emmean, ymin = lower.CL, 
-  #                 ymax = upper.CL), alpha = 0.25, fill = cbbPalette3[3]) +
-  # geom_ribbon(data = subset(narea.beta, pft == "c3_legume" & beta <=500), 
-  #             aes(x = beta, y = emmean, ymin = lower.CL, 
-  #                 ymax = upper.CL, fill = pft), alpha = 0.25) +
-  # geom_ribbon(data = subset(narea.beta, pft == "c3_nonlegume"), 
-  #             aes(x = beta, y = emmean, ymin = lower.CL, 
-  #                 ymax = upper.CL, fill = pft), alpha = 0.25) +
-  # geom_line(data = subset(narea.beta, pft =="c4_nonlegume" & beta < 300),
-  #           aes(x = beta, y = emmean), 
-  #           color = cbbPalette3[3], size = 1, lty = 2) +
-  # geom_line(data = subset(narea.beta, pft == "c3_legume" & beta <=500),
-  #           aes(x = beta, y = emmean), color = cbbPalette3[1], size = 1) +
-  # geom_line(data = subset(narea.beta, pft == "c3_nonlegume"),
-  #           aes(x = beta, y = emmean), color = cbbPalette3[2], size = 1) +
   geom_ribbon(data = subset(narea.beta, pft == "overall"),
               aes(x = beta, y = emmean, ymin = lower.CL,
-                  ymax = upper.CL), alpha = 0.25, fill = "black") +
+                  ymax = upper.CL), alpha = 0.25) +
   geom_line(data = subset(narea.beta, pft == "overall"),
             aes(x = beta, y = emmean),
             color = "black", size = 1) +
@@ -602,14 +520,10 @@ narea.beta.ind <- ggplot(data = subset(df, !is.na(pft)),
                     labels = c(expression("C"[3]~"legume"),
                                expression("C"[3]~"non-legume"),
                                expression("C"[4]~"non-legume"))) +
-  scale_color_manual(values = c(cbbPalette3), 
-                     labels = c(expression("C"[3]~"legume"),
-                                expression("C"[3]~"non-legume"),
-                                expression("C"[4]~"non-legume"))) +
   scale_x_continuous(limits = c(0, 600), breaks = seq(0, 600, 150)) +
-  scale_y_continuous(limits = c(0, 10), breaks = seq(0, 10, 2)) +
+  scale_y_continuous(limits = c(-1, 3), breaks = seq(-1, 3, 1)) +
   labs(x = expression(bold("Unit cost ratio ("*beta*")")),
-       y = expression(bold(italic("N")["area"]*" (gN m"^"-2"~")")),
+       y = expression(bold(ln*" N"["area"]*" (gN m"^"-2"~")")),
        fill = "Functional group") +
   theme_bw(base_size = 18) +
   theme(legend.text.align = 0,
@@ -617,60 +531,14 @@ narea.beta.ind <- ggplot(data = subset(df, !is.na(pft)),
         panel.grid.minor.y = element_blank())
 narea.beta.ind
 
-narea.beta.int <- ggplot(data = subset(df, !is.na(pft)), 
-                         aes(x = beta, y = narea)) +
-  geom_jitter(aes(fill = pft),
-              width = 0.5, size = 4, alpha = 0.7, shape = 21) +
-  geom_ribbon(data = subset(narea.beta, pft =="c4_nonlegume" & beta < 300),
-              aes(x = beta, y = emmean, ymin = lower.CL, 
-                  ymax = upper.CL), alpha = 0.25, fill = cbbPalette3[3]) +
-  geom_ribbon(data = subset(narea.beta, pft == "c3_legume" & beta <=500), 
-              aes(x = beta, y = emmean, ymin = lower.CL, 
-                  ymax = upper.CL, fill = pft), alpha = 0.25) +
-  geom_ribbon(data = subset(narea.beta, pft == "c3_nonlegume"), 
-              aes(x = beta, y = emmean, ymin = lower.CL, 
-                 ymax = upper.CL, fill = pft), alpha = 0.25) +
-  geom_line(data = subset(narea.beta, pft =="c4_nonlegume" & beta < 300),
-              aes(x = beta, y = emmean), 
-            color = cbbPalette3[3], size = 1, lty = 2) +
-  geom_line(data = subset(narea.beta, pft == "c3_legume" & beta <=500),
-            aes(x = beta, y = emmean), color = cbbPalette3[1], size = 1) +
-  geom_line(data = subset(narea.beta, pft == "c3_nonlegume"),
-            aes(x = beta, y = emmean), color = cbbPalette3[2], size = 1, lty = 2) +
-  # geom_ribbon(data = subset(narea.beta, pft == "overall"), 
-  #             aes(x = beta, y = emmean, ymin = lower.CL, 
-  #                 ymax = upper.CL), alpha = 0.25, fill = "black") +
-  # geom_line(data = subset(narea.beta, pft == "overall"),
-  #           aes(x = beta, y = emmean),
-  #           color = "black", size = 1) +
-  scale_fill_manual(values = c(cbbPalette3), 
-                    labels = c(expression("C"[3]~"legume"),
-                               expression("C"[3]~"non-legume"),
-                               expression("C"[4]~"non-legume"))) +
-  scale_color_manual(values = c(cbbPalette3), 
-                     labels = c(expression("C"[3]~"legume"),
-                                expression("C"[3]~"non-legume"),
-                                expression("C"[4]~"non-legume"))) +
-  scale_x_continuous(limits = c(0, 600), breaks = seq(0, 600, 150)) +
-  scale_y_continuous(limits = c(0, 10), breaks = seq(0, 10, 2)) +
-  labs(x = expression(bold("Unit cost ratio ("*beta*")")),
-       y = expression(bold(italic("N")["area"]*" (gN m"^"-2"~")")),
-       fill = "Functional group") +
-  theme_bw(base_size = 18) +
-  theme(legend.text.align = 0,
-        panel.border = element_rect(size = 1.25),
-        panel.grid.minor.y = element_blank())
-narea.beta.int
-
-test(emtrends(narea, ~pft, "beta"))
 
 ##########################################################################
 ## Create Narea plots
 ##########################################################################
 png("../working_drafts/figs/TXeco_fig4_narea.png",
-    width = 11.5, height = 4.5, units = 'in', res = 600)
-ggarrange(narea.no3n.ind, narea.beta.int,
-          ncol = 2, nrow = 1, common.legend = TRUE, legend = "right", 
+    height = 12, width = 7, units = 'in', res = 600)
+ggarrange(narea.no3n.ind, narea.chi.ind, narea.beta.ind,
+          ncol = 1, nrow = 3, common.legend = TRUE, legend = "right", 
           align = "hv", labels = "AUTO", font.label = list(size = 18))
 dev.off()
 
