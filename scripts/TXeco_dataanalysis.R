@@ -26,7 +26,8 @@ df <- read.csv("../data_sheets/TXeco_compiled_datasheet.csv",
                              ifelse(pft == "legume", 
                                     "c3_legume", 
                                     NA))),
-         chi = ifelse(chi > 0.95 | chi < 0.20, NA, chi))
+         chi = ifelse(chi > 0.95 | chi < 0.20, NA, chi),
+         wn3 = df$wn3/150)
 df.sem <- df
 
 ## Add colorblind friendly palette
@@ -42,6 +43,7 @@ df$pft <- factor(df$pft, levels = c("c3_legume", "c4_nonlegume", "c3_nonlegume")
 
 ## Convert VPD from hPa (PRISM units) to kPa (standard)
 df$vpd4 <- df$vpd4 / 10
+
 
 ##########################################################################
 ## Beta
@@ -73,8 +75,6 @@ emmeans(beta, ~1, "wn3", at = list(wn = 0))
 # Individual effect of soil NO3-N
 test(emtrends(beta, ~1, "soil.no3n"))
 
-test(emtrends(beta, ~soil.no3n, "wn3"))
-
 # PFT-only effect
 emmeans(beta, pairwise~pft)
 
@@ -83,12 +83,21 @@ emmeans(beta, pairwise~pft)
 ##########################################################################
 df.chi.nobeta <- df
 
-df.chi.nobeta$chi[c(62, 117, 315, 317, 481)] <- NA
-df.chi.nobeta$chi[c(456, 483)] <- NA
-df.chi.nobeta$chi[c(284, 292, 484)] <- NA
+df.chi.nobeta$chi[c(117, 317, 322, 481)] <- NA
+df.chi.nobeta$chi[c(62, 315, 456)] <- NA
+df.chi.nobeta$chi[c(284, 292, 483, 484)] <- NA
 
 chi <- lmer(chi ~ (vpd4 + tavg4 + (wn3 * soil.no3n)) * pft + 
               (1 | NCRS.code), data = df.chi.nobeta)
+
+
+test <- data.frame(year = rep(seq(2000, 2020, 1), each = 3))
+
+data.frame(date = c(2020))
+
+as.Date(test$year)
+
+
 
 # Check model assumptions
 plot(chi)
@@ -126,9 +135,9 @@ cld(emmeans(chi, pairwise~pft))
 ##########################################################################
 df.chi.beta <- df
 
-df.chi.beta$chi[c(62, 84, 86, 308, 315, 317)] <- NA
-df.chi.beta$chi[c(304, 456, 483)] <- NA
-df.chi.beta$chi[c(402, 481, 484)] <- NA
+df.chi.beta$chi[c(62, 308, 315, 317, 322, 456)] <- NA
+df.chi.beta$chi[c(304, 483, 500)] <- NA
+df.chi.beta$chi[c(220, 402, 484)] <- NA
 
 chi.beta <- lmer(chi ~ (vpd4 + tavg4 + beta) * pft + 
               (1 | NCRS.code), data = df.chi.beta)
@@ -162,7 +171,6 @@ df.narea.beta <- df
 
 # Remove outliers (Bonferroni p<0.05 condition)
 df.narea.beta$narea[df$narea > 10] <- NA
-df.narea.beta$narea[c(76, 80, 156, 273, 382)] <- NA
 df.narea.beta$narea[509] <- NA
 
 # Fit model
@@ -197,8 +205,6 @@ emmeans(narea.beta, ~1, at = list(beta = 0))
 
 ## Individual soil N effect
 test(emtrends(narea.beta, ~1, "soil.no3n"))
-
-
 
 ##########################################################################
 ## Narea without beta
@@ -238,8 +244,6 @@ test(emtrends(narea.nobeta, ~wn3, "soil.no3n",
 ##########################################################################
 ## Structural equation model
 ##########################################################################
-df$wn3 <- df$wn3/150
-
 ## Standardize and center vars
 df.sem$beta.std <- scale(df.sem$beta)
 df.sem$no3n.std <- scale(df.sem$soil.no3n)
@@ -292,7 +296,7 @@ write.csv(summary.coefs,
 ## Table 2 (Coefficients + model results summary)
 beta.coefs <- data.frame(summary(beta)$coefficient) %>%
   mutate(treatment = row.names(.),
-         coef = round(Estimate, digits = 3),
+         coef = format(Estimate, scientific = TRUE, digits = 3),
          se = round(Std..Error, digits = 3)) %>%
   dplyr::select(treatment, coef, se, t.value) %>%
   filter(treatment == "(Intercept)" | treatment == "wn3" | 
@@ -337,7 +341,7 @@ write.csv(table2, "../working_drafts/tables/TXeco_table2_beta.csv",
 ## (w/ and w/o beta))
 chi.nobeta.coefs <- data.frame(summary(chi)$coefficient) %>%
   mutate(treatment = row.names(.),
-         coef.nobeta = round(Estimate, digits = 3),
+         coef.nobeta = format(Estimate, scientific = TRUE, digits = 3),
          se.nobeta = round(Std..Error, digits = 3),
          t.value.nobeta = round(t.value, digits = 3)) %>%
   dplyr::select(treatment, coef.nobeta, se.nobeta, t.value.nobeta) %>%
@@ -350,7 +354,7 @@ chi.nobeta.coefs <- data.frame(summary(chi)$coefficient) %>%
 
 chi.beta.coefs <- data.frame(summary(chi.beta)$coefficient) %>%
   mutate(treatment = row.names(.),
-         coef.beta = round(Estimate, digits = 3),
+         coef.beta = format(Estimate, scientific = TRUE, digits = 3),
          se.beta = round(Std..Error, digits = 3),
          t.value.beta = round(t.value, digits = 3)) %>%
   dplyr::select(treatment, coef.beta, se.beta, t.value.beta) %>%
@@ -411,7 +415,6 @@ table3$treatment <- c("Intercept", "VPD", "Temperature (T)",
 names(table3) <- c("Treatment", "df", "Coefficient", "chi-square", "P-value", 
                    "Coefficient", "chi-square", "P-value")
 
-
 write.csv(table3, "../working_drafts/tables/TXeco_table3_chi.csv", 
           row.names = FALSE)
 
@@ -419,7 +422,7 @@ write.csv(table3, "../working_drafts/tables/TXeco_table3_chi.csv",
 ## Table 4 (Coefficients + model results summary)
 narea.nobeta.coefs <- data.frame(summary(narea.nobeta)$coefficient) %>%
   mutate(treatment = row.names(.),
-         coef.nobeta = round(Estimate, digits = 3),
+         coef.nobeta = format(Estimate, scientific = TRUE, digits = 3),
          se.nobeta = round(Std..Error, digits = 3),
          t.value.nobeta = round(t.value, digits = 3)) %>%
   dplyr::select(treatment, coef.nobeta, se.nobeta, t.value.nobeta) %>%
@@ -451,7 +454,7 @@ narea.nobeta.table4 <- data.frame(Anova(narea.nobeta)) %>%
 
 narea.beta.coefs <- data.frame(summary(narea.beta)$coefficient) %>%
   mutate(treatment = row.names(.),
-         coef.beta = round(Estimate, digits = 3),
+         coef.beta = format(Estimate, scientific = TRUE, digits = 3),
          se.beta = round(Std..Error, digits = 3)) %>%
   dplyr::select(treatment, coef.beta, se.beta, t.value.beta = t.value) %>%
   filter(treatment == c("(Intercept)", "beta", "chi", "soil.no3n")) %>%
@@ -474,7 +477,6 @@ narea.beta.table4 <- data.frame(Anova(narea.beta)) %>%
   dplyr::select(treatment, df = Df, coef.beta, Chisq.beta, P_value.beta) %>%
   arrange(treatment)
 
-
 table4 <- narea.beta.table4 %>% full_join(narea.nobeta.table4) %>%
   mutate(df = replace(df, is.na(df), "-"),
          coef.beta = replace(coef.beta, is.na(coef.beta), "-"),
@@ -490,11 +492,7 @@ table4 <- narea.beta.table4 %>% full_join(narea.nobeta.table4) %>%
                                                   "soil.no3n:pft", "wn3:pft",
                                                   "soil.no3n:wn3:pft"))) %>%
   arrange(treatment)
-
-
-
 table4
-
 
 table4$treatment <- c("Intercept", "Unit cost ratio (beta)", "chi",
                       "Soil N (N)", "Soil moisture (SM)", "PFT", "SM * N",
@@ -503,9 +501,4 @@ table4$treatment <- c("Intercept", "Unit cost ratio (beta)", "chi",
 
 write.csv(table4, "../working_drafts/tables/TXeco_table4_leafN.csv", 
           row.names = FALSE)
-
-## supplemental table with SEM results
-
-
-
 

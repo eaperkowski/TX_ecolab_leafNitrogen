@@ -1,0 +1,58 @@
+NRCS symbol,Species,Photosynthetic pathway,Growth duration,Growth habit,N-fixer?,Plant functional group,Number sampled
+ACAN11,Acaciella angustissima (Mill) Britton & Rose,c3,perennial,"forb, subshrub",yes,c3_legume,3
+AMAR2,Ambrosia artemisiifolia L.,c3,annual,forb,no,c3_nonlegume,25
+AMPS,Ambrosia psilostachya DC.,c3,perennial,forb,no,c3_nonlegume,32
+ARAL3,Argemone albiflora Hornem.,c3,annual,forb,no,c3_nonlegume,3
+ARPU9,Aristida purpurea Nutt.,c4,perennial,graminoid,no,c4_nonlegume,2
+ASAS,Asclepias asperula (Decne.) Woodson,c3,perennial,forb,no,c3_nonlegume,3
+ASLA4,Asclepias latifolia (Torr.) Raf.,c3,perennial,forb,no,c3_nonlegume,3
+ASSY,Asclepias syriaca L.,c3,perennial,forb,no,c3_nonlegume,18
+BASA,Baccharis salicina Torr. & A. Gray,c3,perennial,shrub,no,c3_nonlegume,3
+BOIS,Bothriochloa ischaemum (L.) Keng,c4,perennial,graminoid,no,c4_nonlegume,6
+BOSA,Bothriochloa saccharoides (Sw.) Rydb.,c4,perennial,graminoid,no,c4_nonlegume,6
+CAAM2,Callicarpa americana L.,c3,perennial,shrub,no,c3_nonlegume,3
+CAPL3,Carex planostachys Kunze,c4,perennial,graminoid,no,c4_nonlegume,3
+CAREX,Carex spp. L.,c4,perennial,graminoid,no,c4_nonlegume,16
+CHFE3,Chamaesyce fendleri (Torr. & A. Gray) Small,c3,perennial,forb,no,c3_nonlegume,2
+CHPI8,Chyrysopsis pilosa Nutt.,c3,annual,forb,no,c3_nonlegume,3
+COCO13,Conoclinium coelestinum (L.) DC.,c3,perennial,forb,no,c3_nonlegume,3
+COER,Commelina erecta L.,c3,perennial,forb,no,c3_nonlegume,3
+CRGLL,Croton glandulosus L.,c3,annual,forb,no,c3_nonlegume,22
+CYDA,Cynodon dactylon (L.) Pers.,c4,perennial,graminoid,no,c4_nonlegume,15
+DATE3,Dasylirion texanum Scheele,c3,perennial,shrub,no,c3_nonlegume,3
+DIAN,Dichanthium annulatum (Forssk.) Stapf,c4,perennial,graminoid,no,c4_nonlegume,8
+ENPE4,Engelmannia peristenia (Raf.) Goodman & C.A. Lawson,c3,perennial,forb,no,c3_nonlegume,6
+EUMA8,Euphorbia marginata Pursh,c3,annual,forb,no,c3_nonlegume,6
+GAPU,Gaillardia pulchella Foug.,c3,annual,forb,no,c3_nonlegume,16
+GLGO,Glandularia gooddingii (Briq.) Solbrig,c3,perennial,forb,no,c3_nonlegume,2
+HEAN3,Helianthus annuus L.,c3,annual,forb,no,c3_nonlegume,6
+HECA8,Heterotheca canescens (DC.) Shinners,c3,perennial,forb,no,c3_nonlegume,2
+HETE3,Heliotropium tenellum (Nutt.) Torr,c3,annual,forb,no,c3_nonlegume,3
+IVAX,Iva axillaris Pursh,c3,perennial,forb,no,c3_nonlegume,4
+LIAT,Lilaeopsis attenuata auct. non (Hook. & Arn.) Fernald,c3,perennial,forb,no,c3_nonlegume,3
+LIPU,Liatris punctata Hook.,c3,perennial,forb,no,c3_nonlegume,3
+LOPE,Lolium perenne L.,c3,perennial,graminoid,no,c3_nonlegume,9
+MIQU2,Mimosa quadrivalvis L.,c3,perennial,forb,yes,c3_legume,15
+NALE3,Nassella leucotricha (Trin. & Rupr.) Pohl,c3,perennial,graminoid,no,c3_nonlegume,19
+OECU2,Oenothera curtiflora W.L. Wagner & Hoch,c3,annual,forb,no,c3_nonlegume,3
+OENOT,Oenothera spp. L.,c3,annual,forb,no,c3_nonlegume,1
+PAVI2,Panicum virgatum L.,c4,perennial,graminoid,no,c4_nonlegume,12
+PRGL2,Prosopis glandulosa Torr.,c3,perennial,shrub,yes,c3_legume,33
+QUHA3,Quercus harvardii Rydb.,c3,perennial,shrub,no,c3_nonlegume,3
+QUMO,Quercus mohriana Buckley ex Rydb.,c3,perennial,shrub,no,c3_nonlegume,1
+RACO3,Ratibida columnifera (Nutt) Wooton & Standl.,c3,perennial,forb,no,c3_nonlegume,40
+RHAM,Rhamnus spp. L.,c3,perennial,shrub,yes,c3_legume,1
+RHSET,Rhynchosia senna Gillies ex Hook. var. texana (Torr. & A. Gray) M.C. Johnst.,c3,perennial,forb,yes,c3_legume,1
+RUHI2,Rudbeckia hirta L.,c3,perennial,forb,no,c3_nonlegume,3
+RUNU,Ruellia nudiflora (Engelm. & A. Gray) Urb.,c3,perennial,forb,no,c3_nonlegume,15
+RUTR,Rubus trivialis Michx.,c3,perennial,vine,no,c3_nonlegume,3
+SAFA2,Salvia farinacea Benth.,c3,perennial,forb,no,c3_nonlegume,7
+SCHIZ4,Schizachyrium spp. Nees,c4,perennial,graminoid,no,c4_nonlegume,8
+SCSC,Schizachyrium scoparium (Michx.) Nash,c4,perennial,graminoid,no,c4_nonlegume,3
+SODI,Solanum dimidiatum Raf.,c3,perennial,forb,no,c3_nonlegume,1
+SOEL,Solanum elaeagnifolium Cav.,c3,perennial,forb,no,c3_nonlegume,53
+SOHA,Sorghum halapense (L.) Pers.,c4,perennial,graminoid,no,c4_nonlegume,38
+STTE3,Stillingia texana I.M. Johnst.,c3,perennial,forb,no,c3_nonlegume,3
+VEOC,Verbesina occidentalis (L.) Walter,c3,perennial,forb,no,c3_nonlegume,3
+VEST,Verbena stricta Vent.,c3,perennial,forb,no,c3_nonlegume,3
+WEAC,Wedelia acapulcensis Kunth,c3,perennial,shrub,no,c3_nonlegume,6

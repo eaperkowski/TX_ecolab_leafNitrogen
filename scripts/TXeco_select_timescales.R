@@ -72,7 +72,6 @@ aicc.results.wn <- wn30.modelSelect %>%
   full_join(wn6.modelSelect) %>% full_join(wn5.modelSelect) %>% 
   full_join(wn4.modelSelect) %>% full_join(wn3.modelSelect) %>% 
   full_join(wn2.modelSelect) %>% full_join(wn1.modelSelect) %>%
-  mutate(concat.select = AICc + RMSE) %>%
   arrange(day) %>%
   dplyr::select(day, aicc.wn = AICc, rmse.wn = RMSE)
 # 3-day soil moisture is best model
@@ -230,7 +229,7 @@ wn.beta <- ggplot(data = aicc.results, aes(x = day, y = aicc.wn)) +
              fill = "red", size = 2, shape = 21) +
   geom_line() +
   scale_x_continuous(limits = c(0, 90), breaks = seq(0, 90, 30)) +
-  scale_y_continuous(limits = c(1300, 1330), breaks = seq(1300, 1330, 10)) +
+  scale_y_continuous(limits = c(1300, 1340), breaks = seq(1300, 1340, 10)) +
   labs(x = NULL, y = expression(bold("AIC"["c"])),
        title = expression("Soil moisture (mm)")) +
   theme_bw(base_size = 18) +
@@ -242,7 +241,7 @@ temp.chi <- ggplot(data = aicc.results, aes(x = day, y = aicc.temp)) +
              fill = "red", size = 2, shape = 21) +
   geom_line() +
   scale_x_continuous(limits = c(0, 90), breaks = seq(0, 90, 30)) +
-  scale_y_continuous(limits = c(-922, -910), breaks = seq(-922, -910, 4)) +
+  scale_y_continuous(limits = c(-915, -903), breaks = seq(-915, -903, 3)) +
   labs(x = expression(bold("Days before site visit")), y = NULL,
        title = expression("Air temperature ("*degree*"C)")) +
   theme_bw(base_size = 18) +
@@ -254,7 +253,7 @@ vpd.chi <- ggplot(data = aicc.results, aes(x = day, y = aicc.vpd)) +
              fill = "red", size = 2, shape = 21) +
   geom_line() +
   scale_x_continuous(limits = c(0, 90), breaks = seq(0, 90, 30)) +
-  scale_y_continuous(limits = c(-925, -909), breaks = seq(-925, -910, 5)) +
+  scale_y_continuous(limits = c(-920, -900), breaks = seq(-920, -900, 5)) +
   labs(x = NULL, y = NULL,
        title = "VPD (kPa)") +
   theme_bw(base_size = 18) +
