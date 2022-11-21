@@ -27,7 +27,7 @@ df <- read.csv("../data_sheets/TXeco_compiled_datasheet.csv",
                                     "c3_legume", 
                                     NA))),
          chi = ifelse(chi > 0.95 | chi < 0.20, NA, chi),
-         wn3 = df$wn3/150)
+         wn3 = wn3/150)
 df.sem <- df
 
 ## Add colorblind friendly palette
@@ -90,15 +90,6 @@ df.chi.nobeta$chi[c(284, 292, 483, 484)] <- NA
 chi <- lmer(chi ~ (vpd4 + tavg4 + (wn3 * soil.no3n)) * pft + 
               (1 | NCRS.code), data = df.chi.nobeta)
 
-
-test <- data.frame(year = rep(seq(2000, 2020, 1), each = 3))
-
-data.frame(date = c(2020))
-
-as.Date(test$year)
-
-
-
 # Check model assumptions
 plot(chi)
 qqnorm(residuals(chi))
@@ -123,9 +114,6 @@ test(emtrends(chi, ~pft, "vpd4"))
 
 ## Single factor effect of soil.no3n on chi
 test(emtrends(chi, ~pft, "soil.no3n"))
-
-## Single factor effect of beta on chi
-test(emtrends(chi, ~1, "beta"))
 
 ## Single factor effect of soil.no3n on chi
 cld(emmeans(chi, pairwise~pft))
@@ -251,10 +239,11 @@ df.sem$wn3.std <- scale(df.sem$wn3)
 df.sem$vpd4.std <- scale(df.sem$vpd4)
 df.sem$tavg4.std <- scale(df.sem$tavg4)
 df.sem$chi.std <- scale(df.sem$chi)
+df.sem$narea.std <- scale(df.sem$narea)
 
 ## Add models to be tested in SEM
 models <- ' # regressions
-            narea ~ b*beta.std + chi.std + no3n.std + pft
+            narea.std ~ b*beta.std + chi.std + no3n.std + pft
             beta.std ~ c*wn3.std + a*no3n.std + pft
             chi.std ~ vpd4.std + tavg4.std + pft
             vpd4.std ~ tavg4.std
@@ -275,7 +264,7 @@ fitMeasures(test_fit, c("cfi", "rmsea", "srmr"))
 
 
 summary.coefs <- data.frame(summary(test_fit, standardized = TRUE,
-                                    ci = TRUE, fit.measures = TRUE)$pe[c(1:13),])
+                                    ci = TRUE, fit.measures = TRUE)$pe[c(1:13, 25:27),])
 summary.coefs$line <- abs(summary.coefs$est)
 summary.coefs$line_std <- scale(summary.coefs$line) * 2 + 4
 
@@ -501,4 +490,47 @@ table4$treatment <- c("Intercept", "Unit cost ratio (beta)", "chi",
 
 write.csv(table4, "../working_drafts/tables/TXeco_table4_leafN.csv", 
           row.names = FALSE)
+
+
+table5 <- summary.coefs %>%
+  mutate(slope_ci = str_c(est, " [", ci.lower, ", ", ci.upper, "]", sep = "")) %>%
+  dplyr::select(resp, pred, slope_ci, z, pvalue)
+table5[14, c(1,2)] <- c("narea.std", "no3n*beta")
+table5[15, c(1,2)] <- c("narea.std", "wn3*beta")
+table5[16, c(1,2)] <- c("narea.std", "wn3*no3n*beta")
+
+table5 <- table5 %>% 
+  mutate(resp = ifelse(resp == "narea.std", 
+                       "Narea",
+                       ifelse(resp == "beta.std", 
+                              "beta",
+                              ifelse(resp == "chi.std", 
+                                     "chi",
+                                     ifelse(resp == "vpd4.std",
+                                            "vpd",
+                                            ifelse(resp == "no3n.std",
+                                                   "no3n", 
+                                                   NA))))),
+         pred = ifelse(pred == "beta.std", "beta",
+                       ifelse(pred == "chi.std",
+                              "chi",
+                              ifelse(pred == "no3n.std",
+                                     "no3n",
+                                     ifelse(pred == "pft",
+                                            "pft",
+                                            ifelse(pred == "wn3.std",
+                                                   "wn3",
+                                                   ifelse(pred == "vpd4.std",
+                                                          "vpd",
+                                                          ifelse(pred == "tavg4.std",
+                                                                 "tavg",
+                                                                 pred))))))), 
+         resp = factor(resp, levels = c("Narea", "beta", "chi", "vpd", "no3n"))) %>%
+  arrange(resp)
+
+write.csv(table5, "../working_drafts/tables/TXeco_table5_SEMclean.csv", 
+          row.names = FALSE)
+
+
+
 
