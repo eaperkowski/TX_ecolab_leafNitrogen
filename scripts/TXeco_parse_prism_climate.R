@@ -22,6 +22,12 @@ ecosites <- site.coords %>%
 
 eco.coords <- dplyr::select(ecosites, x = longitude, y = latitude) # select only lat/long data, code as xy
 
+# Load SoilGrids datafile
+soilgrids <- read.csv("../data_sheets/TXeco_soilgrid_data.csv")
+
+# Load calc_soil_water custom fxn
+source("../../r_functions/calc_soil_water.R")
+
 ###############################################################################
 ###############################################################################
 ## Daily PRISM climate by site (1991-2021)
@@ -69,9 +75,6 @@ sites.daily.prcp <- sites.daily.prcp %>%
                       names_to = "date", values_to = "daily.prcp") %>%
   mutate(date = ymd(str_replace(date, "prcp_", "")))
 
-write.csv(sites.daily.prcp, "/Users/eaperkowski/Desktop/precip_daily_ecoSites.csv")
-
-
 ################
 # Tmean
 ################
@@ -96,7 +99,6 @@ names(sites.daily.tmean) <- c("site", "latitude", "longitude",
                               str_c("tmean_", 
                                     str_extract(names(sites.daily.tmean[4:11172]),
                                                 "[0-9]{8}")))
-
 
 # Pivot to long data format
 sites.daily.tmean <- sites.daily.tmean %>%
@@ -131,13 +133,11 @@ names(sites.daily.tmax) <- c("site", "latitude", "longitude",
                                    str_extract(names(sites.daily.tmax[4:11172]),
                                                "[0-9]{8}")))
 
-
 # Pivot to long data format
 sites.daily.tmax <- sites.daily.tmax %>%
   tidyr::pivot_longer(cols = tmax_19910101:tmax_20210730,
                       names_to = "date", values_to = "daily.tmax") %>%
   mutate(date = ymd(str_replace(date, "tmax_", "")))
-
 
 ################
 # Tmin
@@ -172,7 +172,6 @@ sites.daily.tmin <- sites.daily.tmin %>%
                       names_to = "date", values_to = "daily.tmin") %>%
   mutate(date = ymd(str_replace(date, "tmin_", "")))
 
-
 ################
 # VPDmax
 ################
@@ -205,7 +204,6 @@ sites.daily.vpdmax <- sites.daily.vpdmax %>%
   tidyr::pivot_longer(cols = vpdmax_19910101:vpdmax_20210730,
                       names_to = "date", values_to = "daily.vpdmax") %>%
   mutate(date = ymd(str_replace(date, "vpdmax_", "")))
-
 
 ################
 # VPDmin
@@ -255,6 +253,9 @@ write.csv(daily.clim, "../climate_data/TXeco_PRISM_daily.csv")
 ## of sunlight hours
 ###############################################################################
 
+daily.clim <- read.csv("../climate_data/TXeco_PRISM_daily.csv") %>%
+  mutate(date = lubridate::ymd(date))
+
 ## Change latitude/longitude colnames to "lat" and "long" to make easier
 ## data loading into "getSunlightTimes" function
 names(daily.clim)[2:3] <- c("lat", "lon")
@@ -262,7 +263,6 @@ names(daily.clim)[2:3] <- c("lat", "lon")
 ## Visualize dataset
 head(daily.clim)
 
-?suncalc::getSunlightTimes
 ## Obtain sunrise/sunset times given lat/long and date
 sunlight <- getSunlightTimes(data = daily.clim, tz = "America/Chicago")
 
@@ -284,6 +284,27 @@ daily.clim <- daily.clim %>%
   dplyr::select(site:date, m:year, elevation.m, 
                 daily.prcp:daily.vpdmin, sun.hours, sf)
 
+###############################################################################
+## Calculate water holding capacity of each site
+###############################################################################
+whc.data <- soilgrids %>%
+  mutate(calc_soil_water(id = id, fsand = perc.sand/100,
+                         fclay = perc.clay/100,
+                         fom = om/1000,
+                         fgravel = perc.gravel/100,
+                         zbed = bedrock/100),
+         wfc = wfc * 1000, 
+         pwp = pwp * 1000,
+         whc = whc * 1000) %>%
+  dplyr::select(site = id, whc)
+
+## Join water holding capacity data with compiled daily climate dataframe
+daily.clim <- daily.clim %>%
+  full_join(whc.data)
+
+###############################################################################
+## Write daily climate .csv
+###############################################################################
 ## Write daily climate .csv
 write.csv(daily.clim, "../climate_data/TXeco_PRISM_daily.csv",
           row.names = FALSE)
@@ -297,7 +318,7 @@ daily.clim <- read.csv("../climate_data/TXeco_PRISM_daily.csv")
 test.splash1991 <- daily.clim %>%
   filter(year == 1991) %>%
   dplyr::select(site, lat_deg = lat, elv_m = elevation.m, date, m, i, year,
-                sf, tair = daily.tmean, pn = daily.prcp)
+                sf, tair = daily.tmean, pn = daily.prcp, kWm = whc)
 
 test.splash1991 <- lapply(split(test.splash1991, test.splash1991$site, 
                                 drop = TRUE), as.list)
@@ -313,7 +334,7 @@ mapply(write.table,
 test.splash1992 <- daily.clim %>%
   filter(year == 1992) %>%
   dplyr::select(site, lat_deg = lat, elv_m = elevation.m, date, m, i, year,
-                sf, tair = daily.tmean, pn = daily.prcp)
+                sf, tair = daily.tmean, pn = daily.prcp, kWm = whc)
 
 test.splash1992 <- lapply(split(test.splash1992, test.splash1992$site, 
                                 drop = TRUE), as.list)
@@ -329,7 +350,7 @@ mapply(write.table,
 test.splash1993 <- daily.clim %>%
   filter(year == 1993) %>%
   dplyr::select(site, lat_deg = lat, elv_m = elevation.m, date, m, i, year,
-                sf, tair = daily.tmean, pn = daily.prcp)
+                sf, tair = daily.tmean, pn = daily.prcp, kWm = whc)
 
 test.splash1993 <- lapply(split(test.splash1993, test.splash1993$site, 
                                 drop = TRUE), as.list)
@@ -345,7 +366,7 @@ mapply(write.table,
 test.splash1994 <- daily.clim %>%
   filter(year == 1994) %>%
   dplyr::select(site, lat_deg = lat, elv_m = elevation.m, date, m, i, year,
-                sf, tair = daily.tmean, pn = daily.prcp)
+                sf, tair = daily.tmean, pn = daily.prcp, kWm = whc)
 
 test.splash1994 <- lapply(split(test.splash1994, test.splash1994$site, 
                                 drop = TRUE), as.list)
@@ -361,7 +382,7 @@ mapply(write.table,
 test.splash1995 <- daily.clim %>%
   filter(year == 1995) %>%
   dplyr::select(site, lat_deg = lat, elv_m = elevation.m, date, m, i, year,
-                sf, tair = daily.tmean, pn = daily.prcp)
+                sf, tair = daily.tmean, pn = daily.prcp, kWm = whc)
 
 test.splash1995 <- lapply(split(test.splash1995, test.splash1995$site, 
                                 drop = TRUE), as.list)
@@ -377,7 +398,7 @@ mapply(write.table,
 test.splash1996 <- daily.clim %>%
   filter(year == 1996) %>%
   dplyr::select(site, lat_deg = lat, elv_m = elevation.m, date, m, i, year,
-                sf, tair = daily.tmean, pn = daily.prcp)
+                sf, tair = daily.tmean, pn = daily.prcp, kWm = whc)
 
 test.splash1996 <- lapply(split(test.splash1996, test.splash1996$site, 
                                 drop = TRUE), as.list)
@@ -393,7 +414,7 @@ mapply(write.table,
 test.splash1997 <- daily.clim %>%
   filter(year == 1997) %>%
   dplyr::select(site, lat_deg = lat, elv_m = elevation.m, date, m, i, year,
-                sf, tair = daily.tmean, pn = daily.prcp)
+                sf, tair = daily.tmean, pn = daily.prcp, kWm = whc)
 
 test.splash1997 <- lapply(split(test.splash1997, test.splash1997$site, 
                                 drop = TRUE), as.list)
@@ -409,7 +430,7 @@ mapply(write.table,
 test.splash1998 <- daily.clim %>%
   filter(year == 1998) %>%
   dplyr::select(site, lat_deg = lat, elv_m = elevation.m, date, m, i, year,
-                sf, tair = daily.tmean, pn = daily.prcp)
+                sf, tair = daily.tmean, pn = daily.prcp, kWm = whc)
 
 test.splash1998 <- lapply(split(test.splash1998, test.splash1998$site, 
                                 drop = TRUE), as.list)
@@ -425,7 +446,7 @@ mapply(write.table,
 test.splash1999 <- daily.clim %>%
   filter(year == 1999) %>%
   dplyr::select(site, lat_deg = lat, elv_m = elevation.m, date, m, i, year,
-                sf, tair = daily.tmean, pn = daily.prcp)
+                sf, tair = daily.tmean, pn = daily.prcp, kWm = whc)
 
 test.splash1999 <- lapply(split(test.splash1999, test.splash1999$site, 
                                 drop = TRUE), as.list)
@@ -441,7 +462,7 @@ mapply(write.table,
 test.splash2000 <- daily.clim %>%
   filter(year == 2000) %>%
   dplyr::select(site, lat_deg = lat, elv_m = elevation.m, date, m, i, year,
-                sf, tair = daily.tmean, pn = daily.prcp)
+                sf, tair = daily.tmean, pn = daily.prcp, kWm = whc)
 
 test.splash2000 <- lapply(split(test.splash2000, test.splash2000$site, 
                                 drop = TRUE), as.list)
@@ -457,7 +478,7 @@ mapply(write.table,
 test.splash2001 <- daily.clim %>%
   filter(year == 2001) %>%
   dplyr::select(site, lat_deg = lat, elv_m = elevation.m, date, m, i, year,
-                sf, tair = daily.tmean, pn = daily.prcp)
+                sf, tair = daily.tmean, pn = daily.prcp, kWm = whc)
 
 test.splash2001 <- lapply(split(test.splash2001, test.splash2001$site, 
                                 drop = TRUE), as.list)
@@ -473,7 +494,7 @@ mapply(write.table,
 test.splash2002 <- daily.clim %>%
   filter(year == 2002) %>%
   dplyr::select(site, lat_deg = lat, elv_m = elevation.m, date, m, i, year,
-                sf, tair = daily.tmean, pn = daily.prcp)
+                sf, tair = daily.tmean, pn = daily.prcp, kWm = whc)
 
 test.splash2002 <- lapply(split(test.splash2002, test.splash2002$site, 
                                 drop = TRUE), as.list)
@@ -489,7 +510,7 @@ mapply(write.table,
 test.splash2003 <- daily.clim %>%
   filter(year == 2003) %>%
   dplyr::select(site, lat_deg = lat, elv_m = elevation.m, date, m, i, year,
-                sf, tair = daily.tmean, pn = daily.prcp)
+                sf, tair = daily.tmean, pn = daily.prcp, kWm = whc)
 
 test.splash2003 <- lapply(split(test.splash2003, test.splash2003$site, 
                                 drop = TRUE), as.list)
@@ -505,7 +526,7 @@ mapply(write.table,
 test.splash2004 <- daily.clim %>%
   filter(year == 2004) %>%
   dplyr::select(site, lat_deg = lat, elv_m = elevation.m, date, m, i, year,
-                sf, tair = daily.tmean, pn = daily.prcp)
+                sf, tair = daily.tmean, pn = daily.prcp, kWm = whc)
 
 test.splash2004 <- lapply(split(test.splash2004, test.splash2004$site, 
                                 drop = TRUE), as.list)
@@ -521,7 +542,7 @@ mapply(write.table,
 test.splash2005 <- daily.clim %>%
   filter(year == 2005) %>%
   dplyr::select(site, lat_deg = lat, elv_m = elevation.m, date, m, i, year,
-                sf, tair = daily.tmean, pn = daily.prcp)
+                sf, tair = daily.tmean, pn = daily.prcp, kWm = whc)
 
 test.splash2005 <- lapply(split(test.splash2005, test.splash2005$site, 
                                 drop = TRUE), as.list)
@@ -537,7 +558,7 @@ mapply(write.table,
 test.splash2006 <- daily.clim %>%
   filter(year == 2006) %>%
   dplyr::select(site, lat_deg = lat, elv_m = elevation.m, date, m, i, year,
-                sf, tair = daily.tmean, pn = daily.prcp)
+                sf, tair = daily.tmean, pn = daily.prcp, kWm = whc)
 
 test.splash2006 <- lapply(split(test.splash2006, test.splash2006$site, 
                                 drop = TRUE), as.list)
@@ -553,7 +574,7 @@ mapply(write.table,
 test.splash2007 <- daily.clim %>%
   filter(year == 2007) %>%
   dplyr::select(site, lat_deg = lat, elv_m = elevation.m, date, m, i, year,
-                sf, tair = daily.tmean, pn = daily.prcp)
+                sf, tair = daily.tmean, pn = daily.prcp, kWm = whc)
 
 test.splash2007 <- lapply(split(test.splash2007, test.splash2007$site, 
                                 drop = TRUE), as.list)
@@ -569,7 +590,7 @@ mapply(write.table,
 test.splash2008 <- daily.clim %>%
   filter(year == 2008) %>%
   dplyr::select(site, lat_deg = lat, elv_m = elevation.m, date, m, i, year,
-                sf, tair = daily.tmean, pn = daily.prcp)
+                sf, tair = daily.tmean, pn = daily.prcp, kWm = whc)
 
 test.splash2008 <- lapply(split(test.splash2008, test.splash2008$site, 
                                 drop = TRUE), as.list)
@@ -585,7 +606,7 @@ mapply(write.table,
 test.splash2009 <- daily.clim %>%
   filter(year == 2009) %>%
   dplyr::select(site, lat_deg = lat, elv_m = elevation.m, date, m, i, year,
-                sf, tair = daily.tmean, pn = daily.prcp)
+                sf, tair = daily.tmean, pn = daily.prcp, kWm = whc)
 
 test.splash2009 <- lapply(split(test.splash2009, test.splash2009$site, 
                                 drop = TRUE), as.list)
@@ -601,7 +622,7 @@ mapply(write.table,
 test.splash2010 <- daily.clim %>%
   filter(year == 2010) %>%
   dplyr::select(site, lat_deg = lat, elv_m = elevation.m, date, m, i, year,
-                sf, tair = daily.tmean, pn = daily.prcp)
+                sf, tair = daily.tmean, pn = daily.prcp, kWm = whc)
 
 test.splash2010 <- lapply(split(test.splash2010, test.splash2010$site, 
                                 drop = TRUE), as.list)
@@ -617,7 +638,7 @@ mapply(write.table,
 test.splash2011 <- daily.clim %>%
   filter(year == 2011) %>%
   dplyr::select(site, lat_deg = lat, elv_m = elevation.m, date, m, i, year,
-                sf, tair = daily.tmean, pn = daily.prcp)
+                sf, tair = daily.tmean, pn = daily.prcp, kWm = whc)
 
 test.splash2011 <- lapply(split(test.splash2011, test.splash2011$site, 
                                 drop = TRUE), as.list)
@@ -633,7 +654,7 @@ mapply(write.table,
 test.splash2012 <- daily.clim %>%
   filter(year == 2012) %>%
   dplyr::select(site, lat_deg = lat, elv_m = elevation.m, date, m, i, year,
-                sf, tair = daily.tmean, pn = daily.prcp)
+                sf, tair = daily.tmean, pn = daily.prcp, kWm = whc)
 
 test.splash2012 <- lapply(split(test.splash2012, test.splash2012$site, 
                                 drop = TRUE), as.list)
@@ -649,7 +670,7 @@ mapply(write.table,
 test.splash2013 <- daily.clim %>%
   filter(year == 2013) %>%
   dplyr::select(site, lat_deg = lat, elv_m = elevation.m, date, m, i, year,
-                sf, tair = daily.tmean, pn = daily.prcp)
+                sf, tair = daily.tmean, pn = daily.prcp, kWm = whc)
 
 test.splash2013 <- lapply(split(test.splash2013, test.splash2013$site, 
                                 drop = TRUE), as.list)
@@ -665,7 +686,7 @@ mapply(write.table,
 test.splash2014 <- daily.clim %>%
   filter(year == 2014) %>%
   dplyr::select(site, lat_deg = lat, elv_m = elevation.m, date, m, i, year,
-                sf, tair = daily.tmean, pn = daily.prcp)
+                sf, tair = daily.tmean, pn = daily.prcp, kWm = whc)
 
 test.splash2014 <- lapply(split(test.splash2014, test.splash2014$site, 
                                 drop = TRUE), as.list)
@@ -681,7 +702,7 @@ mapply(write.table,
 test.splash2015 <- daily.clim %>%
   filter(year == 2015) %>%
   dplyr::select(site, lat_deg = lat, elv_m = elevation.m, date, m, i, year,
-                sf, tair = daily.tmean, pn = daily.prcp)
+                sf, tair = daily.tmean, pn = daily.prcp, kWm = whc)
 
 test.splash2015 <- lapply(split(test.splash2015, test.splash2015$site, 
                                 drop = TRUE), as.list)
@@ -697,7 +718,7 @@ mapply(write.table,
 test.splash2016 <- daily.clim %>%
   filter(year == 2016) %>%
   dplyr::select(site, lat_deg = lat, elv_m = elevation.m, date, m, i, year,
-                sf, tair = daily.tmean, pn = daily.prcp)
+                sf, tair = daily.tmean, pn = daily.prcp, kWm = whc)
 
 test.splash2016 <- lapply(split(test.splash2016, test.splash2016$site, 
                                 drop = TRUE), as.list)
@@ -713,7 +734,7 @@ mapply(write.table,
 test.splash2017 <- daily.clim %>%
   filter(year == 2017) %>%
   dplyr::select(site, lat_deg = lat, elv_m = elevation.m, date, m, i, year,
-                sf, tair = daily.tmean, pn = daily.prcp)
+                sf, tair = daily.tmean, pn = daily.prcp, kWm = whc)
 
 test.splash2017 <- lapply(split(test.splash2017, test.splash2017$site, 
                                 drop = TRUE), as.list)
@@ -729,7 +750,7 @@ mapply(write.table,
 test.splash2018 <- daily.clim %>%
   filter(year == 2018) %>%
   dplyr::select(site, lat_deg = lat, elv_m = elevation.m, date, m, i, year,
-                sf, tair = daily.tmean, pn = daily.prcp)
+                sf, tair = daily.tmean, pn = daily.prcp, kWm = whc)
 
 test.splash2018 <- lapply(split(test.splash2018, test.splash2018$site, 
                                 drop = TRUE), as.list)
@@ -745,7 +766,7 @@ mapply(write.table,
 test.splash2019 <- daily.clim %>%
   filter(year == 2019) %>%
   dplyr::select(site, lat_deg = lat, elv_m = elevation.m, date, m, i, year,
-                sf, tair = daily.tmean, pn = daily.prcp)
+                sf, tair = daily.tmean, pn = daily.prcp, kWm = whc)
 
 test.splash2019 <- lapply(split(test.splash2019, test.splash2019$site, 
                                 drop = TRUE), as.list)
@@ -762,7 +783,7 @@ mapply(write.table,
 test.splash2020 <- daily.clim %>%
   filter(year == 2020) %>%
   dplyr::select(site, lat_deg = lat, elv_m = elevation.m, date, m, i, year,
-                sf, tair = daily.tmean, pn = daily.prcp)
+                sf, tair = daily.tmean, pn = daily.prcp, kWm = whc)
 
 test.splash2020 <- lapply(split(test.splash2020, test.splash2020$site, 
                                 drop = TRUE), as.list)
@@ -778,7 +799,7 @@ mapply(write.table,
 test.splash2021 <- daily.clim %>%
   filter(year == 2021) %>%
   dplyr::select(site, lat_deg = lat, elv_m = elevation.m, date, m, i, year,
-                sf, tair = daily.tmean, pn = daily.prcp)
+                sf, tair = daily.tmean, pn = daily.prcp, kWm = whc)
 
 test.splash2021 <- lapply(split(test.splash2021, test.splash2021$site, 
                                 drop = TRUE), as.list)
