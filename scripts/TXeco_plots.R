@@ -452,8 +452,8 @@ chi.pft.plot
 ##########################################################################
 png("../working_drafts/figs/TXeco_fig3_chi.png",
     height = 14, width = 13, units = 'in', res = 600)
-ggarrange(chi.sm.int, chi.no3n.int,
-          chi.vpd.int, chi.temp.int,
+ggarrange(chi.vpd.int, chi.temp.int,
+          chi.sm.int, chi.no3n.int,
           chi.pft.plot,
           nrow = 3, ncol = 2, common.legend = TRUE, legend = "right", 
           align = "hv", labels = "AUTO", font.label = list(size = 18))
@@ -621,7 +621,8 @@ narea.pft.plot
 ##########################################################################
 png("../working_drafts/figs/TXeco_fig4_narea.png",
     width = 12, height = 8.5, units = 'in', res = 600)
-ggarrange(narea.no3n.ind, narea.chi.ind, narea.beta.ind, narea.pft.plot,
+ggarrange(narea.beta.ind, narea.chi.ind,
+          narea.no3n.ind, narea.pft.plot,
           ncol = 2, nrow = 2, common.legend = TRUE, legend = "right", 
           align = "hv", labels = "AUTO", font.label = list(size = 18))
 dev.off()
