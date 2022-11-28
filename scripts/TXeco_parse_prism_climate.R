@@ -35,218 +35,218 @@ source("../../r_functions/calc_soil_water.R")
 ###############################################################################
 
 # Set PRISM directory (put folder where prism data will be stored here)
-prism_set_dl_dir("../climate_data/prism/prism_daily/")
-
-###############################################################################
-## Stack raster files, select grid cells by site
-###############################################################################
-# Note: pd_stack stacks all daily climate data into single RasterStack, 
-# terra:extract extracts all data from single grid cell for each Ecolab site
-
-
-################
-# Precipitation
-################
-pd.daily.prcp <- pd_stack(prism_archive_subset("ppt", "daily", 
-                                               minDate = "1991-01-01",
-                                               maxDate = "2021-07-31"))
-sites.daily.prcp <- as.data.frame(terra::extract(pd.daily.prcp,
-                                                 SpatialPoints(eco.coords),
-                                                 sp = F))
-
-# Add precipitation site, latitude, longitude data
-sites.daily.prcp$latitude = eco.coords$y
-sites.daily.prcp$longitude = eco.coords$x
-sites.daily.prcp$site = ecosites$site
-
-sites.daily.prcp <- sites.daily.prcp %>%
-  dplyr::select(site, latitude, longitude, everything())
-
-# Rename columns to have climate data indicator as prefix with month/year
-# as suffix
-names(sites.daily.prcp) <- c("site", "latitude", "longitude",
-                             str_c("prcp_", 
-                                   str_extract(names(sites.daily.prcp[4:11172]),
-                                               "[0-9]{8}")))
-
-# Pivot to long data format
-sites.daily.prcp <- sites.daily.prcp %>%
-  tidyr::pivot_longer(cols = prcp_19910101:prcp_20210730,
-                      names_to = "date", values_to = "daily.prcp") %>%
-  mutate(date = ymd(str_replace(date, "prcp_", "")))
-
-################
-# Tmean
-################
-pd.daily.tmean <- pd_stack(prism_archive_subset("tmean", "daily", 
-                                                minDate = "1991-01-01",
-                                                maxDate = "2021-07-31"))
-sites.daily.tmean <- as.data.frame(terra::extract(pd.daily.tmean,
-                                                  SpatialPoints(eco.coords),
-                                                  sp = F))
-
-# Add  site, latitude, longitude data
-sites.daily.tmean$latitude = eco.coords$y
-sites.daily.tmean$longitude = eco.coords$x
-sites.daily.tmean$site = ecosites$site
-
-sites.daily.tmean <- sites.daily.tmean %>%
-  dplyr::select(site, latitude, longitude, everything())
-
-# Rename columns to have climate data indicator as prefix with month/year
-# as suffix
-names(sites.daily.tmean) <- c("site", "latitude", "longitude",
-                              str_c("tmean_", 
-                                    str_extract(names(sites.daily.tmean[4:11172]),
-                                                "[0-9]{8}")))
-
-# Pivot to long data format
-sites.daily.tmean <- sites.daily.tmean %>%
-  tidyr::pivot_longer(cols = tmean_19910101:tmean_20210730,
-                      names_to = "date", values_to = "daily.tmean") %>%
-  mutate(date = ymd(str_replace(date, "tmean_", "")))
-
-
-################
-# Tmax
-################
-pd.daily.tmax <- pd_stack(prism_archive_subset("tmax", "daily", 
-                                         minDate = "1991-01-01",
-                                         maxDate = "2021-07-31"))
-sites.daily.tmax <- as.data.frame(terra::extract(pd.daily.tmax,
-                                                 SpatialPoints(eco.coords),
-                                                 sp = F))
-
-# Add  site, latitude, longitude data
-sites.daily.tmax$latitude = eco.coords$y
-sites.daily.tmax$longitude = eco.coords$x
-sites.daily.tmax$site = ecosites$site
-
-sites.daily.tmax <- sites.daily.tmax %>%
-  dplyr::select(site, latitude, longitude, everything())
-
-
-# Rename columns to have climate data indicator as prefix with month/year
-# as suffix
-names(sites.daily.tmax) <- c("site", "latitude", "longitude",
-                             str_c("tmax_", 
-                                   str_extract(names(sites.daily.tmax[4:11172]),
-                                               "[0-9]{8}")))
-
-# Pivot to long data format
-sites.daily.tmax <- sites.daily.tmax %>%
-  tidyr::pivot_longer(cols = tmax_19910101:tmax_20210730,
-                      names_to = "date", values_to = "daily.tmax") %>%
-  mutate(date = ymd(str_replace(date, "tmax_", "")))
-
-################
-# Tmin
-################
-pd.daily.tmin <- pd_stack(prism_archive_subset("tmin", "daily", 
-                                         minDate = "1991-01-01",
-                                         maxDate = "2021-07-31"))
-
-sites.daily.tmin <- as.data.frame(terra::extract(pd.daily.tmin,
-                                                 SpatialPoints(eco.coords),
-                                                 sp = F))
-
-# Add  site, latitude, longitude data
-sites.daily.tmin$latitude = eco.coords$y
-sites.daily.tmin$longitude = eco.coords$x
-sites.daily.tmin$site = ecosites$site
-
-sites.daily.tmin <- sites.daily.tmin %>%
-  dplyr::select(site, latitude, longitude, everything())
-
-# Rename columns to have climate data indicator as prefix with month/year
-# as suffix
-names(sites.daily.tmin) <- c("site", "latitude", "longitude",
-                             str_c("tmin_", 
-                                   str_extract(names(sites.daily.tmin[4:11172]),
-                                               "[0-9]{8}")))
-
-# Pivot to long data format and summarize precipitation by month (1991-2020)
-# to simulate 1991-2020 climate normals
-sites.daily.tmin <- sites.daily.tmin %>%
-  tidyr::pivot_longer(cols = tmin_19910101:tmin_20210730,
-                      names_to = "date", values_to = "daily.tmin") %>%
-  mutate(date = ymd(str_replace(date, "tmin_", "")))
-
-################
-# VPDmax
-################
-pd.daily.vpdmax <- pd_stack(prism_archive_subset("vpdmax", "daily", 
-                                           minDate = "1991-01-01",
-                                           maxDate = "2021-07-31"))
-
-sites.daily.vpdmax <- as.data.frame(terra::extract(pd.daily.vpdmax,
-                                                   SpatialPoints(eco.coords),
-                                                   sp = F))
-
-# Add  site, latitude, longitude data
-sites.daily.vpdmax$latitude = eco.coords$y
-sites.daily.vpdmax$longitude = eco.coords$x
-sites.daily.vpdmax$site = ecosites$site
-
-# Rename columns to have climate data indicator as prefix with month/year
-# as suffix
-sites.daily.vpdmax <- sites.daily.vpdmax %>%
-  dplyr::select(site, latitude, longitude, everything())
-
-names(sites.daily.vpdmax) <- c("site", "latitude", "longitude",
-                               str_c("vpdmax_", 
-                                     str_extract(names(sites.daily.vpdmax[4:11172]),
-                                                 "[0-9]{8}")))
-
-# Pivot to long data format and summarize precipitation by month (1991-2020)
-# to simulate 1991-2020 climate normals
-sites.daily.vpdmax <- sites.daily.vpdmax %>%
-  tidyr::pivot_longer(cols = vpdmax_19910101:vpdmax_20210730,
-                      names_to = "date", values_to = "daily.vpdmax") %>%
-  mutate(date = ymd(str_replace(date, "vpdmax_", "")))
-
-################
-# VPDmin
-################
-pd.daily.vpdmin <- pd_stack(prism_archive_subset("vpdmin", "daily", 
-                                           minDate = "1991-01-01",
-                                           maxDate = "2021-07-31"))
-
-sites.daily.vpdmin <- as.data.frame(terra::extract(pd.daily.vpdmin,
-                                                   SpatialPoints(eco.coords),
-                                                   sp = F))
-
-# Add  site, latitude, longitude data
-sites.daily.vpdmin$latitude = eco.coords$y
-sites.daily.vpdmin$longitude = eco.coords$x
-sites.daily.vpdmin$site = ecosites$site
-
-# Rename columns to have climate data indicator as prefix with month/year
-# as suffix
-sites.daily.vpdmin <- sites.daily.vpdmin %>%
-  dplyr::select(site, latitude, longitude, everything())
-
-names(sites.daily.vpdmin) <- c("site", "latitude", "longitude",
-                               str_c("vpdmin_", 
-                                     str_extract(names(sites.daily.vpdmin[4:11171]),
-                                                 "[0-9]{8}")))
-
-# Pivot to long data format and summarize precipitation by month (1991-2020)
-# to simulate 1991-2020 climate normals
-sites.daily.vpdmin <- sites.daily.vpdmin %>%
-  tidyr::pivot_longer(cols = vpdmin_19910101:vpdmin_20210730,
-                      names_to = "date", values_to = "daily.vpdmin") %>%
-  mutate(date = ymd(str_replace(date, "vpdmin_", "")))
-
-## Join normals data into single dataset
-daily.clim <- sites.daily.prcp %>%
-  left_join(sites.daily.tmean) %>%
-  left_join(sites.daily.tmax) %>%
-  full_join(sites.daily.tmin) %>%
-  full_join(sites.daily.vpdmax) %>%
-  full_join(sites.daily.vpdmin)
-
-write.csv(daily.clim, "../climate_data/TXeco_PRISM_daily.csv")
+# prism_set_dl_dir("../climate_data/prism/prism_daily/")
+# 
+# ###############################################################################
+# ## Stack raster files, select grid cells by site
+# ###############################################################################
+# # Note: pd_stack stacks all daily climate data into single RasterStack, 
+# # terra:extract extracts all data from single grid cell for each Ecolab site
+# 
+# 
+# ################
+# # Precipitation
+# ################
+# pd.daily.prcp <- pd_stack(prism_archive_subset("ppt", "daily", 
+#                                                minDate = "1991-01-01",
+#                                                maxDate = "2021-07-31"))
+# sites.daily.prcp <- as.data.frame(terra::extract(pd.daily.prcp,
+#                                                  SpatialPoints(eco.coords),
+#                                                  sp = F))
+# 
+# # Add precipitation site, latitude, longitude data
+# sites.daily.prcp$latitude = eco.coords$y
+# sites.daily.prcp$longitude = eco.coords$x
+# sites.daily.prcp$site = ecosites$site
+# 
+# sites.daily.prcp <- sites.daily.prcp %>%
+#   dplyr::select(site, latitude, longitude, everything())
+# 
+# # Rename columns to have climate data indicator as prefix with month/year
+# # as suffix
+# names(sites.daily.prcp) <- c("site", "latitude", "longitude",
+#                              str_c("prcp_", 
+#                                    str_extract(names(sites.daily.prcp[4:11172]),
+#                                                "[0-9]{8}")))
+# 
+# # Pivot to long data format
+# sites.daily.prcp <- sites.daily.prcp %>%
+#   tidyr::pivot_longer(cols = prcp_19910101:prcp_20210730,
+#                       names_to = "date", values_to = "daily.prcp") %>%
+#   mutate(date = ymd(str_replace(date, "prcp_", "")))
+# 
+# ################
+# # Tmean
+# ################
+# pd.daily.tmean <- pd_stack(prism_archive_subset("tmean", "daily", 
+#                                                 minDate = "1991-01-01",
+#                                                 maxDate = "2021-07-31"))
+# sites.daily.tmean <- as.data.frame(terra::extract(pd.daily.tmean,
+#                                                   SpatialPoints(eco.coords),
+#                                                   sp = F))
+# 
+# # Add  site, latitude, longitude data
+# sites.daily.tmean$latitude = eco.coords$y
+# sites.daily.tmean$longitude = eco.coords$x
+# sites.daily.tmean$site = ecosites$site
+# 
+# sites.daily.tmean <- sites.daily.tmean %>%
+#   dplyr::select(site, latitude, longitude, everything())
+# 
+# # Rename columns to have climate data indicator as prefix with month/year
+# # as suffix
+# names(sites.daily.tmean) <- c("site", "latitude", "longitude",
+#                               str_c("tmean_", 
+#                                     str_extract(names(sites.daily.tmean[4:11172]),
+#                                                 "[0-9]{8}")))
+# 
+# # Pivot to long data format
+# sites.daily.tmean <- sites.daily.tmean %>%
+#   tidyr::pivot_longer(cols = tmean_19910101:tmean_20210730,
+#                       names_to = "date", values_to = "daily.tmean") %>%
+#   mutate(date = ymd(str_replace(date, "tmean_", "")))
+# 
+# 
+# ################
+# # Tmax
+# ################
+# pd.daily.tmax <- pd_stack(prism_archive_subset("tmax", "daily", 
+#                                          minDate = "1991-01-01",
+#                                          maxDate = "2021-07-31"))
+# sites.daily.tmax <- as.data.frame(terra::extract(pd.daily.tmax,
+#                                                  SpatialPoints(eco.coords),
+#                                                  sp = F))
+# 
+# # Add  site, latitude, longitude data
+# sites.daily.tmax$latitude = eco.coords$y
+# sites.daily.tmax$longitude = eco.coords$x
+# sites.daily.tmax$site = ecosites$site
+# 
+# sites.daily.tmax <- sites.daily.tmax %>%
+#   dplyr::select(site, latitude, longitude, everything())
+# 
+# 
+# # Rename columns to have climate data indicator as prefix with month/year
+# # as suffix
+# names(sites.daily.tmax) <- c("site", "latitude", "longitude",
+#                              str_c("tmax_", 
+#                                    str_extract(names(sites.daily.tmax[4:11172]),
+#                                                "[0-9]{8}")))
+# 
+# # Pivot to long data format
+# sites.daily.tmax <- sites.daily.tmax %>%
+#   tidyr::pivot_longer(cols = tmax_19910101:tmax_20210730,
+#                       names_to = "date", values_to = "daily.tmax") %>%
+#   mutate(date = ymd(str_replace(date, "tmax_", "")))
+# 
+# ################
+# # Tmin
+# ################
+# pd.daily.tmin <- pd_stack(prism_archive_subset("tmin", "daily", 
+#                                          minDate = "1991-01-01",
+#                                          maxDate = "2021-07-31"))
+# 
+# sites.daily.tmin <- as.data.frame(terra::extract(pd.daily.tmin,
+#                                                  SpatialPoints(eco.coords),
+#                                                  sp = F))
+# 
+# # Add  site, latitude, longitude data
+# sites.daily.tmin$latitude = eco.coords$y
+# sites.daily.tmin$longitude = eco.coords$x
+# sites.daily.tmin$site = ecosites$site
+# 
+# sites.daily.tmin <- sites.daily.tmin %>%
+#   dplyr::select(site, latitude, longitude, everything())
+# 
+# # Rename columns to have climate data indicator as prefix with month/year
+# # as suffix
+# names(sites.daily.tmin) <- c("site", "latitude", "longitude",
+#                              str_c("tmin_", 
+#                                    str_extract(names(sites.daily.tmin[4:11172]),
+#                                                "[0-9]{8}")))
+# 
+# # Pivot to long data format and summarize precipitation by month (1991-2020)
+# # to simulate 1991-2020 climate normals
+# sites.daily.tmin <- sites.daily.tmin %>%
+#   tidyr::pivot_longer(cols = tmin_19910101:tmin_20210730,
+#                       names_to = "date", values_to = "daily.tmin") %>%
+#   mutate(date = ymd(str_replace(date, "tmin_", "")))
+# 
+# ################
+# # VPDmax
+# ################
+# pd.daily.vpdmax <- pd_stack(prism_archive_subset("vpdmax", "daily", 
+#                                            minDate = "1991-01-01",
+#                                            maxDate = "2021-07-31"))
+# 
+# sites.daily.vpdmax <- as.data.frame(terra::extract(pd.daily.vpdmax,
+#                                                    SpatialPoints(eco.coords),
+#                                                    sp = F))
+# 
+# # Add  site, latitude, longitude data
+# sites.daily.vpdmax$latitude = eco.coords$y
+# sites.daily.vpdmax$longitude = eco.coords$x
+# sites.daily.vpdmax$site = ecosites$site
+# 
+# # Rename columns to have climate data indicator as prefix with month/year
+# # as suffix
+# sites.daily.vpdmax <- sites.daily.vpdmax %>%
+#   dplyr::select(site, latitude, longitude, everything())
+# 
+# names(sites.daily.vpdmax) <- c("site", "latitude", "longitude",
+#                                str_c("vpdmax_", 
+#                                      str_extract(names(sites.daily.vpdmax[4:11172]),
+#                                                  "[0-9]{8}")))
+# 
+# # Pivot to long data format and summarize precipitation by month (1991-2020)
+# # to simulate 1991-2020 climate normals
+# sites.daily.vpdmax <- sites.daily.vpdmax %>%
+#   tidyr::pivot_longer(cols = vpdmax_19910101:vpdmax_20210730,
+#                       names_to = "date", values_to = "daily.vpdmax") %>%
+#   mutate(date = ymd(str_replace(date, "vpdmax_", "")))
+# 
+# ################
+# # VPDmin
+# ################
+# pd.daily.vpdmin <- pd_stack(prism_archive_subset("vpdmin", "daily", 
+#                                            minDate = "1991-01-01",
+#                                            maxDate = "2021-07-31"))
+# 
+# sites.daily.vpdmin <- as.data.frame(terra::extract(pd.daily.vpdmin,
+#                                                    SpatialPoints(eco.coords),
+#                                                    sp = F))
+# 
+# # Add  site, latitude, longitude data
+# sites.daily.vpdmin$latitude = eco.coords$y
+# sites.daily.vpdmin$longitude = eco.coords$x
+# sites.daily.vpdmin$site = ecosites$site
+# 
+# # Rename columns to have climate data indicator as prefix with month/year
+# # as suffix
+# sites.daily.vpdmin <- sites.daily.vpdmin %>%
+#   dplyr::select(site, latitude, longitude, everything())
+# 
+# names(sites.daily.vpdmin) <- c("site", "latitude", "longitude",
+#                                str_c("vpdmin_", 
+#                                      str_extract(names(sites.daily.vpdmin[4:11171]),
+#                                                  "[0-9]{8}")))
+# 
+# # Pivot to long data format and summarize precipitation by month (1991-2020)
+# # to simulate 1991-2020 climate normals
+# sites.daily.vpdmin <- sites.daily.vpdmin %>%
+#   tidyr::pivot_longer(cols = vpdmin_19910101:vpdmin_20210730,
+#                       names_to = "date", values_to = "daily.vpdmin") %>%
+#   mutate(date = ymd(str_replace(date, "vpdmin_", "")))
+# 
+# ## Join normals data into single dataset
+# daily.clim <- sites.daily.prcp %>%
+#   left_join(sites.daily.tmean) %>%
+#   left_join(sites.daily.tmax) %>%
+#   full_join(sites.daily.tmin) %>%
+#   full_join(sites.daily.vpdmax) %>%
+#   full_join(sites.daily.vpdmin)
+# 
+# write.csv(daily.clim, "../climate_data/TXeco_PRISM_daily.csv")
 
 ###############################################################################
 ## Determine sunrise/sunset using 'suncalc' package, then calculate fraction
@@ -258,7 +258,7 @@ daily.clim <- read.csv("../climate_data/TXeco_PRISM_daily.csv") %>%
 
 ## Change latitude/longitude colnames to "lat" and "long" to make easier
 ## data loading into "getSunlightTimes" function
-names(daily.clim)[2:3] <- c("lat", "lon")
+# names(daily.clim)[2:3] <- c("lat", "lon")
 
 ## Visualize dataset
 head(daily.clim)

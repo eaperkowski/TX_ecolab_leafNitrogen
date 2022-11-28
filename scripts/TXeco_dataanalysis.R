@@ -211,8 +211,6 @@ emmeans(narea.nobeta, pairwise~pft)
 ##########################################################################
 ## Structural equation model
 ##########################################################################
-df.sem <- df
-
 df.sem$beta[c(84, 317, 500)] <- NA
 df.sem$chi[c(62, 84, 86, 304, 308, 456)] <- NA
 df.sem$chi[c(322, 483)] <- NA
@@ -220,7 +218,6 @@ df.sem$chi[c(315, 484)] <- NA
 df.sem$chi[c(220, 402)] <- NA
 df.sem$narea[df.sem$narea > 10] <- NA
 df.sem$narea[509] <- NA
-
 
 ## Standardize and center vars
 df.sem$beta.std <- scale(df.sem$beta)
@@ -234,19 +231,19 @@ df.sem$narea.std <- scale(df.sem$narea)
 ## Add models to be tested in SEM
 models <- ' # regressions
             narea.std ~ b*beta.std + chi.std + no3n.std + pft
-            beta.std ~ c*wn90.std + a*no3n.std + pft
-            chi.std ~ f*vpd4.std + tavg4.std + pft
-            vpd4.std ~ e*tavg4.std
-            no3n.std ~ d*wn90.std
+            beta.std ~ wn90.std + a*no3n.std + pft
+            chi.std ~ c*vpd4.std + tavg4.std + pft
+            vpd4.std ~ d*tavg4.std
+            no3n.std ~ wn90.std
 
             # covariates
-            beta.std ~~ chi.std
+            beta.std ~~ g*chi.std
 
             # indirect effect of soil N and soil moisture on leaf N
             soiln.indirect:=a*b
-            moisture.indirect:=c*b
-            moisture.indirect2:=d*a*b
-            temp.chi.indirect:=e*f'
+            temp.chi.indirect:= d*c
+            vpd.narea.indirect:= c*g*b
+            temp.narea.indirect:= d*c*g*b'
 
 test_fit <- sem(models, data = df.sem)
 summary(test_fit, standardized = TRUE,
@@ -269,6 +266,9 @@ summary.coefs <- summary.coefs %>%
 write.csv(summary.coefs,
           "../working_drafts/tables/TXeco_tableS2_SEMresults.csv",
           row.names = FALSE)
+
+## Get R2 values of each fitted value
+lavInspect(test_fit, "rsquare")
 
 ##########################################################################
 ## Tables
@@ -472,9 +472,9 @@ table5 <- summary.coefs %>%
   mutate(slope_ci = str_c(est, " [", ci.lower, ", ", ci.upper, "]", sep = "")) %>%
   dplyr::select(resp, pred, slope_ci, z, pvalue)
 table5[14, c(1,2)] <- c("narea.std", "no3n*beta")
-table5[15, c(1,2)] <- c("narea.std", "wn3*beta")
-table5[16, c(1,2)] <- c("narea.std", "wn3*no3n*beta")
-table5[17, c(1,2)] <- c("chi.std", "tavg4*vpd4")
+table5[15, c(1,2)] <- c("chi.std", "tavg4*vpd4")
+table5[16, c(1,2)] <- c("narea.std", "vpd4*chi*beta")
+table5[17, c(1,2)] <- c("narea.std", "tavg4vpd4*chi*beta")
 
 table5 <- table5 %>% 
   mutate(resp = ifelse(resp == "narea.std", 
