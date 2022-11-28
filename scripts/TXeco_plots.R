@@ -22,7 +22,7 @@ df <- read.csv("../data_sheets/TXeco_compiled_datasheet.csv",
                              ifelse(pft == "legume", 
                                     "c3_legume", 
                                     NA))),
-         chi = ifelse(chi > 0.95 | chi < 0.20, NA, chi))
+         chi = ifelse(chi > 0.95 & chi < 0.20, NA, chi))
 
 ## Add colorblind friendly palette
 cbbPalette <- c("#0077BB", "#33BBEE", "#009988", "#EE7733", "#CC3311")
@@ -36,19 +36,17 @@ length(df$pft[df$pft == "c4_nonlegume"])
 
 ## Convert VPD from hPa (PRISM units) to kPa (standard)
 df$vpd4 <- df$vpd4 / 10
-df$wn3 <- df$wn3 / 150 # relative to maximum bucket size
 
 ## Remove outliers from statistical models
-df$beta[c(84)] <- NA
-df$chi[c(117, 317, 322, 481)] <- NA
-df$chi[c(62, 315, 456)] <- NA
-df$chi[c(284, 292, 483, 484)] <- NA
+df$beta[c(84, 317, 500)] <- NA
+df$chi[c(62, 117, 275, 317, 481, 276, 304, 322, 500,
+         315, 456, 480, 502, 71, 292, 483, 484, 402)] <- NA
 df$narea[df$narea > 10] <- NA
 df$narea[509] <- NA
 
 ## Add general models
-beta <- lmer(log(beta) ~ wn3 * soil.no3n * pft + (1 | NCRS.code), data = df)
-chi <- lmer(chi ~ (vpd4 + tavg4 + (wn3 * soil.no3n)) * pft + (1 | NCRS.code), 
+beta <- lmer(log(beta) ~ wn90_perc * soil.no3n * pft + (1 | NCRS.code), data = df)
+chi <- lmer(chi ~ (vpd4 + tavg4 + (wn90_perc * soil.no3n)) * pft + (1 | NCRS.code), 
             data = df)
 narea <- lmer(log(narea) ~ (beta + chi + soil.no3n) * pft + (1 | NCRS.code), 
               data = df)
@@ -74,7 +72,7 @@ beta.no3n <- data.frame(emmeans(beta, ~1, "soil.no3n",
 beta.no3n.ind <- ggplot(data = subset(df, !is.na(pft)), 
                         aes(x = soil.no3n, y = log(beta))) +
    geom_jitter(aes(fill = pft),
-               width = 0.5, size = 4, alpha = 0.7, shape = 21) +
+               width = 0.5, size = 3, alpha = 0.7, shape = 21) +
   geom_ribbon(data = subset(beta.no3n, pft == "overall"), 
               aes(x = soil.no3n, y = emmean, ymin = lower.CL, 
                   ymax = upper.CL), alpha = 0.25, fill = "black") +
@@ -82,13 +80,13 @@ beta.no3n.ind <- ggplot(data = subset(df, !is.na(pft)),
             aes(x = soil.no3n, y = emmean),
             color = "black", size = 1) +
   scale_fill_manual(values = c(cbbPalette3), 
-                    labels = c(expression("C"[3]~"legume"),
-                               expression("C"[3]~"non-legume"),
-                               expression("C"[4]~"non-legume"))) +
+                    labels = c(expression("C"[3]~"legume (C"[3]*" L)"),
+                               expression("C"[4]~"non-legume (C"[4]*" NL)"),
+                               expression("C"[3]~"non-legume (C"[4]*" NL)"))) +
   scale_color_manual(values = c(cbbPalette3), 
-                    labels = c(expression("C"[3]~"legume"),
-                               expression("C"[3]~"non-legume"),
-                               expression("C"[4]~"non-legume"))) +
+                     labels = c(expression("C"[3]~"legume (C"[3]*" L)"),
+                                expression("C"[4]~"non-legume (C"[4]*" NL)"),
+                                expression("C"[3]~"non-legume (C"[3]*" NL)"))) +
   scale_x_continuous(limits = c(-1, 80), breaks = seq(0, 80, 20)) +
   scale_y_continuous(limits = c(-2.5, 7.5), breaks = seq(-2.5, 7.5, 2.5)) +
   labs(x = expression(bold("Soil N availability (ppm NO"[3]*"-N)")),
@@ -96,72 +94,69 @@ beta.no3n.ind <- ggplot(data = subset(df, !is.na(pft)),
        fill = "Functional group") +
   theme_bw(base_size = 18) +
   theme(legend.text.align = 0,
-        panel.border = element_rect(size = 1.25))
+        panel.border = element_rect(size = 1.25),
+        legend.title = element_text(face = "bold"))
 beta.no3n.ind
+
 
 beta.no3n.int <- ggplot(data = subset(df, !is.na(pft)), 
                         aes(x = soil.no3n, y = log(beta))) +
   geom_jitter(aes(fill = pft),
-              width = 0.5, size = 4, alpha = 0.7, shape = 21) +
-   geom_ribbon(data = subset(beta.no3n, pft != "overall"), 
-               aes(x = soil.no3n, y = emmean, ymin = lower.CL, 
-                   ymax = upper.CL, fill = pft), alpha = 0.25) +
-   geom_line(data = subset(beta.no3n, pft != "overall"), size = 1,
-              aes(x = soil.no3n, y = emmean, color = pft), lty=2) +
-  # geom_ribbon(data = subset(beta.no3n, pft == "overall"), 
-  #             aes(x = soil.no3n, y = emmean, ymin = lower.CL, 
-  #                 ymax = upper.CL), alpha = 0.25, fill = "black") +
-  # geom_line(data = subset(beta.no3n, pft == "overall"),
-  #           aes(x = soil.no3n, y = emmean),
-  #           color = "black", size = 1) +
+              width = 0.5, size = 3, alpha = 0.7, shape = 21) +
+  geom_ribbon(data = subset(beta.no3n, pft != "overall"), 
+              aes(x = soil.no3n, y = emmean, ymin = lower.CL, 
+                  ymax = upper.CL, fill = pft), alpha = 0.25) +
+  geom_line(data = subset(beta.no3n, pft != "overall"),
+            aes(x = soil.no3n, y = emmean, color = pft), size = 1) +
   scale_fill_manual(values = c(cbbPalette3), 
-                    labels = c(expression("C"[3]~"legume"),
-                               expression("C"[3]~"non-legume"),
-                               expression("C"[4]~"non-legume"))) +
+                    labels = c(expression("C"[3]~"legume (C"[3]*" L)"),
+                               expression("C"[3]~"non-legume (C"[3]*" NL)"),
+                               expression("C"[4]~"non-legume (C"[4]*" NL)"))) +
   scale_color_manual(values = c(cbbPalette3), 
-                     labels = c(expression("C"[3]~"legume"),
-                                expression("C"[3]~"non-legume"),
-                                expression("C"[4]~"non-legume"))) +
+                    labels = c(expression("C"[3]~"legume (C"[3]*" L)"),
+                               expression("C"[3]~"non-legume (C"[3]*" NL)"),
+                               expression("C"[4]~"non-legume (C"[4]*" NL)"))) +
   scale_x_continuous(limits = c(-1, 80), breaks = seq(0, 80, 20)) +
   scale_y_continuous(limits = c(-2.5, 7.5), breaks = seq(-2.5, 7.5, 2.5)) +
   labs(x = expression(bold("Soil N availability (ppm NO"[3]*"-N)")),
        y = expression(bold(ln~beta)),
-       fill = "Functional group") +
-  guides(color = "none") +
+       fill = "Functional group", color = "Functional group") +
   theme_bw(base_size = 18) +
   theme(legend.text.align = 0,
-        panel.border = element_rect(size = 1.25))
+        panel.border = element_rect(size = 1.25),
+        legend.title = element_text(face = "bold"))
 beta.no3n.int
 
 ##########################################################################
 ## Beta - soil moisture
 ##########################################################################
-test(emtrends(beta, ~pft, "wn3"))
+test(emtrends(beta, ~pft, "wn90_perc"))
 
-beta.sm.pft <- data.frame(emmeans(beta, ~pft, "wn3",
-                                    at = list(wn3 = seq(0,1,0.01))))
+beta.sm.pft <- data.frame(emmeans(beta, ~pft, "wn90_perc",
+                                    at = list(wn90_perc = seq(0,1,0.01))))
 
-beta.sm <- data.frame(emmeans(beta, ~1, "wn3",
-                                at = list(wn3 = seq(0,1,0.01)))) %>%
+beta.sm <- data.frame(emmeans(beta, ~1, "wn90_perc",
+                                at = list(wn90_perc = seq(0,1,0.01)))) %>%
   dplyr::select(pft = X1, everything()) %>%
   full_join(beta.sm.pft) %>%
-  mutate(linetype = ifelse(pft == "c4_nonlegume", "solid", "dashed"))
+  mutate(linetype = ifelse(pft == "c3_nonlegume", "solid", "dashed"))
 
 beta.h2o.ind <- ggplot(data = subset(df, !is.na(pft)), 
-                       aes(x = wn3, y = log(beta))) +
+                       aes(x = wn90_perc, y = log(beta))) +
   geom_jitter(aes(fill = pft),
-              width = 0.1, size = 4, alpha = 0.7, shape = 21) +
+              width = 0.1, size = 3, alpha = 0.7, shape = 21) +
   geom_ribbon(data = subset(beta.sm, pft == "overall"),
-              aes(x = wn3, y = emmean, ymin = lower.CL, ymax = upper.CL),
+              aes(x = wn90_perc, y = emmean, ymin = lower.CL, ymax = upper.CL),
               alpha = 0.25, fill = "black") +
   geom_line(data = subset(beta.sm, pft == "overall"),
-            aes(x = wn3, y = emmean),
+            aes(x = wn90_perc, y = emmean),
             size = 1, color = "black") +
   scale_fill_manual(values = c(cbbPalette3), 
-                    labels = c(expression("C"[3]~"legume"),
-                               expression("C"[3]~"non-legume"),
-                               expression("C"[4]~"non-legume"))) +
-  scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.25)) +
+                    labels = c(expression("C"[3]~"legume (C"[3]*" L)"),
+                               expression("C"[3]~"non-legume (C"[3]*" NL)"),
+                               expression("C"[4]~"non-legume (C"[4]*" NL)"))) +
+  scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.25),
+                     labels = c(0, 25, 50, 75, 100)) +
   scale_y_continuous(limits = c(-2.5, 7.5), breaks = seq(-2.5, 7.5, 2.5)) +
   labs(x = expression(bold("Soil moisture (%)")),
        y = expression(bold(ln~beta)),
@@ -169,49 +164,80 @@ beta.h2o.ind <- ggplot(data = subset(df, !is.na(pft)),
        color = "Functional group") +
   theme_bw(base_size = 18) +
   theme(legend.text.align = 0,
-        panel.border = element_rect(size = 1.25))
+        panel.border = element_rect(size = 1.25),
+        legend.title = element_text(face = "bold"))
 beta.h2o.ind
 
 beta.h2o.int <- ggplot(data = subset(df, !is.na(pft)), 
-                       aes(x = wn3, y = log(beta))) +
+                       aes(x = wn90_perc, y = log(beta))) +
   geom_jitter(aes(fill = pft),
-              width = 0.1, size = 4, alpha = 0.7, shape = 21) +
+              width = 0.1, size = 3, alpha = 0.7, shape = 21) +
   geom_ribbon(data = subset(beta.sm, pft != "overall"),
-              aes(x = wn3, y = emmean, ymin = lower.CL,
+              aes(x = wn90_perc, y = emmean, ymin = lower.CL,
                   ymax = upper.CL, fill = pft),
               alpha = 0.3) +
   geom_line(data = subset(beta.sm, pft != "overall"),
-            aes(x = wn3, y = emmean, linetype = linetype, color = pft),
+            aes(x = wn90_perc, y = emmean, linetype = linetype, color = pft),
             size = 1) +
   scale_fill_manual(values = c(cbbPalette3), 
-                    labels = c(expression("C"[3]~"legume"),
-                               expression("C"[3]~"non-legume"),
-                               expression("C"[4]~"non-legume"))) +
+                    labels = c(expression("C"[3]~"legume (C"[3]*" L)"),
+                               expression("C"[3]~"non-legume (C"[3]*" NL)"),
+                               expression("C"[4]~"non-legume (C"[4]*" NL)"))) +
   scale_color_manual(values = c(cbbPalette3), 
-                    labels = c(expression("C"[3]~"legume"),
-                               expression("C"[3]~"non-legume"),
-                               expression("C"[4]~"non-legume"))) +
+                     labels = c(expression("C"[3]~"legume (C"[3]*" L)"),
+                                expression("C"[3]~"non-legume (C"[3]*" NL)"),
+                                expression("C"[4]~"non-legume (C"[4]*" NL)"))) +
   scale_linetype_manual(values = c("dashed", "solid")) +
-  scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.25)) +
+  scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.25),
+                     labels = c(0, 25, 50, 75, 100)) +
   scale_y_continuous(limits = c(-2.5, 7.5), breaks = seq(-2.5, 7.5, 2.5)) +
-  labs(x = expression(bold("Soil moisture (%)")),
+  labs(x = expression(bold("Soil moisture (% WHC)")),
        y = expression(bold(ln~beta)),
        fill = "Functional group",
        color = "Functional group") +
   guides(linetype = "none") +
   theme_bw(base_size = 18) +
   theme(legend.text.align = 0,
-        panel.border = element_rect(size = 1.25))
+        panel.border = element_rect(size = 1.25),
+        legend.title = element_text(face = "bold"))
 beta.h2o.int
+
+##########################################################################
+## Beta - PFT
+##########################################################################
+beta.pft <- data.frame(multcomp::cld(emmeans(beta, ~pft), 
+                           Letters = LETTERS)) %>%
+  mutate(.group = trimws(.group, which = "both"))
+
+beta.pft.plot <- ggplot() +
+  geom_jitter(data = subset(df, !is.na(pft)), 
+              aes(x = pft, y = log(beta), fill = pft),
+              width = 0.05, alpha = 0.7, shape = 21, size = 3) +
+  geom_boxplot(data = subset(df, !is.na(pft)), 
+               aes(x = pft, y = log(beta), fill = pft), 
+               alpha = 0.5, width = 0.5, size = 0.75) +
+  geom_text(data = beta.pft,
+            aes(x = pft, y = 7.5, label = .group), fontface = "bold", size = 6) +
+  scale_fill_manual(values = cbbPalette3) +
+  scale_x_discrete(labels = c(expression("C"[3]*" L"),
+                              expression("C"[3]*" NL"),
+                              expression("C"[4]*" NL"))) +
+  scale_y_continuous(limits = c(-2.5, 7.5), breaks = seq(-2.5, 7.5, 2.5)) +
+  labs(x = expression(bold("Functional group")),
+       y = expression(bold(ln~beta))) +
+  guides(fill = "none") +
+  theme_bw(base_size = 18) +
+  theme(panel.border = element_rect(size = 1.25))
+beta.pft.plot
 
 ##########################################################################
 ## Write beta plot
 ##########################################################################
 # Write plot
 png("../working_drafts/figs/TXeco_fig2_beta.png",
-    width = 11.5, height = 4.5, units = 'in', res = 600)
-ggarrange(beta.h2o.int, beta.no3n.ind,
-          ncol = 2, nrow = 1, common.legend = TRUE,
+    width = 12, height = 8.5, units = 'in', res = 600)
+ggarrange(beta.h2o.int, beta.no3n.int, beta.pft.plot,
+          ncol = 2, nrow = 2, common.legend = TRUE,
           legend = "right", align = "hv", labels = "AUTO",
           font.label = list(size = 18))
 dev.off()
@@ -233,7 +259,7 @@ chi.vpd <- data.frame(emmeans(chi, ~1, "vpd4",
 
 chi.vpd.int <- ggplot(data = df, aes(x = vpd4, y = chi)) +
   geom_jitter(aes(fill = pft),
-              width = 0.1, size = 4, alpha = 0.7, shape = 21) +
+              width = 0.1, size = 3, alpha = 0.7, shape = 21) +
   geom_ribbon(data = subset(chi.vpd, pft != "overall"), 
               aes(x = vpd4, y = emmean, ymin = lower.CL, 
                   ymax = upper.CL, fill = pft), alpha = 0.25) +
@@ -241,20 +267,20 @@ chi.vpd.int <- ggplot(data = df, aes(x = vpd4, y = chi)) +
             aes(x = vpd4, y = emmean, color = pft, linetype = linetype), 
             size = 1) +
   scale_fill_manual(values = cbbPalette3, 
-                    labels = c(expression("C"[3]~"legume"),
-                               expression("C"[3]~"non-legume"),
-                               expression("C"[4]~"non-legume"))) +
+                    labels = c(expression("C"[3]~"legume (C"[3]*" L)"),
+                               expression("C"[3]~"non-legume (C"[3]*" NL)"),
+                               expression("C"[4]~"non-legume (C"[4]*" NL)"))) +
   scale_color_manual(values = cbbPalette3, 
-                    labels = c(expression("C"[3]~"legume"),
-                               expression("C"[3]~"non-legume"),
-                               expression("C"[4]~"non-legume"))) +
+                     labels = c(expression("C"[3]~"legume (C"[3]*" L)"),
+                                expression("C"[3]~"non-legume (C"[3]*" NL)"),
+                                expression("C"[4]~"non-legume (C"[4]*" NL)"))) +
   scale_linetype_manual(values = c("dashed", "solid")) +
   scale_x_continuous(limits = c(0.8, 1.41), breaks = seq(0.8, 1.4, 0.15)) +
-  scale_y_continuous(limits = c(0.2, 1), breaks = seq(0.2, 1, 0.2)) +
+  scale_y_continuous(limits = c(0, 1.07), breaks = seq(0, 1, 0.25)) +
   labs(x = expression(bold("Vapor pressure deficit (kPa)")),
        y = expression(bold(chi)),
-       fill = "Functional group", 
-       color = "Functional group") +
+       fill = expression(bold("Functional group")), 
+       color = expression(bold("Functional group"))) +
   guides(linetype = "none") +
   theme_bw(base_size = 18) +
   theme(legend.text.align = 0,
@@ -273,11 +299,11 @@ chi.tavg <- data.frame(emmeans(chi, ~1, "tavg4",
                               at = list(tavg4 = seq(18, 22,0.1)))) %>%
   dplyr::select(pft = X1, everything()) %>%
   full_join(chi.tavg.pft) %>%
-  mutate(linetype = ifelse(pft == "c3_nonlegume", "dashed", "solid"))
+  mutate(linetype = ifelse(pft == "c4_nonlegume", "solid", "dashed"))
 
 chi.temp.int <- ggplot(data = df, aes(x = tavg4, y = chi)) +
   geom_jitter(aes(fill = pft),
-              width = 0.1, size = 4, alpha = 0.7, shape = 21) +
+              width = 0.1, size = 3, alpha = 0.7, shape = 21) +
   geom_ribbon(data = subset(chi.tavg, pft != "overall"),
               aes(x = tavg4, y = emmean, ymin = lower.CL,
                   ymax = upper.CL, fill = pft), alpha = 0.25) +
@@ -285,20 +311,20 @@ chi.temp.int <- ggplot(data = df, aes(x = tavg4, y = chi)) +
             aes(x = tavg4, y = emmean, color = pft, linetype = linetype), 
             size = 1) +
   scale_fill_manual(values = cbbPalette3, 
-                    labels = c(expression("C"[3]~"legume"),
-                               expression("C"[3]~"non-legume"),
-                               expression("C"[4]~"non-legume"))) +
+                    labels = c(expression("C"[3]~"legume (C"[3]*" L)"),
+                               expression("C"[3]~"non-legume (C"[3]*" NL)"),
+                               expression("C"[4]~"non-legume (C"[4]*" NL)"))) +
   scale_color_manual(values = cbbPalette3, 
-                    labels = c(expression("C"[3]~"legume"),
-                               expression("C"[3]~"non-legume"),
-                               expression("C"[4]~"non-legume"))) +
+                     labels = c(expression("C"[3]~"legume (C"[3]*" L)"),
+                                expression("C"[3]~"non-legume (C"[3]*" NL)"),
+                                expression("C"[4]~"non-legume (C"[4]*" NL)"))) +
   scale_linetype_manual(values = c("dashed", "solid")) +
   scale_x_continuous(limits = c(18, 22), breaks = seq(18, 22, 1)) +
-  scale_y_continuous(limits = c(0.2, 1), breaks = seq(0.2, 1, 0.2)) +
+  scale_y_continuous(limits = c(0, 1.07), breaks = seq(0, 1, 0.25)) +
   labs(x = expression(bold("Air temperature ("*degree*"C)")),
        y = expression(bold(chi)),
-       fill = "Functional group",
-       color = "Functional group") +
+       fill = expression(bold("Functional group")),
+       color = expression(bold("Functional group"))) +
   guides(linetype = "none") +
   theme_bw(base_size = 18) +
   theme(legend.text.align = 0,
@@ -308,41 +334,42 @@ chi.temp.int
 ##########################################################################
 ## Chi - Soil moisture
 ##########################################################################
-test(emtrends(chi, ~pft, "wn3"))
+test(emtrends(chi, ~pft, "wn90_perc"))
 
-chi.sm.pft <- data.frame(emmeans(chi, ~pft, "wn3",
-                                   at = list(wn3 = seq(0, 1, 0.01))))
+chi.sm.pft <- data.frame(emmeans(chi, ~pft, "wn90_perc",
+                                   at = list(wn90_perc = seq(0, 1, 0.01))))
 
-chi.sm <- data.frame(emmeans(chi, ~1, "wn3",
-                               at = list(wn3 = seq(0, 1, 0.01)))) %>%
+chi.sm <- data.frame(emmeans(chi, ~1, "wn90_perc",
+                               at = list(wn90_perc = seq(0, 1, 0.01)))) %>%
   dplyr::select(pft = X1, everything()) %>%
   full_join(chi.sm.pft) %>%
-  mutate(linetype = ifelse(pft == "c4_nonlegume", "dashed", "solid"))
+  mutate(linetype = ifelse(pft == "c3_nonlegume", "dashed", "solid"))
 
-chi.sm.int <- ggplot(data = df, aes(x = wn3, y = chi)) +
+chi.sm.int <- ggplot(data = df, aes(x = wn90_perc, y = chi)) +
   geom_jitter(aes(fill = pft),
-              width = 0.1, size = 4, alpha = 0.7, shape = 21) +
+              width = 0.1, size = 3, alpha = 0.7, shape = 21) +
   geom_ribbon(data = subset(chi.sm, pft != "overall"), 
-              aes(x = wn3, y = emmean, ymin = lower.CL, 
+              aes(x = wn90_perc, y = emmean, ymin = lower.CL, 
                   ymax = upper.CL, fill = pft), alpha = 0.25) +
   geom_line(data = subset(chi.sm, pft != "overall"), 
-            aes(x = wn3, y = emmean, color = pft, linetype = linetype),
+            aes(x = wn90_perc, y = emmean, color = pft, linetype = linetype),
             size = 1) +
   scale_fill_manual(values = cbbPalette3, 
-                    labels = c(expression("C"[3]~"legume"),
-                               expression("C"[3]~"non-legume"),
-                               expression("C"[4]~"non-legume"))) +
+                    labels = c(expression("C"[3]~"legume (C"[3]*" L)"),
+                               expression("C"[3]~"non-legume (C"[3]*" NL)"),
+                               expression("C"[4]~"non-legume (C"[4]*" NL)"))) +
   scale_color_manual(values = cbbPalette3, 
-                     labels = c(expression("C"[3]~"legume"),
-                                expression("C"[3]~"non-legume"),
-                                expression("C"[4]~"non-legume"))) +
-  scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.25)) +
-  scale_y_continuous(limits = c(0.2, 1), breaks = seq(0.2, 1, 0.2)) +
+                     labels = c(expression("C"[3]~"legume (C"[3]*" L)"),
+                                expression("C"[3]~"non-legume (C"[3]*" NL)"),
+                                expression("C"[4]~"non-legume (C"[4]*" NL)"))) +
+  scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.25),
+                     labels = c(0, 25, 50, 75, 100)) +
+  scale_y_continuous(limits = c(0, 1.07), breaks = seq(0, 1, 0.25)) +
   scale_linetype_manual(values = c("solid", "dashed")) +
-  labs(x = expression(bold("Soil moisture (%)")),
+  labs(x = expression(bold("Soil moisture (% WHC)")),
        y = expression(bold(chi)),
-       fill = "Functional group",
-       color = "Functional group") +
+       fill = expression(bold("Functional group")),
+       color = expression(bold("Functional group"))) +
   guides(linetype = "none") +
   theme_bw(base_size = 18) +
   theme(legend.text.align = 0,
@@ -366,40 +393,69 @@ chi.no3n <- data.frame(emmeans(chi, ~1, "soil.no3n",
 
 chi.no3n.int <- ggplot(data = df, aes(x = soil.no3n, y = chi)) +
   geom_jitter(aes(fill = pft),
-              width = 0.1, size = 4, alpha = 0.7, shape = 21) +
-  geom_ribbon(data = subset(chi.no3n, pft != "overall"), 
-              aes(x = soil.no3n, y = emmean, ymin = lower.CL, 
-                  ymax = upper.CL, fill = pft), alpha = 0.25) +
-  geom_line(data = subset(chi.no3n, pft != "overall"),
-            aes(x = soil.no3n, y = emmean, color = pft), 
-            size = 1, lty = "dashed") +
+              width = 0.5, size = 3, alpha = 0.7, shape = 21) +
+  # geom_ribbon(data = subset(chi.no3n, pft != "overall"), 
+  #             aes(x = soil.no3n, y = emmean, ymin = lower.CL, 
+  #                 ymax = upper.CL, fill = pft), alpha = 0.25) +
+  # geom_line(data = subset(chi.no3n, pft != "overall"),
+  #           aes(x = soil.no3n, y = emmean, color = pft), 
+  #           size = 1, lty = "dashed") +
   scale_fill_manual(values = cbbPalette3, 
-                    labels = c(expression("C"[3]~"legume"),
-                               expression("C"[3]~"non-legume"),
-                               expression("C"[4]~"non-legume"))) +
+                    labels = c(expression("C"[3]~"legume (C"[3]*" L)"),
+                               expression("C"[3]~"non-legume (C"[3]*" NL)"),
+                               expression("C"[4]~"non-legume (C"[4]*" NL)"))) +
   scale_color_manual(values = cbbPalette3, 
-                    labels = c(expression("C"[3]~"legume"),
-                               expression("C"[3]~"non-legume"),
-                               expression("C"[4]~"non-legume"))) +
+                     labels = c(expression("C"[3]~"legume (C"[3]*" L)"),
+                                expression("C"[3]~"non-legume (C"[3]*" NL)"),
+                                expression("C"[4]~"non-legume (C"[4]*" NL)"))) +
   scale_x_continuous(limits = c(0, 80), breaks = seq(0, 80, 20)) +
-  scale_y_continuous(limits = c(0.2, 1), breaks = seq(0.2, 1, 0.2)) +
+  scale_y_continuous(limits = c(0, 1.07), breaks = seq(0, 1, 0.25)) +
   labs(x = expression(bold("Soil N availability (ppm NO"[3]*"-N)")),
        y = expression(bold(chi)),
-       fill = "Functional group",
-       color = "Functional group") +
+       fill = expression(bold("Functional group")),
+       color = expression(bold("Functional group"))) +
   theme_bw(base_size = 18) +
   theme(legend.text.align = 0,
         panel.border = element_rect(size = 1.25))
-chi.no3n.int  
+chi.no3n.int
+
+##########################################################################
+## Chi- pft
+##########################################################################
+chi.pft <- data.frame(multcomp::cld(emmeans(chi, ~pft), 
+                                     Letters = LETTERS)) %>%
+  mutate(.group = trimws(.group, which = "both"))
+
+chi.pft.plot <- ggplot() +
+  geom_jitter(data = subset(df, !is.na(pft)), 
+              aes(x = pft, y = chi, fill = pft),
+              width = 0.05, alpha = 0.7, shape = 21, size = 3) +
+  geom_boxplot(data = subset(df, !is.na(pft)), 
+               aes(x = pft, y = chi, fill = pft), 
+               alpha = 0.5, width = 0.5, size = 0.75) +
+  geom_text(data = chi.pft,
+            aes(x = pft, y = 1.07, label = .group), fontface = "bold", size = 6) +
+  scale_fill_manual(values = cbbPalette3) +
+  scale_x_discrete(labels = c(expression("C"[3]*" L"),
+                              expression("C"[3]*" NL"),
+                              expression("C"[4]*" NL"))) +
+  scale_y_continuous(limits = c(0, 1.07), breaks = seq(0, 1, 0.25)) +
+  labs(x = expression(bold("Functional group")),
+       y = expression(bold(chi))) +
+  guides(fill = "none") +
+  theme_bw(base_size = 18) +
+  theme(panel.border = element_rect(size = 1.25))
+chi.pft.plot
 
 ##########################################################################
 ## Write chi plot
 ##########################################################################
 png("../working_drafts/figs/TXeco_fig3_chi.png",
-    width = 11.5, height = 9.5, units = 'in', res = 600)
+    height = 14, width = 13, units = 'in', res = 600)
 ggarrange(chi.sm.int, chi.no3n.int,
           chi.vpd.int, chi.temp.int,
-          nrow = 2, ncol = 2, common.legend = TRUE, legend = "right", 
+          chi.pft.plot,
+          nrow = 3, ncol = 2, common.legend = TRUE, legend = "right", 
           align = "hv", labels = "AUTO", font.label = list(size = 18))
 dev.off()
 
@@ -422,22 +478,22 @@ narea.no3n <- data.frame(emmeans(narea, ~1, "soil.no3n",
 narea.no3n.ind <- ggplot(data = subset(df, !is.na(pft)), 
                         aes(x = soil.no3n, y = log(narea))) +
   geom_jitter(aes(fill = pft),
-              width = 0.5, size = 4, alpha = 0.7, shape = 21) +
-  geom_ribbon(data = subset(narea.no3n, pft == "overall"),
-              aes(y = emmean, ymin = lower.CL, ymax = upper.CL), 
-              alpha = 0.25) +
-  geom_smooth(data = subset(narea.no3n, pft == "overall"),
-              aes(y = emmean), linetype = "dashed", color = "black",
-              size = 1) +
+              width = 0.5, size = 3, alpha = 0.7, shape = 21) +
+  # geom_ribbon(data = subset(narea.no3n, pft == "overall"),
+  #             aes(y = emmean, ymin = lower.CL, ymax = upper.CL), 
+  #             alpha = 0.25) +
+  # geom_smooth(data = subset(narea.no3n, pft == "overall"),
+  #             aes(y = emmean), linetype = "dashed", color = "black",
+  #             size = 1) +
   scale_fill_manual(values = c(cbbPalette3), 
-                    labels = c(expression("C"[3]~"legume"),
-                               expression("C"[3]~"non-legume"),
-                               expression("C"[4]~"non-legume"))) +
+                    labels = c(expression("C"[3]~"legume (C"[3]*" L)"),
+                               expression("C"[3]~"non-legume (C"[3]*" NL)"),
+                               expression("C"[4]~"non-legume (C"[4]*" NL)"))) +
   scale_x_continuous(limits = c(-1, 80), breaks = seq(0, 80, 20)) +
   scale_y_continuous(limits = c(-1, 3), breaks = seq(-1, 3, 1)) +
   labs(x = expression(bold("Soil N availability (ppm NO"[3]*"-N)")),
        y = expression(bold(ln*" N"["area"]*" (gN m"^"-2"~")")),
-       fill = "Functional group") +
+       fill = expression(bold("Functional group"))) +
   theme_bw(base_size = 18) +
   theme(legend.text.align = 0,
         panel.border = element_rect(size = 1.25),
@@ -451,10 +507,10 @@ test(emtrends(narea, ~pft, "chi"))
 car::Anova(narea)
 
 narea.chi.pft <- data.frame(emmeans(narea, ~pft, "chi",
-                                     at = list(chi = seq(0.0, 1, 0.01))))
+                                     at = list(chi = seq(0.2, 1, 0.01))))
 
 narea.chi <- data.frame(emmeans(narea, ~1, "chi",
-                                 at = list(chi = seq(0.0, 1, 0.01)))) %>%
+                                 at = list(chi = seq(0.2, 1, 0.01)))) %>%
   dplyr::select(pft = X1, everything()) %>%
   full_join(narea.chi.pft) %>%
   mutate(linetype = ifelse(pft == "c3_nonlegume", "solid", "dashed"))
@@ -462,7 +518,7 @@ narea.chi <- data.frame(emmeans(narea, ~1, "chi",
 narea.chi.ind <- ggplot(data = subset(df, !is.na(pft)), 
                          aes(x = chi, y = log(narea))) +
   geom_jitter(aes(fill = pft),
-              width = 0.5, size = 4, alpha = 0.7, shape = 21) +
+              width = 0.01, size = 3, alpha = 0.7, shape = 21) +
   geom_ribbon(data = subset(narea.chi, pft != "overall"),
               aes(x = chi, y = emmean, ymin = lower.CL,
                   ymax = upper.CL, fill = pft), alpha = 0.25) +
@@ -470,20 +526,20 @@ narea.chi.ind <- ggplot(data = subset(df, !is.na(pft)),
             aes(x = chi, y = emmean, color = pft, linetype = linetype),
             size = 1) +
   scale_fill_manual(values = c(cbbPalette3), 
-                    labels = c(expression("C"[3]~"legume"),
-                               expression("C"[3]~"non-legume"),
-                               expression("C"[4]~"non-legume"))) +
+                    labels = c(expression("C"[3]~"legume (C"[3]*" L)"),
+                               expression("C"[3]~"non-legume (C"[3]*" NL)"),
+                               expression("C"[4]~"non-legume (C"[4]*" NL)"))) +
   scale_color_manual(values = c(cbbPalette3), 
-                    labels = c(expression("C"[3]~"legume"),
-                               expression("C"[3]~"non-legume"),
-                               expression("C"[4]~"non-legume"))) +
+                     labels = c(expression("C"[3]~"legume (C"[3]*" L)"),
+                                expression("C"[3]~"non-legume (C"[3]*" NL)"),
+                                expression("C"[4]~"non-legume (C"[4]*" NL)"))) +
   scale_linetype_manual(values = c("dashed", "solid")) +
-  scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.2)) +
-  scale_y_continuous(limits = c(-1, 3), breaks = seq(-1, 3, 1)) +
+  scale_x_continuous(limits = c(0.2, 1), breaks = seq(0.2, 1, 0.2)) +
+  scale_y_continuous(limits = c(-1.2, 3), breaks = seq(-1, 3, 1)) +
   labs(x = expression(bold(chi)),
        y = expression(bold(ln*" N"["area"]*" (gN m"^"-2"~")")),
-       fill = "Functional group",
-       color = "Functional group") +
+       fill = expression(bold("Functional group")),
+       color = expression(bold("Functional group"))) +
   guides(linetype = "none") +
   theme_bw(base_size = 18) +
   theme(legend.text.align = 0,
@@ -494,7 +550,7 @@ narea.chi.ind
 ##########################################################################
 ## Narea - beta
 ##########################################################################
-test(emtrends(narea, ~pft, "soil.no3n"))
+test(emtrends(narea, ~pft, "beta"))
 car::Anova(narea)
 
 narea.beta.pft <- data.frame(emmeans(narea, ~pft, "beta",
@@ -504,41 +560,69 @@ narea.beta <- data.frame(emmeans(narea, ~1, "beta",
                                  at = list(beta = seq(0, 600, 1)))) %>%
   dplyr::select(pft = X1, everything()) %>%
   full_join(narea.beta.pft) %>%
-  mutate(linetype = "dashed")
+  mutate(linetype = ifelse(pft == "c3_legume", "solid", "dashed"))
 
 narea.beta.ind <- ggplot(data = subset(df, !is.na(pft)), 
                          aes(x = beta, y = log(narea))) +
-  geom_jitter(aes(fill = pft),
-              width = 0.5, size = 4, alpha = 0.7, shape = 21) +
+  geom_point(aes(fill = pft),
+              size = 3, alpha = 0.7, shape = 21) +
   geom_ribbon(data = subset(narea.beta, pft == "overall"),
               aes(x = beta, y = emmean, ymin = lower.CL,
                   ymax = upper.CL), alpha = 0.25) +
   geom_line(data = subset(narea.beta, pft == "overall"),
             aes(x = beta, y = emmean),
-            color = "black", size = 1) +
+            size = 1) +
   scale_fill_manual(values = c(cbbPalette3), 
-                    labels = c(expression("C"[3]~"legume"),
-                               expression("C"[3]~"non-legume"),
-                               expression("C"[4]~"non-legume"))) +
+                    labels = c(expression("C"[3]~"legume (C"[3]*" L)"),
+                               expression("C"[3]~"non-legume (C"[3]*" NL)"),
+                               expression("C"[4]~"non-legume (C"[4]*" NL)"))) +
   scale_x_continuous(limits = c(0, 600), breaks = seq(0, 600, 150)) +
   scale_y_continuous(limits = c(-1, 3), breaks = seq(-1, 3, 1)) +
   labs(x = expression(bold("Unit cost ratio ("*beta*")")),
        y = expression(bold(ln*" N"["area"]*" (gN m"^"-2"~")")),
-       fill = "Functional group") +
+       fill = expression(bold("Functional group"))) +
   theme_bw(base_size = 18) +
   theme(legend.text.align = 0,
         panel.border = element_rect(size = 1.25),
         panel.grid.minor.y = element_blank())
 narea.beta.ind
 
+##########################################################################
+## Narea- pft
+##########################################################################
+narea.pft <- data.frame(multcomp::cld(emmeans(narea, ~pft), 
+                                    Letters = LETTERS)) %>%
+  mutate(.group = trimws(.group, which = "both"))
+
+narea.pft.plot <- ggplot() +
+  geom_jitter(data = subset(df, !is.na(pft)), 
+              aes(x = pft, y = log(narea), fill = pft),
+              width = 0.05, alpha = 0.7, shape = 21, size = 3) +
+  geom_boxplot(data = subset(df, !is.na(pft)), 
+               aes(x = pft, y = log(narea), fill = pft), 
+               alpha = 0.5, width = 0.5, size = 0.75) +
+  geom_text(data = narea.pft,
+            aes(x = pft, y = 3, label = .group), fontface = "bold", size = 6) +
+  scale_fill_manual(values = cbbPalette3) +
+  scale_x_discrete(labels = c(expression("C"[3]*" L"),
+                              expression("C"[3]*" NL"),
+                              expression("C"[4]*" NL"))) +
+  scale_y_continuous(limits = c(-1, 3), breaks = seq(-1, 3, 1)) +
+  labs(x = expression(bold("Functional group")),
+       y = expression(bold(ln*" N"["area"]*" (gN m"^"-2"~")"))) +
+  guides(fill = "none") +
+  theme_bw(base_size = 18) +
+  theme(panel.border = element_rect(size = 1.25))
+narea.pft.plot
+
 
 ##########################################################################
 ## Create Narea plots
 ##########################################################################
 png("../working_drafts/figs/TXeco_fig4_narea.png",
-    height = 12, width = 7, units = 'in', res = 600)
-ggarrange(narea.no3n.ind, narea.chi.ind, narea.beta.ind,
-          ncol = 1, nrow = 3, common.legend = TRUE, legend = "right", 
+    width = 12, height = 8.5, units = 'in', res = 600)
+ggarrange(narea.no3n.ind, narea.chi.ind, narea.beta.ind, narea.pft.plot,
+          ncol = 2, nrow = 2, common.legend = TRUE, legend = "right", 
           align = "hv", labels = "AUTO", font.label = list(size = 18))
 dev.off()
 

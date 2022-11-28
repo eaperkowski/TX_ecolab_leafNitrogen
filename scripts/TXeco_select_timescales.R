@@ -11,26 +11,37 @@ library(merTools)
 ###############################################################################
 # Load compiled data file
 ###############################################################################
-df <- read.csv("../data_sheets/TXeco_compiled_datasheet.csv")
+df <- read.csv("../data_sheets/TXeco_compiled_datasheet.csv",
+               na.strings = c("NA", "NaN")) %>%
+  filter(site != "Bell_2020_05" & 
+           site != "Russel_2020_01") %>%
+  mutate(pft = ifelse(pft == "c4_graminoid", 
+                      "c4_nonlegume",
+                      ifelse(pft == "c3_graminoid" | pft == "c3_forb" | pft == "c3_shrub",
+                             "c3_nonlegume", 
+                             ifelse(pft == "legume", 
+                                    "c3_legume", 
+                                    NA))),
+         chi = ifelse(chi > 0.95 | chi < 0.20, NA, chi))
 
 ###############################################################################
 # Iterative models for soil moisture and beta
 ###############################################################################
-wn90 <- lmer(log(beta) ~ wn90 + (1 | NCRS.code), data = df)
-wn60 <- lmer(log(beta) ~ wn60 + (1 | NCRS.code), data = df)
-wn30 <- lmer(log(beta) ~ wn30 + (1 | NCRS.code), data = df)
-wn20 <- lmer(log(beta) ~ wn20 + (1 | NCRS.code), data = df)
-wn15 <- lmer(log(beta) ~ wn15 + (1 | NCRS.code), data = df)
-wn10 <- lmer(log(beta) ~ wn10 + (1 | NCRS.code), data = df)
-wn9 <- lmer(log(beta) ~ wn9 + (1 | NCRS.code), data = df)
-wn8 <- lmer(log(beta) ~ wn8 + (1 | NCRS.code), data = df)
-wn7 <- lmer(log(beta) ~ wn7 + (1 | NCRS.code), data = df)
-wn6 <- lmer(log(beta) ~ wn6 + (1 | NCRS.code), data = df)
-wn5 <- lmer(log(beta) ~ wn5 + (1 | NCRS.code), data = df)
-wn4 <- lmer(log(beta) ~ wn4 + (1 | NCRS.code), data = df)
-wn3 <- lmer(log(beta) ~ wn3 + (1 | NCRS.code), data = df)
-wn2 <- lmer(log(beta) ~ wn2 + (1 | NCRS.code), data = df)
-wn1 <- lmer(log(beta) ~ wn1 + (1 | NCRS.code), data = df)
+wn90 <- lmer(log(beta) ~ wn90_perc + (1 | NCRS.code), data = df)
+wn60 <- lmer(log(beta) ~ wn60_perc + (1 | NCRS.code), data = df)
+wn30 <- lmer(log(beta) ~ wn30_perc + (1 | NCRS.code), data = df)
+wn20 <- lmer(log(beta) ~ wn20_perc + (1 | NCRS.code), data = df)
+wn15 <- lmer(log(beta) ~ wn15_perc + (1 | NCRS.code), data = df)
+wn10 <- lmer(log(beta) ~ wn10_perc + (1 | NCRS.code), data = df)
+wn9 <- lmer(log(beta) ~ wn9_perc + (1 | NCRS.code), data = df)
+wn8 <- lmer(log(beta) ~ wn8_perc + (1 | NCRS.code), data = df)
+wn7 <- lmer(log(beta) ~ wn7_perc + (1 | NCRS.code), data = df)
+wn6 <- lmer(log(beta) ~ wn6_perc + (1 | NCRS.code), data = df)
+wn5 <- lmer(log(beta) ~ wn5_perc + (1 | NCRS.code), data = df)
+wn4 <- lmer(log(beta) ~ wn4_perc + (1 | NCRS.code), data = df)
+wn3 <- lmer(log(beta) ~ wn3_perc + (1 | NCRS.code), data = df)
+wn2 <- lmer(log(beta) ~ wn2_perc + (1 | NCRS.code), data = df)
+wn1 <- lmer(log(beta) ~ wn1_perc + (1 | NCRS.code), data = df)
 
 # Model selection across timescales
 wn90.modelSelect <- data.frame(day = 90, var = "wn", AICc = AICc(wn90), 
@@ -74,7 +85,7 @@ aicc.results.wn <- wn30.modelSelect %>%
   full_join(wn2.modelSelect) %>% full_join(wn1.modelSelect) %>%
   arrange(day) %>%
   dplyr::select(day, aicc.wn = AICc, rmse.wn = RMSE)
-# 3-day soil moisture is best model
+# 90-day soil moisture is best model
 
 ###############################################################################
 # Iterative models for mean air temperature and chi
@@ -225,13 +236,13 @@ write.csv(aicc.results,
 ###############################################################################
 wn.beta <- ggplot(data = aicc.results, aes(x = day, y = aicc.wn)) +
   geom_point() +
-  geom_point(data = subset(aicc.results, day == 3), 
+  geom_point(data = subset(aicc.results, day == 90), 
              fill = "red", size = 2, shape = 21) +
   geom_line() +
   scale_x_continuous(limits = c(0, 90), breaks = seq(0, 90, 30)) +
-  scale_y_continuous(limits = c(1300, 1340), breaks = seq(1300, 1340, 10)) +
+  scale_y_continuous(limits = c(1280, 1292), breaks = seq(1280, 1292, 3)) +
   labs(x = NULL, y = expression(bold("AIC"["c"])),
-       title = expression("Soil moisture (mm)")) +
+       title = expression("Soil moisture (% of water-holding capacity)")) +
   theme_bw(base_size = 18) +
   theme(panel.grid.minor = element_blank())
 
@@ -241,7 +252,7 @@ temp.chi <- ggplot(data = aicc.results, aes(x = day, y = aicc.temp)) +
              fill = "red", size = 2, shape = 21) +
   geom_line() +
   scale_x_continuous(limits = c(0, 90), breaks = seq(0, 90, 30)) +
-  scale_y_continuous(limits = c(-915, -903), breaks = seq(-915, -903, 3)) +
+  scale_y_continuous(limits = c(-877, -865), breaks = seq(-877, -865, 3)) +
   labs(x = expression(bold("Days before site visit")), y = NULL,
        title = expression("Air temperature ("*degree*"C)")) +
   theme_bw(base_size = 18) +
@@ -253,7 +264,7 @@ vpd.chi <- ggplot(data = aicc.results, aes(x = day, y = aicc.vpd)) +
              fill = "red", size = 2, shape = 21) +
   geom_line() +
   scale_x_continuous(limits = c(0, 90), breaks = seq(0, 90, 30)) +
-  scale_y_continuous(limits = c(-920, -900), breaks = seq(-920, -900, 5)) +
+  scale_y_continuous(limits = c(-880, -860), breaks = seq(-880, -860, 5)) +
   labs(x = NULL, y = NULL,
        title = "VPD (kPa)") +
   theme_bw(base_size = 18) +

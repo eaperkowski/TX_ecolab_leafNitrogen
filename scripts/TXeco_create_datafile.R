@@ -9,13 +9,18 @@ library(readxl)
 library(reshape)
 
 ##########################################################################
-## Import raw leaf trait data files
+## Load calc_chi function
+##########################################################################
+source("../../r_functions/calc_chi.R")
+source("../../r_functions/calc_beta.R")
+source("../../r_functions/calc_optchi.R")
+source("../../r_functions/calc_soil_water.R")
+
+##########################################################################
+## Import files
 ##########################################################################
 biomass <- read.csv("../data_sheets/TXeco_drybiomass.csv", na.strings = "NA")
 
-##########################################################################
-## Import soil data, spei data, site coord data, and species id data
-##########################################################################
 clim <- read.csv("../climate_data/TXeco_climate_data.csv", 
                  stringsAsFactors = FALSE, na.strings = "NA")
 
@@ -25,13 +30,16 @@ spp.info <- read.csv("../data_sheets/TXeco_species_id.csv",
                      na.strings = c("NA", "<NA>", ""))
 
 soil <- read.csv("../data_sheets/TXeco_soil_characteristics.csv")
+soil.grid <- read.csv("../data_sheets/TXeco_soilgrid_data.csv") %>%
+  mutate(calc_soil_water(id = id, fsand = perc.sand/100,
+                         fclay = perc.clay/100,
+                         fom = om/1000,
+                         fgravel = perc.gravel/100,
+                         zbed = bedrock/100)[4],
+         whc = whc * 1000) %>%
+  dplyr::select(site = id, everything())
 
-##########################################################################
-## Load calc_chi function
-##########################################################################
-source("/Users/eaperkowski/git/r_functions/calc_chi.R")
-source("/Users/eaperkowski/git/r_functions/calc_beta.R")
-source("/Users/eaperkowski/git/r_functions/calc_optchi.R")
+names(soil.grid)[4:23] <- str_c("sg.", names(soil.grid)[4:23])
 
 ##########################################################################
 ## Import raw costech files
@@ -108,14 +116,15 @@ full.df <- leaf %>%
   filter(pft != "c3_tree") %>%
   dplyr::mutate(chi = ifelse(pft == "c4_graminoid", 
                              calc_chi_c4(d13C),
-                             calc_chi_c3(d13C)))
+                             calc_chi_c3(d13C))) %>%
+  full_join(soil.grid) %>%
+  dplyr::select(-lat, -long) %>%
+  mutate(across(wn1:wn90, list(perc =~./ whc)))
 
 ## Add chi column
 full.df$chi[full.df$chi < 0.2 | full.df$chi > 0.95] <- NA
 full.df$beta <- calc_beta(chi = full.df$chi, temp = full.df$tavg7, 
                           vpd = full.df$vpd7 * 10, z = full.df$elevation.m)
-
-hist(full.df$beta)
 
 ## Write csv
 write.csv(full.df, "../data_sheets/TXeco_compiled_datasheet.csv")

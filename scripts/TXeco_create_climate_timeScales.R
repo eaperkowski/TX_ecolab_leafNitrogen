@@ -254,7 +254,8 @@ splash.df <- read.csv("../climate_data/TXeco_siteAridity_SPLASH.csv")
 d <- d %>% full_join(splash.df) %>% 
   dplyr::select(site:mav.15yr, 
                 ai.30:ai.15yr,
-                everything())
+                everything()) %>%
+  distinct(site, sampling.year, visit.type, .keep_all = TRUE)
 
 ## Write csv
 write.csv(d, "../climate_data/TXeco_climate_data.csv",

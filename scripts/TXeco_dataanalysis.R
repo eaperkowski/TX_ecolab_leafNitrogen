@@ -26,8 +26,7 @@ df <- read.csv("../data_sheets/TXeco_compiled_datasheet.csv",
                              ifelse(pft == "legume", 
                                     "c3_legume", 
                                     NA))),
-         chi = ifelse(chi > 0.95 | chi < 0.20, NA, chi),
-         wn3 = wn3/150)
+         chi = ifelse(chi > 0.95 | chi < 0.20, NA, chi))
 df.sem <- df
 
 ## Add colorblind friendly palette
@@ -48,9 +47,9 @@ df$vpd4 <- df$vpd4 / 10
 ##########################################################################
 ## Beta
 ##########################################################################
-df$beta[c(84)] <- NA
+df$beta[c(84, 317, 500)] <- NA
 
-beta <- lmer(log(beta) ~ wn3 * soil.no3n * pft + (1 | NCRS.code), data = df)
+beta <- lmer(log(beta) ~ wn90_perc * soil.no3n * pft + (1 | NCRS.code), data = df)
 
 # Check model assumptions
 plot(beta)
@@ -65,17 +64,13 @@ summary(beta)
 Anova(beta)
 r.squaredGLMM(beta)
 
-# Two-way interaction between wn3 and pft
-test(emtrends(beta, ~pft, "wn3"))
+# Post-hoc comparisons
+test(emtrends(beta, ~pft, "wn90_perc"))
+test(emtrends(beta, pairwise~pft, "soil.no3n"))
 
-# Individual effect of wn3 
-test(emtrends(beta, ~1, "wn3"))
-emmeans(beta, ~1, "wn3", at = list(wn = 0))
-
-# Individual effect of soil NO3-N
-test(emtrends(beta, ~1, "soil.no3n"))
-
-# PFT-only effect
+# Individual effects
+test(emtrends(beta, ~1, "wn90_perc", regrid = "response"))
+test(emtrends(beta, ~pft, "soil.no3n"))
 emmeans(beta, pairwise~pft)
 
 ##########################################################################
@@ -83,11 +78,14 @@ emmeans(beta, pairwise~pft)
 ##########################################################################
 df.chi.nobeta <- df
 
-df.chi.nobeta$chi[c(117, 317, 322, 481)] <- NA
-df.chi.nobeta$chi[c(62, 315, 456)] <- NA
-df.chi.nobeta$chi[c(284, 292, 483, 484)] <- NA
+df.chi.nobeta$chi[c(62, 117, 275, 317, 481)] <- NA
+df.chi.nobeta$chi[c(276, 304, 322, 500)] <- NA
+df.chi.nobeta$chi[c(315, 456, 480, 502)] <- NA
+df.chi.nobeta$chi[c(71, 292, 483)] <- NA
+df.chi.nobeta$chi[484] <- NA
+df.chi.nobeta$chi[402] <- NA
 
-chi <- lmer(chi ~ (vpd4 + tavg4 + (wn3 * soil.no3n)) * pft + 
+chi <- lmer(chi ~ (vpd4 + tavg4 + (wn90_perc * soil.no3n)) * pft + 
               (1 | NCRS.code), data = df.chi.nobeta)
 
 # Check model assumptions
@@ -103,29 +101,24 @@ round(summary(chi)$coefficients, digits = 3)
 Anova(chi)
 r.squaredGLMM(chi)
 
-## Single factor effect of 3-day soil moisture on chi
-test(emtrends(chi, ~pft, "wn3"))
-
-## Single factor effect of 4 day temperature on chi
+## Post-hoc comparisons 
+test(emtrends(chi, ~pft, "wn90_perc"))
 test(emtrends(chi, ~pft, "tavg4"))
-
-## Single factor effect of 4 day VPD on chi
 test(emtrends(chi, ~pft, "vpd4"))
+emmeans(chi, pairwise~pft)
 
-## Single factor effect of soil.no3n on chi
-test(emtrends(chi, ~pft, "soil.no3n"))
-
-## Single factor effect of soil.no3n on chi
-cld(emmeans(chi, pairwise~pft))
+test(emtrends(chi, ~soil.no3n*pft, "wn90_perc",
+              at = list(soil.no3n = c(0, 40, 80))))
 
 ##########################################################################
 ## Chi w/ beta
 ##########################################################################
 df.chi.beta <- df
 
-df.chi.beta$chi[c(62, 308, 315, 317, 322, 456)] <- NA
-df.chi.beta$chi[c(304, 483, 500)] <- NA
-df.chi.beta$chi[c(220, 402, 484)] <- NA
+df.chi.beta$chi[c(62, 84, 86, 304, 308, 456)] <- NA
+df.chi.beta$chi[c(322, 483)] <- NA
+df.chi.beta$chi[c(315, 484)] <- NA
+df.chi.beta$chi[c(220, 402)] <- NA
 
 chi.beta <- lmer(chi ~ (vpd4 + tavg4 + beta) * pft + 
               (1 | NCRS.code), data = df.chi.beta)
@@ -143,14 +136,12 @@ round(summary(chi.beta)$coefficients, digits = 3)
 Anova(chi.beta)
 r.squaredGLMM(chi.beta)
 
-# Two way interaction between vpd and pft
+# Post-hoc comparisons
+test(emtrends(chi.beta, ~1, "vpd4"))
 test(emtrends(chi.beta, ~pft, "vpd4"))
-
-# Two way interaction between vpd and pft
-test(emtrends(chi.beta, ~pft, "tavg4"))
-
-# Two way interaction between vpd and pft
 test(emtrends(chi.beta, pairwise~pft, "beta"))
+test(emtrends(chi.beta, ~pft, "tavg4"))
+emmeans(chi.beta, pairwise~pft)
 
 ##########################################################################
 ## Narea with beta
@@ -158,7 +149,7 @@ test(emtrends(chi.beta, pairwise~pft, "beta"))
 df.narea.beta <- df
 
 # Remove outliers (Bonferroni p<0.05 condition)
-df.narea.beta$narea[df$narea > 10] <- NA
+df.narea.beta$narea[df.narea.beta$narea > 10] <- NA
 df.narea.beta$narea[509] <- NA
 
 # Fit model
@@ -179,20 +170,10 @@ round(summary(narea.beta)$coefficients, digits = 3)
 Anova(narea.beta)
 r.squaredGLMM(narea.beta)
 
-## Individual beta effect
-test(emtrends(narea.beta, ~1, "beta"))
-emmeans(narea.beta, ~1, at = list(beta = 0))
-
-## Individual chi effect
-test(emtrends(narea.beta, ~1, "chi"))
-emmeans(narea.beta, ~1, at = list(beta = 0))
-
-## Individual beta effect
+## Post hoc comparisons
 test(emtrends(narea.beta, ~pft, "beta"))
-emmeans(narea.beta, ~1, at = list(beta = 0))
-
-## Individual soil N effect
-test(emtrends(narea.beta, ~1, "soil.no3n"))
+test(emtrends(narea.beta, ~pft, "chi"))
+emmeans(narea.beta, pairwise~pft)
 
 ##########################################################################
 ## Narea without beta
@@ -200,11 +181,11 @@ test(emtrends(narea.beta, ~1, "soil.no3n"))
 df.narea.nobeta <- df
 
 # Remove outliers (Bonferroni p<0.05 condition)
-df.narea.nobeta$narea[df$narea > 10] <- NA
+df.narea.nobeta$narea[df.narea.nobeta$narea > 10] <- NA
 df.narea.nobeta$narea[509] <- NA
 
 # Fit model
-narea.nobeta <- lmer(log(narea) ~ (chi + (soil.no3n * wn3)) * 
+narea.nobeta <- lmer(log(narea) ~ (chi + (soil.no3n * wn90_perc)) * 
                        pft + (1 | NCRS.code), data = df.narea.nobeta)
 
 # Check model assumptions
@@ -222,20 +203,29 @@ Anova(narea.nobeta)
 r.squaredGLMM(narea.nobeta)
 
 # Pairwise comparisons
-## Two-way interaction between chi and pft
+test(emtrends(narea.nobeta, ~1, "chi"))
+test(emtrends(narea.nobeta, ~1, "soil.no3n"))
 test(emtrends(narea.nobeta, ~pft, "chi"))
-
-## Two-way interactio nbetween soil moisture and soil N
-test(emtrends(narea.nobeta, ~wn3, "soil.no3n",
-              at = list(wn3 = c(0, 0.25, 0.5, 0.75, 1))))
+emmeans(narea.nobeta, pairwise~pft)
 
 ##########################################################################
 ## Structural equation model
 ##########################################################################
+df.sem <- df
+
+df.sem$beta[c(84, 317, 500)] <- NA
+df.sem$chi[c(62, 84, 86, 304, 308, 456)] <- NA
+df.sem$chi[c(322, 483)] <- NA
+df.sem$chi[c(315, 484)] <- NA
+df.sem$chi[c(220, 402)] <- NA
+df.sem$narea[df.sem$narea > 10] <- NA
+df.sem$narea[509] <- NA
+
+
 ## Standardize and center vars
 df.sem$beta.std <- scale(df.sem$beta)
 df.sem$no3n.std <- scale(df.sem$soil.no3n)
-df.sem$wn3.std <- scale(df.sem$wn3)
+df.sem$wn90.std <- scale(df.sem$wn90_perc)
 df.sem$vpd4.std <- scale(df.sem$vpd4)
 df.sem$tavg4.std <- scale(df.sem$tavg4)
 df.sem$chi.std <- scale(df.sem$chi)
@@ -244,10 +234,10 @@ df.sem$narea.std <- scale(df.sem$narea)
 ## Add models to be tested in SEM
 models <- ' # regressions
             narea.std ~ b*beta.std + chi.std + no3n.std + pft
-            beta.std ~ c*wn3.std + a*no3n.std + pft
-            chi.std ~ vpd4.std + tavg4.std + pft
-            vpd4.std ~ tavg4.std
-            no3n.std ~ d*wn3.std
+            beta.std ~ c*wn90.std + a*no3n.std + pft
+            chi.std ~ f*vpd4.std + tavg4.std + pft
+            vpd4.std ~ e*tavg4.std
+            no3n.std ~ d*wn90.std
 
             # covariates
             beta.std ~~ chi.std
@@ -255,7 +245,8 @@ models <- ' # regressions
             # indirect effect of soil N and soil moisture on leaf N
             soiln.indirect:=a*b
             moisture.indirect:=c*b
-            moisture.indirect2:=d*a*b'
+            moisture.indirect2:=d*a*b
+            temp.chi.indirect:=e*f'
 
 test_fit <- sem(models, data = df.sem)
 summary(test_fit, standardized = TRUE,
@@ -264,7 +255,7 @@ fitMeasures(test_fit, c("cfi", "rmsea", "srmr"))
 
 
 summary.coefs <- data.frame(summary(test_fit, standardized = TRUE,
-                                    ci = TRUE, fit.measures = TRUE)$pe[c(1:13, 25:27),])
+                                    ci = TRUE, fit.measures = TRUE)$pe[c(1:13, 25:28),])
 summary.coefs$line <- abs(summary.coefs$est)
 summary.coefs$line_std <- scale(summary.coefs$line) * 2 + 4
 
@@ -288,8 +279,8 @@ beta.coefs <- data.frame(summary(beta)$coefficient) %>%
          coef = format(Estimate, scientific = TRUE, digits = 3),
          se = round(Std..Error, digits = 3)) %>%
   dplyr::select(treatment, coef, se, t.value) %>%
-  filter(treatment == "(Intercept)" | treatment == "wn3" | 
-           treatment == "soil.no3n" | treatment == "wn3:soil.no3n") %>%
+  filter(treatment == "(Intercept)" | treatment == "wn90_perc" | 
+           treatment == "soil.no3n" | treatment == "wn90_perc:soil.no3n") %>%
   mutate(coef = ifelse(coef <0.001 & coef >= 0, "<0.001", coef)) %>%
   print(., row.names = FALSE)
 
@@ -300,19 +291,16 @@ table2 <- data.frame(Anova(beta)) %>%
                           round(Pr..Chisq., 3))) %>%
   full_join(beta.coefs) %>%
   mutate(treatment = factor(treatment, levels = c("(Intercept)",
-                                                  "wn3",
+                                                  "wn90_perc",
                                                   "soil.no3n",
                                                   "pft",
-                                                  "wn3:soil.no3n",
-                                                  "wn3:pft",
+                                                  "wn90_perc:soil.no3n",
+                                                  "wn90_perc:pft",
                                                   "soil.no3n:pft",
-                                                  "wn3:soil.no3n:pft"))) %>%
+                                                  "wn90_perc:soil.no3n:pft"))) %>%
   dplyr::select(treatment, df = Df, coef, Chisq, P_value) %>%
-  arrange(treatment) %>%
-  mutate(df = replace(df, is.na(df), "-"),
-         coef = replace(coef, is.na(coef), "-"),
-         Chisq = replace(Chisq, is.na(Chisq), "-"),
-         P_value = replace(P_value, is.na(P_value), "-"))
+  arrange(treatment)  %>%
+  replace(is.na(.), "-")
 
 table2$treatment <- c("Intercept", 
                       "Soil moisture (SM)", 
@@ -335,8 +323,8 @@ chi.nobeta.coefs <- data.frame(summary(chi)$coefficient) %>%
          t.value.nobeta = round(t.value, digits = 3)) %>%
   dplyr::select(treatment, coef.nobeta, se.nobeta, t.value.nobeta) %>%
   filter(treatment == "(Intercept)" | treatment == "vpd4" | 
-           treatment == "wn3" | treatment == "soil.no3n" | 
-           treatment == "wn3:soil.no3n") %>%
+           treatment == "wn90_perc" | treatment == "soil.no3n" | 
+           treatment == "wn90_perc:soil.no3n") %>%
   mutate(coef.nobeta = ifelse(coef.nobeta <0.001 & coef.nobeta >= 0, 
                               "<0.001", coef.nobeta)) %>%
   print(., row.names = FALSE)
@@ -361,10 +349,10 @@ chi.nobeta.table3 <- data.frame(Anova(chi)) %>%
                           round(Pr..Chisq., 3))) %>%
   full_join(chi.nobeta.coefs) %>%
   mutate(treatment = factor(treatment, 
-                            levels = c("(Intercept)", "vpd4", "tavg4", "wn3",
-                                       "soil.no3n", "pft", "wn3:soil.no3n",
-                                       "vpd4:pft", "tavg4:pft", "wn3:pft",
-                                       "soil.no3n:pft", "wn3:soil.no3n:pft"))) %>%
+                            levels = c("(Intercept)", "vpd4", "tavg4", "wn90_perc",
+                                       "soil.no3n", "pft", "wn90_perc:soil.no3n",
+                                       "vpd4:pft", "tavg4:pft", "wn90_perc:pft",
+                                       "soil.no3n:pft", "wn90_perc:soil.no3n:pft"))) %>%
   dplyr::select(treatment, df = Df, coef.nobeta, Chisq.nobeta, P_value.nobeta) %>%
   arrange(treatment)
 
@@ -385,19 +373,13 @@ chi.beta.table3 <- data.frame(Anova(chi.beta)) %>%
 table3 <- chi.beta.table3 %>% full_join(chi.nobeta.table3) %>%
   mutate(treatment = factor(treatment, 
                             levels = c("(Intercept)", "vpd4", "tavg4", "beta",
-                                       "wn3", "soil.no3n", "pft", "wn3:soil.no3n",
-                                       "vpd4:pft", "tavg4:pft", "beta:pft", "wn3:pft",
-                                       "soil.no3n:pft", "wn3:soil.no3n:pft"))) %>%
-  arrange(treatment) %>%
-  mutate(df = replace(df, is.na(df), "-"),
-         coef.beta = replace(coef.beta, is.na(coef.beta), "-"),
-         coef.nobeta = replace(coef.nobeta, is.na(coef.nobeta), "-"),
-         Chisq.beta = replace(Chisq.beta, is.na(Chisq.beta), "-"),
-         Chisq.nobeta = replace(Chisq.nobeta, is.na(Chisq.nobeta), "-"),
-         P_value.beta = replace(P_value.beta, is.na(P_value.beta), "-"),
-         P_value.nobeta = replace(P_value.nobeta, is.na(P_value.nobeta), "-"))
+                                       "wn90_perc", "soil.no3n", "pft", "wn90_perc:soil.no3n",
+                                       "vpd4:pft", "tavg4:pft", "beta:pft", "wn90_perc:pft",
+                                       "soil.no3n:pft", "wn90_perc:soil.no3n:pft"))) %>%
+  arrange(treatment)  %>%
+  replace(is.na(.), "-")
 
-table3$treatment <- c("Intercept", "VPD", "Temperature (T)", 
+table3$treatment <- c("(Intercept)", "VPD", "Temperature (T)", 
                       "Unit cost ratio (beta)", "Soil moisture", "Soil N",
                       "PFT", "SM * N", "VPD * PFT", "T * PFT", "beta * PFT",
                       "SM * PFT", "N * PFT", "SM * N * PFT")
@@ -416,8 +398,8 @@ narea.nobeta.coefs <- data.frame(summary(narea.nobeta)$coefficient) %>%
          t.value.nobeta = round(t.value, digits = 3)) %>%
   dplyr::select(treatment, coef.nobeta, se.nobeta, t.value.nobeta) %>%
   filter(treatment == "(Intercept)" | treatment == "chi" | 
-           treatment == "soil.no3n" | treatment == "wn3" | 
-           treatment == "soil.no3n:wn3") %>%
+           treatment == "soil.no3n" | treatment == "wn90_perc" | 
+           treatment == "soil.no3n:wn90_perc") %>%
   mutate(coef.nobeta = ifelse(coef.nobeta <0.001 & coef.nobeta >= 0, 
                               "<0.001", coef.nobeta)) %>%
   print(., row.names = FALSE)
@@ -431,13 +413,13 @@ narea.nobeta.table4 <- data.frame(Anova(narea.nobeta)) %>%
   mutate(treatment = factor(treatment, levels = c("(Intercept)",
                                                   "chi",
                                                   "soil.no3n",
-                                                  "wn3",
+                                                  "wn90_perc",
                                                   "pft",
-                                                  "soil.no3n:wn3",
+                                                  "soil.no3n:wn90_perc",
                                                   "chi:pft",
                                                   "soil.no3n:pft",
-                                                  "wn3:pft",
-                                                  "soil.no3n:wn3:pft"))) %>%
+                                                  "wn90_perc:pft",
+                                                  "soil.no3n:wn90_perc:pft"))) %>%
   dplyr::select(treatment, df = Df, coef.nobeta, Chisq.nobeta, P_value.nobeta) %>%
   arrange(treatment)
 
@@ -467,19 +449,13 @@ narea.beta.table4 <- data.frame(Anova(narea.beta)) %>%
   arrange(treatment)
 
 table4 <- narea.beta.table4 %>% full_join(narea.nobeta.table4) %>%
-  mutate(df = replace(df, is.na(df), "-"),
-         coef.beta = replace(coef.beta, is.na(coef.beta), "-"),
-         coef.nobeta = replace(coef.nobeta, is.na(coef.nobeta), "-"),
-         Chisq.beta = replace(Chisq.beta, is.na(Chisq.beta), "-"),
-         Chisq.nobeta = replace(Chisq.nobeta, is.na(Chisq.nobeta), "-"),
-         P_value.beta = replace(P_value.beta, is.na(P_value.beta), "-"),
-         P_value.nobeta = replace(P_value.nobeta, is.na(P_value.nobeta), "-"),
-         treatment = factor(treatment, levels = c("(Intercept)",
+  replace(is.na(.), "-") %>%
+  mutate(treatment = factor(treatment, levels = c("(Intercept)",
                                                   "beta", "chi", "soil.no3n",
-                                                  "wn3", "pft", "soil.no3n:wn3",
+                                                  "wn90_perc", "pft", "soil.no3n:wn90_perc",
                                                   "beta:pft", "chi:pft",
-                                                  "soil.no3n:pft", "wn3:pft",
-                                                  "soil.no3n:wn3:pft"))) %>%
+                                                  "soil.no3n:pft", "wn90_perc:pft",
+                                                  "soil.no3n:wn90_perc:pft"))) %>%
   arrange(treatment)
 table4
 
@@ -498,6 +474,7 @@ table5 <- summary.coefs %>%
 table5[14, c(1,2)] <- c("narea.std", "no3n*beta")
 table5[15, c(1,2)] <- c("narea.std", "wn3*beta")
 table5[16, c(1,2)] <- c("narea.std", "wn3*no3n*beta")
+table5[17, c(1,2)] <- c("chi.std", "tavg4*vpd4")
 
 table5 <- table5 %>% 
   mutate(resp = ifelse(resp == "narea.std", 
@@ -530,7 +507,3 @@ table5 <- table5 %>%
 
 write.csv(table5, "../working_drafts/tables/TXeco_table5_SEMclean.csv", 
           row.names = FALSE)
-
-
-
-
