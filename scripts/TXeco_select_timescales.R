@@ -87,6 +87,8 @@ aicc.results.wn <- wn30.modelSelect %>%
   dplyr::select(day, aicc.wn = AICc, rmse.wn = RMSE)
 # 90-day soil moisture is best model
 
+plot(aicc.results.wn$aicc.wn)
+
 ###############################################################################
 # Iterative models for mean air temperature and chi
 ###############################################################################
@@ -228,7 +230,7 @@ aicc.results <- aicc.results.wn %>%
          rmse.vpd = round(rmse.vpd, digits = 4))
 
 write.csv(aicc.results,
-          "../data_sheets/TXeco_modelselection_results.csv",
+          "../working_drafts/tables/TXeco_TableS2_modelselection.csv",
           row.names = FALSE)
 
 ###############################################################################
@@ -236,11 +238,11 @@ write.csv(aicc.results,
 ###############################################################################
 wn.beta <- ggplot(data = aicc.results, aes(x = day, y = aicc.wn)) +
   geom_point() +
-  geom_point(data = subset(aicc.results, day == 90), 
-             fill = "red", size = 2, shape = 21) +
+  geom_point(data = subset(aicc.results, day == 3), 
+             fill = "red", size = 3, shape = 21) +
   geom_line() +
   scale_x_continuous(limits = c(0, 90), breaks = seq(0, 90, 30)) +
-  scale_y_continuous(limits = c(1280, 1292), breaks = seq(1280, 1292, 3)) +
+  scale_y_continuous(limits = c(1270, 1290), breaks = seq(1270, 1290, 5)) +
   labs(x = NULL, y = expression(bold("AIC"["c"])),
        title = expression("Soil moisture (% of water-holding capacity)")) +
   theme_bw(base_size = 18) +

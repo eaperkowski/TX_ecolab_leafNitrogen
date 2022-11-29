@@ -1,7 +1,7 @@
 ## Libraries
 library(soilDB)
 library(dplyr)
-library(dplyr)
+library(terra)
 
 ## Load site data 
 sites <- read.csv("../data_sheets/TXeco_sitecoords.csv",
@@ -38,7 +38,7 @@ site.soilgrid.df <- site.soilgrid@horizons %>%
          om = soc * 1.724) # van Bemmelen factor for converting SOC -> SOM
 
 ## Load bedrock GEOTiff into 
-bedrock.rast <- rast("../climate_data/soil_grids/TXeco_soilGrid_250m_bedrock.tif")
+bedrock.rast <- rast("../climate_data/soil_grids/TXeco_soilGrid_250m_bedrock_Rhorizon.tif")
 
 ## Check to make sure raster plots
 plot(bedrock.rast)
@@ -48,7 +48,8 @@ eco.coords <- dplyr::select(sites, x = long, y = lat) # select only lat/long dat
 
 site.soilgrid.full <- terra::extract(x = bedrock.rast,
                                      y = eco.coords, xy = TRUE) %>%
-  select(bedrock = TXeco_soilGrid_250m_bedrock) %>%
+  select(bedrock = TXeco_soilGrid_250m_bedrock_Rhorizon) %>%
+  mutate(bedrock = bedrock / 100) %>%
   cbind(sites) %>%
   select(id, lat, long, bedrock) %>%
   full_join(site.soilgrid.df)

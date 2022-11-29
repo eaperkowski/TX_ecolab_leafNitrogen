@@ -252,13 +252,8 @@ source("../../r_functions/calc_soil_water.R")
 ## Determine sunrise/sunset using 'suncalc' package, then calculate fraction
 ## of sunlight hours
 ###############################################################################
-
 daily.clim <- read.csv("../climate_data/TXeco_PRISM_daily.csv") %>%
   mutate(date = lubridate::ymd(date))
-
-## Change latitude/longitude colnames to "lat" and "long" to make easier
-## data loading into "getSunlightTimes" function
-# names(daily.clim)[2:3] <- c("lat", "lon")
 
 ## Visualize dataset
 head(daily.clim)
@@ -290,17 +285,20 @@ daily.clim <- daily.clim %>%
 whc.data <- soilgrids %>%
   mutate(calc_soil_water(id = id, fsand = perc.sand/100,
                          fclay = perc.clay/100,
-                         fom = om/1000,
+                         fom = om/100,
                          fgravel = perc.gravel/100,
-                         zbed = bedrock/100),
-         wfc = wfc * 1000, 
-         pwp = pwp * 1000,
-         whc = whc * 1000) %>%
-  dplyr::select(site = id, whc)
+                         zbed = bedrock),
+         wfc = wfc*1000, 
+         pwp = pwp*1000,
+         whc = whc*1000) %>%
+  dplyr::rename(site = id)
+
+write.csv(whc.data, "../data_sheets/TXeco_soilgrid_data.csv", row.names = FALSE)
 
 ## Join water holding capacity data with compiled daily climate dataframe
 daily.clim <- daily.clim %>%
-  full_join(whc.data)
+  full_join(whc.data) %>%
+  distinct(site,date, .keep_all = TRUE)
 
 ###############################################################################
 ## Write daily climate .csv

@@ -13,7 +13,7 @@ library(lubridate)
 ## Load modified form of SPLASH model (modified to change kWm in `spin_up`, 
 ## rather than constand 150mm)
 ###############################################################################
-R.utils::sourceDirectory("../../splash/R", modifiedOnly = FALSE)
+R.utils::sourceDirectory("../../r_functions/splash_dev/R/", modifiedOnly = FALSE)
 
 ###############################################################################
 ## Load site name file with visit date info
@@ -37,50 +37,8 @@ file.list.1991 <- setNames(file.list.1991,
 ## Read files based on 'splash' read_csv function
 splash.readin.1991 <- lapply(file.list.1991, read_csv)
 
-## Remove duplicate rows in sites that received more than one site visit
-# Brazos 2020-18
-splash.readin.1991$Brazos_2020_18.1991splash$sf <- splash.readin.1991$Brazos_2020_18.1991splash$sf[seq_along(splash.readin.1991$Brazos_2020_18.1991splash$sf) %% 2 > 0]
-splash.readin.1991$Brazos_2020_18.1991splash$tair <- splash.readin.1991$Brazos_2020_18.1991splash$tair[seq_along(splash.readin.1991$Brazos_2020_18.1991splash$tair) %% 2 > 0]
-splash.readin.1991$Brazos_2020_18.1991splash$pn <- splash.readin.1991$Brazos_2020_18.1991splash$pn[seq_along(splash.readin.1991$Brazos_2020_18.1991splash$pn) %% 2 > 0]
-splash.readin.1991$Brazos_2020_18.1991splash$num_lines <- 365
-
-# Harris 2020-03
-splash.readin.1991$Harris_2020_03.1991splash$sf <- splash.readin.1991$Harris_2020_03.1991splash$sf[seq_along(splash.readin.1991$Harris_2020_03.1991splash$sf) %% 2 > 0]
-splash.readin.1991$Harris_2020_03.1991splash$tair <- splash.readin.1991$Harris_2020_03.1991splash$tair[seq_along(splash.readin.1991$Harris_2020_03.1991splash$tair) %% 2 > 0]
-splash.readin.1991$Harris_2020_03.1991splash$pn <- splash.readin.1991$Harris_2020_03.1991splash$pn[seq_along(splash.readin.1991$Harris_2020_03.1991splash$pn) %% 2 > 0]
-splash.readin.1991$Harris_2020_03.1991splash$num_lines <- 365
-
-# Menard 2020-01
-splash.readin.1991$Menard_2020_01.1991splash$sf <- splash.readin.1991$Menard_2020_01.1991splash$sf[seq_along(splash.readin.1991$Menard_2020_01.1991splash$sf) %% 2 > 0]
-splash.readin.1991$Menard_2020_01.1991splash$tair <- splash.readin.1991$Menard_2020_01.1991splash$tair[seq_along(splash.readin.1991$Menard_2020_01.1991splash$tair) %% 2 > 0]
-splash.readin.1991$Menard_2020_01.1991splash$pn <- splash.readin.1991$Menard_2020_01.1991splash$pn[seq_along(splash.readin.1991$Menard_2020_01.1991splash$pn) %% 2 > 0]
-splash.readin.1991$Menard_2020_01.1991splash$num_lines <- 365
-
-# Uvalde 2020-02
-splash.readin.1991$Uvalde_2020_02.1991splash$sf <- splash.readin.1991$Uvalde_2020_02.1991splash$sf[seq_along(splash.readin.1991$Uvalde_2020_02.1991splash$sf) %% 2 > 0]
-splash.readin.1991$Uvalde_2020_02.1991splash$tair <- splash.readin.1991$Uvalde_2020_02.1991splash$tair[seq_along(splash.readin.1991$Uvalde_2020_02.1991splash$tair) %% 2 > 0]
-splash.readin.1991$Uvalde_2020_02.1991splash$pn <- splash.readin.1991$Uvalde_2020_02.1991splash$pn[seq_along(splash.readin.1991$Uvalde_2020_02.1991splash$pn) %% 2 > 0]
-splash.readin.1991$Uvalde_2020_02.1991splash$num_lines <- 365
-
 ## Load ancillary details needed to run 'spin_up" and 'run_one_day'
 splash.month.1991 <- lapply(file.list.1991, read.csv)
-
-## Remove multiple dates for sites visited more than one growing season
-# Brazos 2020-18
-splash.month.1991[["Brazos_2020_18.1991splash"]] <- splash.month.1991[["Brazos_2020_18.1991splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Harris 2020-03
-splash.month.1991[["Harris_2020_03.1991splash"]] <- splash.month.1991[["Harris_2020_03.1991splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Menard 2020-01
-splash.month.1991[["Menard_2020_01.1991splash"]] <- splash.month.1991[["Menard_2020_01.1991splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Uvalde 2020-02
-splash.month.1991[["Uvalde_2020_02.1991splash"]] <- splash.month.1991[["Uvalde_2020_02.1991splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
 
 ## Loop to select only month and day
 for (i in seq_along(splash.month.1991)) {
@@ -183,52 +141,8 @@ file.list.1992 <- setNames(file.list.1992,
 ## Read files based on 'splash' read_csv function
 splash.readin.1992 <- lapply(file.list.1992, read_csv)
 
-## Remove duplicate rows in sites that received more than one site visit
-# Brazos 2020-18
-splash.readin.1992$Brazos_2020_18.1992splash$sf <- splash.readin.1992$Brazos_2020_18.1992splash$sf[seq_along(splash.readin.1992$Brazos_2020_18.1992splash$sf) %% 2 > 0]
-splash.readin.1992$Brazos_2020_18.1992splash$tair <- splash.readin.1992$Brazos_2020_18.1992splash$tair[seq_along(splash.readin.1992$Brazos_2020_18.1992splash$tair) %% 2 > 0]
-splash.readin.1992$Brazos_2020_18.1992splash$pn <- splash.readin.1992$Brazos_2020_18.1992splash$pn[seq_along(splash.readin.1992$Brazos_2020_18.1992splash$pn) %% 2 > 0]
-splash.readin.1992$Brazos_2020_18.1992splash$num_lines <- 366
-
-# Harris 2020-03
-splash.readin.1992$Harris_2020_03.1992splash$sf <- splash.readin.1992$Harris_2020_03.1992splash$sf[seq_along(splash.readin.1992$Harris_2020_03.1992splash$sf) %% 2 > 0]
-splash.readin.1992$Harris_2020_03.1992splash$tair <- splash.readin.1992$Harris_2020_03.1992splash$tair[seq_along(splash.readin.1992$Harris_2020_03.1992splash$tair) %% 2 > 0]
-splash.readin.1992$Harris_2020_03.1992splash$pn <- splash.readin.1992$Harris_2020_03.1992splash$pn[seq_along(splash.readin.1992$Harris_2020_03.1992splash$pn) %% 2 > 0]
-splash.readin.1992$Harris_2020_03.1992splash$num_lines <- 366
-
-# Menard 2020-01
-splash.readin.1992$Menard_2020_01.1992splash$sf <- splash.readin.1992$Menard_2020_01.1992splash$sf[seq_along(splash.readin.1992$Menard_2020_01.1992splash$sf) %% 2 > 0]
-splash.readin.1992$Menard_2020_01.1992splash$tair <- splash.readin.1992$Menard_2020_01.1992splash$tair[seq_along(splash.readin.1992$Menard_2020_01.1992splash$tair) %% 2 > 0]
-splash.readin.1992$Menard_2020_01.1992splash$pn <- splash.readin.1992$Menard_2020_01.1992splash$pn[seq_along(splash.readin.1992$Menard_2020_01.1992splash$pn) %% 2 > 0]
-splash.readin.1992$Menard_2020_01.1992splash$num_lines <- 366
-
-# Uvalde 2020-02
-splash.readin.1992$Uvalde_2020_02.1992splash$sf <- splash.readin.1992$Uvalde_2020_02.1992splash$sf[seq_along(splash.readin.1992$Uvalde_2020_02.1992splash$sf) %% 2 > 0]
-splash.readin.1992$Uvalde_2020_02.1992splash$tair <- splash.readin.1992$Uvalde_2020_02.1992splash$tair[seq_along(splash.readin.1992$Uvalde_2020_02.1992splash$tair) %% 2 > 0]
-splash.readin.1992$Uvalde_2020_02.1992splash$pn <- splash.readin.1992$Uvalde_2020_02.1992splash$pn[seq_along(splash.readin.1992$Uvalde_2020_02.1992splash$pn) %% 2 > 0]
-splash.readin.1992$Uvalde_2020_02.1992splash$num_lines <- 366
-
-
 ## Load ancillary details needed to run 'spin_up" and 'run_one_day'
 splash.month.1992 <- lapply(file.list.1992, read.csv)
-
-## Remove multiple dates for sites visited more than one growing season
-# Brazos 2020-18
-splash.month.1992[["Brazos_2020_18.1992splash"]] <- splash.month.1992[["Brazos_2020_18.1992splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Harris 2020-03
-splash.month.1992[["Harris_2020_03.1992splash"]] <- splash.month.1992[["Harris_2020_03.1992splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Menard 2020-01
-splash.month.1992[["Menard_2020_01.1992splash"]] <- splash.month.1992[["Menard_2020_01.1992splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Uvalde 2020-02
-splash.month.1992[["Uvalde_2020_02.1992splash"]] <- splash.month.1992[["Uvalde_2020_02.1992splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
 
 ## Loop to select only month and day
 for (i in seq_along(splash.month.1992)) {
@@ -261,8 +175,6 @@ for (i in seq_along(splash.total.1992)) {
                                                       dtot = splash.total.1992[[i]]$daily_totals)
 }
 
-
-
 ## Convert list of lists to data.frame (for run_one_day), revise column names
 splash.water.1992 <- map(splash.total.1992, as.data.table)
 splash.water.1992 <- rbindlist(splash.water.1992, fill = TRUE, idcol = TRUE)
@@ -278,7 +190,6 @@ splash.water.1992 <- splash.water.1992 %>%
 splash.water.1992 <- tidyr::unite(splash.water.1992, "date", year:day, sep = "-", remove = FALSE)
 splash.water.1992$date <- lubridate::ymd(as.Date(splash.water.1992$date))
 splash.water.1992$doy <- lubridate::yday(splash.water.1992$date)
-
 
 ## Run run_one_day given equilibrated soil moisture
 splash.oneday.1992 <- run_one_day(lat = splash.water.1992$lat_deg,
@@ -332,51 +243,8 @@ file.list.1993 <- setNames(file.list.1993,
 ## Read files based on 'splash' read_csv function
 splash.readin.1993 <- lapply(file.list.1993, read_csv)
 
-## Remove duplicate rows in sites that received more than one site visit
-# Brazos 2020-18
-splash.readin.1993$Brazos_2020_18.1993splash$sf <- splash.readin.1993$Brazos_2020_18.1993splash$sf[seq_along(splash.readin.1993$Brazos_2020_18.1993splash$sf) %% 2 > 0]
-splash.readin.1993$Brazos_2020_18.1993splash$tair <- splash.readin.1993$Brazos_2020_18.1993splash$tair[seq_along(splash.readin.1993$Brazos_2020_18.1993splash$tair) %% 2 > 0]
-splash.readin.1993$Brazos_2020_18.1993splash$pn <- splash.readin.1993$Brazos_2020_18.1993splash$pn[seq_along(splash.readin.1993$Brazos_2020_18.1993splash$pn) %% 2 > 0]
-splash.readin.1993$Brazos_2020_18.1993splash$num_lines <- 365
-
-# Harris 2020-03
-splash.readin.1993$Harris_2020_03.1993splash$sf <- splash.readin.1993$Harris_2020_03.1993splash$sf[seq_along(splash.readin.1993$Harris_2020_03.1993splash$sf) %% 2 > 0]
-splash.readin.1993$Harris_2020_03.1993splash$tair <- splash.readin.1993$Harris_2020_03.1993splash$tair[seq_along(splash.readin.1993$Harris_2020_03.1993splash$tair) %% 2 > 0]
-splash.readin.1993$Harris_2020_03.1993splash$pn <- splash.readin.1993$Harris_2020_03.1993splash$pn[seq_along(splash.readin.1993$Harris_2020_03.1993splash$pn) %% 2 > 0]
-splash.readin.1993$Harris_2020_03.1993splash$num_lines <- 365
-
-# Menard 2020-01
-splash.readin.1993$Menard_2020_01.1993splash$sf <- splash.readin.1993$Menard_2020_01.1993splash$sf[seq_along(splash.readin.1993$Menard_2020_01.1993splash$sf) %% 2 > 0]
-splash.readin.1993$Menard_2020_01.1993splash$tair <- splash.readin.1993$Menard_2020_01.1993splash$tair[seq_along(splash.readin.1993$Menard_2020_01.1993splash$tair) %% 2 > 0]
-splash.readin.1993$Menard_2020_01.1993splash$pn <- splash.readin.1993$Menard_2020_01.1993splash$pn[seq_along(splash.readin.1993$Menard_2020_01.1993splash$pn) %% 2 > 0]
-splash.readin.1993$Menard_2020_01.1993splash$num_lines <- 365
-
-# Uvalde 2020-02
-splash.readin.1993$Uvalde_2020_02.1993splash$sf <- splash.readin.1993$Uvalde_2020_02.1993splash$sf[seq_along(splash.readin.1993$Uvalde_2020_02.1993splash$sf) %% 2 > 0]
-splash.readin.1993$Uvalde_2020_02.1993splash$tair <- splash.readin.1993$Uvalde_2020_02.1993splash$tair[seq_along(splash.readin.1993$Uvalde_2020_02.1993splash$tair) %% 2 > 0]
-splash.readin.1993$Uvalde_2020_02.1993splash$pn <- splash.readin.1993$Uvalde_2020_02.1993splash$pn[seq_along(splash.readin.1993$Uvalde_2020_02.1993splash$pn) %% 2 > 0]
-splash.readin.1993$Uvalde_2020_02.1993splash$num_lines <- 365
-
 ## Load ancillary details needed to run 'spin_up" and 'run_one_day'
 splash.month.1993 <- lapply(file.list.1993, read.csv)
-
-## Remove multiple dates for sites visited more than one growing season
-# Brazos 2020-18
-splash.month.1993[["Brazos_2020_18.1993splash"]] <- splash.month.1993[["Brazos_2020_18.1993splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Harris 2020-03
-splash.month.1993[["Harris_2020_03.1993splash"]] <- splash.month.1993[["Harris_2020_03.1993splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Menard 2020-01
-splash.month.1993[["Menard_2020_01.1993splash"]] <- splash.month.1993[["Menard_2020_01.1993splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Uvalde 2020-02
-splash.month.1993[["Uvalde_2020_02.1993splash"]] <- splash.month.1993[["Uvalde_2020_02.1993splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
 
 ## Loop to select only month and day
 for (i in seq_along(splash.month.1993)) {
@@ -408,8 +276,6 @@ for (i in seq_along(splash.total.1993)) {
   splash.total.1993[[i]][["daily_totals"]] <- spin_up(mdat = splash.total.1993[[i]],
                                                       dtot = splash.total.1993[[i]]$daily_totals)
 }
-
-
 
 ## Convert list of lists to data.frame (for run_one_day), revise column names
 splash.water.1993 <- map(splash.total.1993, as.data.table)
@@ -479,51 +345,8 @@ file.list.1994 <- setNames(file.list.1994,
 ## Read files based on 'splash' read_csv function
 splash.readin.1994 <- lapply(file.list.1994, read_csv)
 
-## Remove duplicate rows in sites that received more than one site visit
-# Brazos 2020-18
-splash.readin.1994$Brazos_2020_18.1994splash$sf <- splash.readin.1994$Brazos_2020_18.1994splash$sf[seq_along(splash.readin.1994$Brazos_2020_18.1994splash$sf) %% 2 > 0]
-splash.readin.1994$Brazos_2020_18.1994splash$tair <- splash.readin.1994$Brazos_2020_18.1994splash$tair[seq_along(splash.readin.1994$Brazos_2020_18.1994splash$tair) %% 2 > 0]
-splash.readin.1994$Brazos_2020_18.1994splash$pn <- splash.readin.1994$Brazos_2020_18.1994splash$pn[seq_along(splash.readin.1994$Brazos_2020_18.1994splash$pn) %% 2 > 0]
-splash.readin.1994$Brazos_2020_18.1994splash$num_lines <- 365
-
-# Harris 2020-03
-splash.readin.1994$Harris_2020_03.1994splash$sf <- splash.readin.1994$Harris_2020_03.1994splash$sf[seq_along(splash.readin.1994$Harris_2020_03.1994splash$sf) %% 2 > 0]
-splash.readin.1994$Harris_2020_03.1994splash$tair <- splash.readin.1994$Harris_2020_03.1994splash$tair[seq_along(splash.readin.1994$Harris_2020_03.1994splash$tair) %% 2 > 0]
-splash.readin.1994$Harris_2020_03.1994splash$pn <- splash.readin.1994$Harris_2020_03.1994splash$pn[seq_along(splash.readin.1994$Harris_2020_03.1994splash$pn) %% 2 > 0]
-splash.readin.1994$Harris_2020_03.1994splash$num_lines <- 365
-
-# Menard 2020-01
-splash.readin.1994$Menard_2020_01.1994splash$sf <- splash.readin.1994$Menard_2020_01.1994splash$sf[seq_along(splash.readin.1994$Menard_2020_01.1994splash$sf) %% 2 > 0]
-splash.readin.1994$Menard_2020_01.1994splash$tair <- splash.readin.1994$Menard_2020_01.1994splash$tair[seq_along(splash.readin.1994$Menard_2020_01.1994splash$tair) %% 2 > 0]
-splash.readin.1994$Menard_2020_01.1994splash$pn <- splash.readin.1994$Menard_2020_01.1994splash$pn[seq_along(splash.readin.1994$Menard_2020_01.1994splash$pn) %% 2 > 0]
-splash.readin.1994$Menard_2020_01.1994splash$num_lines <- 365
-
-# Uvalde 2020-02
-splash.readin.1994$Uvalde_2020_02.1994splash$sf <- splash.readin.1994$Uvalde_2020_02.1994splash$sf[seq_along(splash.readin.1994$Uvalde_2020_02.1994splash$sf) %% 2 > 0]
-splash.readin.1994$Uvalde_2020_02.1994splash$tair <- splash.readin.1994$Uvalde_2020_02.1994splash$tair[seq_along(splash.readin.1994$Uvalde_2020_02.1994splash$tair) %% 2 > 0]
-splash.readin.1994$Uvalde_2020_02.1994splash$pn <- splash.readin.1994$Uvalde_2020_02.1994splash$pn[seq_along(splash.readin.1994$Uvalde_2020_02.1994splash$pn) %% 2 > 0]
-splash.readin.1994$Uvalde_2020_02.1994splash$num_lines <- 365
-
 ## Load ancillary details needed to run 'spin_up" and 'run_one_day'
 splash.month.1994 <- lapply(file.list.1994, read.csv)
-
-## Remove multiple dates for sites visited more than one growing season
-# Brazos 2020-18
-splash.month.1994[["Brazos_2020_18.1994splash"]] <- splash.month.1994[["Brazos_2020_18.1994splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Harris 2020-03
-splash.month.1994[["Harris_2020_03.1994splash"]] <- splash.month.1994[["Harris_2020_03.1994splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Menard 2020-01
-splash.month.1994[["Menard_2020_01.1994splash"]] <- splash.month.1994[["Menard_2020_01.1994splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Uvalde 2020-02
-splash.month.1994[["Uvalde_2020_02.1994splash"]] <- splash.month.1994[["Uvalde_2020_02.1994splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
 
 ## Loop to select only month and day
 for (i in seq_along(splash.month.1994)) {
@@ -556,8 +379,6 @@ for (i in seq_along(splash.total.1994)) {
                                                       dtot = splash.total.1994[[i]]$daily_totals)
 }
 
-
-
 ## Convert list of lists to data.frame (for run_one_day), revise column names
 splash.water.1994 <- map(splash.total.1994, as.data.table)
 splash.water.1994 <- rbindlist(splash.water.1994, fill = TRUE, idcol = TRUE)
@@ -573,7 +394,6 @@ splash.water.1994 <- splash.water.1994 %>%
 splash.water.1994 <- tidyr::unite(splash.water.1994, "date", year:day, sep = "-", remove = FALSE)
 splash.water.1994$date <- lubridate::ymd(as.Date(splash.water.1994$date))
 splash.water.1994$doy <- lubridate::yday(splash.water.1994$date)
-
 
 ## Run run_one_day given equilibrated soil moisture
 splash.oneday.1994 <- run_one_day(lat = splash.water.1994$lat_deg,
@@ -627,51 +447,8 @@ file.list.1995 <- setNames(file.list.1995,
 ## Read files based on 'splash' read_csv function
 splash.readin.1995 <- lapply(file.list.1995, read_csv)
 
-## Remove duplicate rows in sites that received more than one site visit
-# Brazos 2020-18
-splash.readin.1995$Brazos_2020_18.1995splash$sf <- splash.readin.1995$Brazos_2020_18.1995splash$sf[seq_along(splash.readin.1995$Brazos_2020_18.1995splash$sf) %% 2 > 0]
-splash.readin.1995$Brazos_2020_18.1995splash$tair <- splash.readin.1995$Brazos_2020_18.1995splash$tair[seq_along(splash.readin.1995$Brazos_2020_18.1995splash$tair) %% 2 > 0]
-splash.readin.1995$Brazos_2020_18.1995splash$pn <- splash.readin.1995$Brazos_2020_18.1995splash$pn[seq_along(splash.readin.1995$Brazos_2020_18.1995splash$pn) %% 2 > 0]
-splash.readin.1995$Brazos_2020_18.1995splash$num_lines <- 365
-
-# Harris 2020-03
-splash.readin.1995$Harris_2020_03.1995splash$sf <- splash.readin.1995$Harris_2020_03.1995splash$sf[seq_along(splash.readin.1995$Harris_2020_03.1995splash$sf) %% 2 > 0]
-splash.readin.1995$Harris_2020_03.1995splash$tair <- splash.readin.1995$Harris_2020_03.1995splash$tair[seq_along(splash.readin.1995$Harris_2020_03.1995splash$tair) %% 2 > 0]
-splash.readin.1995$Harris_2020_03.1995splash$pn <- splash.readin.1995$Harris_2020_03.1995splash$pn[seq_along(splash.readin.1995$Harris_2020_03.1995splash$pn) %% 2 > 0]
-splash.readin.1995$Harris_2020_03.1995splash$num_lines <- 365
-
-# Menard 2020-01
-splash.readin.1995$Menard_2020_01.1995splash$sf <- splash.readin.1995$Menard_2020_01.1995splash$sf[seq_along(splash.readin.1995$Menard_2020_01.1995splash$sf) %% 2 > 0]
-splash.readin.1995$Menard_2020_01.1995splash$tair <- splash.readin.1995$Menard_2020_01.1995splash$tair[seq_along(splash.readin.1995$Menard_2020_01.1995splash$tair) %% 2 > 0]
-splash.readin.1995$Menard_2020_01.1995splash$pn <- splash.readin.1995$Menard_2020_01.1995splash$pn[seq_along(splash.readin.1995$Menard_2020_01.1995splash$pn) %% 2 > 0]
-splash.readin.1995$Menard_2020_01.1995splash$num_lines <- 365
-
-# Uvalde 2020-02
-splash.readin.1995$Uvalde_2020_02.1995splash$sf <- splash.readin.1995$Uvalde_2020_02.1995splash$sf[seq_along(splash.readin.1995$Uvalde_2020_02.1995splash$sf) %% 2 > 0]
-splash.readin.1995$Uvalde_2020_02.1995splash$tair <- splash.readin.1995$Uvalde_2020_02.1995splash$tair[seq_along(splash.readin.1995$Uvalde_2020_02.1995splash$tair) %% 2 > 0]
-splash.readin.1995$Uvalde_2020_02.1995splash$pn <- splash.readin.1995$Uvalde_2020_02.1995splash$pn[seq_along(splash.readin.1995$Uvalde_2020_02.1995splash$pn) %% 2 > 0]
-splash.readin.1995$Uvalde_2020_02.1995splash$num_lines <- 365
-
 ## Load ancillary details needed to run 'spin_up" and 'run_one_day'
 splash.month.1995 <- lapply(file.list.1995, read.csv)
-
-## Remove multiple dates for sites visited more than one growing season
-# Brazos 2020-18
-splash.month.1995[["Brazos_2020_18.1995splash"]] <- splash.month.1995[["Brazos_2020_18.1995splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Harris 2020-03
-splash.month.1995[["Harris_2020_03.1995splash"]] <- splash.month.1995[["Harris_2020_03.1995splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Menard 2020-01
-splash.month.1995[["Menard_2020_01.1995splash"]] <- splash.month.1995[["Menard_2020_01.1995splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Uvalde 2020-02
-splash.month.1995[["Uvalde_2020_02.1995splash"]] <- splash.month.1995[["Uvalde_2020_02.1995splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
 
 ## Loop to select only month and day
 for (i in seq_along(splash.month.1995)) {
@@ -703,8 +480,6 @@ for (i in seq_along(splash.total.1995)) {
   splash.total.1995[[i]][["daily_totals"]] <- spin_up(mdat = splash.total.1995[[i]],
                                                       dtot = splash.total.1995[[i]]$daily_totals)
 }
-
-
 
 ## Convert list of lists to data.frame (for run_one_day), revise column names
 splash.water.1995 <- map(splash.total.1995, as.data.table)
@@ -774,51 +549,8 @@ file.list.1996 <- setNames(file.list.1996,
 ## Read files based on 'splash' read_csv function
 splash.readin.1996 <- lapply(file.list.1996, read_csv)
 
-## Remove duplicate rows in sites that received more than one site visit
-# Brazos 2020-18
-splash.readin.1996$Brazos_2020_18.1996splash$sf <- splash.readin.1996$Brazos_2020_18.1996splash$sf[seq_along(splash.readin.1996$Brazos_2020_18.1996splash$sf) %% 2 > 0]
-splash.readin.1996$Brazos_2020_18.1996splash$tair <- splash.readin.1996$Brazos_2020_18.1996splash$tair[seq_along(splash.readin.1996$Brazos_2020_18.1996splash$tair) %% 2 > 0]
-splash.readin.1996$Brazos_2020_18.1996splash$pn <- splash.readin.1996$Brazos_2020_18.1996splash$pn[seq_along(splash.readin.1996$Brazos_2020_18.1996splash$pn) %% 2 > 0]
-splash.readin.1996$Brazos_2020_18.1996splash$num_lines <- 366
-
-# Harris 2020-03
-splash.readin.1996$Harris_2020_03.1996splash$sf <- splash.readin.1996$Harris_2020_03.1996splash$sf[seq_along(splash.readin.1996$Harris_2020_03.1996splash$sf) %% 2 > 0]
-splash.readin.1996$Harris_2020_03.1996splash$tair <- splash.readin.1996$Harris_2020_03.1996splash$tair[seq_along(splash.readin.1996$Harris_2020_03.1996splash$tair) %% 2 > 0]
-splash.readin.1996$Harris_2020_03.1996splash$pn <- splash.readin.1996$Harris_2020_03.1996splash$pn[seq_along(splash.readin.1996$Harris_2020_03.1996splash$pn) %% 2 > 0]
-splash.readin.1996$Harris_2020_03.1996splash$num_lines <- 366
-
-# Menard 2020-01
-splash.readin.1996$Menard_2020_01.1996splash$sf <- splash.readin.1996$Menard_2020_01.1996splash$sf[seq_along(splash.readin.1996$Menard_2020_01.1996splash$sf) %% 2 > 0]
-splash.readin.1996$Menard_2020_01.1996splash$tair <- splash.readin.1996$Menard_2020_01.1996splash$tair[seq_along(splash.readin.1996$Menard_2020_01.1996splash$tair) %% 2 > 0]
-splash.readin.1996$Menard_2020_01.1996splash$pn <- splash.readin.1996$Menard_2020_01.1996splash$pn[seq_along(splash.readin.1996$Menard_2020_01.1996splash$pn) %% 2 > 0]
-splash.readin.1996$Menard_2020_01.1996splash$num_lines <- 366
-
-# Uvalde 2020-02
-splash.readin.1996$Uvalde_2020_02.1996splash$sf <- splash.readin.1996$Uvalde_2020_02.1996splash$sf[seq_along(splash.readin.1996$Uvalde_2020_02.1996splash$sf) %% 2 > 0]
-splash.readin.1996$Uvalde_2020_02.1996splash$tair <- splash.readin.1996$Uvalde_2020_02.1996splash$tair[seq_along(splash.readin.1996$Uvalde_2020_02.1996splash$tair) %% 2 > 0]
-splash.readin.1996$Uvalde_2020_02.1996splash$pn <- splash.readin.1996$Uvalde_2020_02.1996splash$pn[seq_along(splash.readin.1996$Uvalde_2020_02.1996splash$pn) %% 2 > 0]
-splash.readin.1996$Uvalde_2020_02.1996splash$num_lines <- 366
-
 ## Load ancillary details needed to run 'spin_up" and 'run_one_day'
 splash.month.1996 <- lapply(file.list.1996, read.csv)
-
-## Remove multiple dates for sites visited more than one growing season
-# Brazos 2020-18
-splash.month.1996[["Brazos_2020_18.1996splash"]] <- splash.month.1996[["Brazos_2020_18.1996splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Harris 2020-03
-splash.month.1996[["Harris_2020_03.1996splash"]] <- splash.month.1996[["Harris_2020_03.1996splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Menard 2020-01
-splash.month.1996[["Menard_2020_01.1996splash"]] <- splash.month.1996[["Menard_2020_01.1996splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Uvalde 2020-02
-splash.month.1996[["Uvalde_2020_02.1996splash"]] <- splash.month.1996[["Uvalde_2020_02.1996splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
 
 ## Loop to select only month and day
 for (i in seq_along(splash.month.1996)) {
@@ -850,8 +582,6 @@ for (i in seq_along(splash.total.1996)) {
   splash.total.1996[[i]][["daily_totals"]] <- spin_up(mdat = splash.total.1996[[i]],
                                                       dtot = splash.total.1996[[i]]$daily_totals)
 }
-
-
 
 ## Convert list of lists to data.frame (for run_one_day), revise column names
 splash.water.1996 <- map(splash.total.1996, as.data.table)
@@ -921,52 +651,8 @@ file.list.1997 <- setNames(file.list.1997,
 ## Read files based on 'splash' read_csv function
 splash.readin.1997 <- lapply(file.list.1997, read_csv)
 
-## Remove duplicate rows in sites that received more than one site visit
-# Brazos 2020-18
-splash.readin.1997$Brazos_2020_18.1997splash$sf <- splash.readin.1997$Brazos_2020_18.1997splash$sf[seq_along(splash.readin.1997$Brazos_2020_18.1997splash$sf) %% 2 > 0]
-splash.readin.1997$Brazos_2020_18.1997splash$tair <- splash.readin.1997$Brazos_2020_18.1997splash$tair[seq_along(splash.readin.1997$Brazos_2020_18.1997splash$tair) %% 2 > 0]
-splash.readin.1997$Brazos_2020_18.1997splash$pn <- splash.readin.1997$Brazos_2020_18.1997splash$pn[seq_along(splash.readin.1997$Brazos_2020_18.1997splash$pn) %% 2 > 0]
-splash.readin.1997$Brazos_2020_18.1997splash$num_lines <- 365
-
-# Harris 2020-03
-splash.readin.1997$Harris_2020_03.1997splash$sf <- splash.readin.1997$Harris_2020_03.1997splash$sf[seq_along(splash.readin.1997$Harris_2020_03.1997splash$sf) %% 2 > 0]
-splash.readin.1997$Harris_2020_03.1997splash$tair <- splash.readin.1997$Harris_2020_03.1997splash$tair[seq_along(splash.readin.1997$Harris_2020_03.1997splash$tair) %% 2 > 0]
-splash.readin.1997$Harris_2020_03.1997splash$pn <- splash.readin.1997$Harris_2020_03.1997splash$pn[seq_along(splash.readin.1997$Harris_2020_03.1997splash$pn) %% 2 > 0]
-splash.readin.1997$Harris_2020_03.1997splash$num_lines <- 365
-
-# Menard 2020-01
-splash.readin.1997$Menard_2020_01.1997splash$sf <- splash.readin.1997$Menard_2020_01.1997splash$sf[seq_along(splash.readin.1997$Menard_2020_01.1997splash$sf) %% 2 > 0]
-splash.readin.1997$Menard_2020_01.1997splash$tair <- splash.readin.1997$Menard_2020_01.1997splash$tair[seq_along(splash.readin.1997$Menard_2020_01.1997splash$tair) %% 2 > 0]
-splash.readin.1997$Menard_2020_01.1997splash$pn <- splash.readin.1997$Menard_2020_01.1997splash$pn[seq_along(splash.readin.1997$Menard_2020_01.1997splash$pn) %% 2 > 0]
-splash.readin.1997$Menard_2020_01.1997splash$num_lines <- 365
-
-# Uvalde 2020-02
-splash.readin.1997$Uvalde_2020_02.1997splash$sf <- splash.readin.1997$Uvalde_2020_02.1997splash$sf[seq_along(splash.readin.1997$Uvalde_2020_02.1997splash$sf) %% 2 > 0]
-splash.readin.1997$Uvalde_2020_02.1997splash$tair <- splash.readin.1997$Uvalde_2020_02.1997splash$tair[seq_along(splash.readin.1997$Uvalde_2020_02.1997splash$tair) %% 2 > 0]
-splash.readin.1997$Uvalde_2020_02.1997splash$pn <- splash.readin.1997$Uvalde_2020_02.1997splash$pn[seq_along(splash.readin.1997$Uvalde_2020_02.1997splash$pn) %% 2 > 0]
-splash.readin.1997$Uvalde_2020_02.1997splash$num_lines <- 365
-
-
 ## Load ancillary details needed to run 'spin_up" and 'run_one_day'
 splash.month.1997 <- lapply(file.list.1997, read.csv)
-
-## Remove multiple dates for sites visited more than one growing season
-# Brazos 2020-18
-splash.month.1997[["Brazos_2020_18.1997splash"]] <- splash.month.1997[["Brazos_2020_18.1997splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Harris 2020-03
-splash.month.1997[["Harris_2020_03.1997splash"]] <- splash.month.1997[["Harris_2020_03.1997splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Menard 2020-01
-splash.month.1997[["Menard_2020_01.1997splash"]] <- splash.month.1997[["Menard_2020_01.1997splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Uvalde 2020-02
-splash.month.1997[["Uvalde_2020_02.1997splash"]] <- splash.month.1997[["Uvalde_2020_02.1997splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
 
 ## Loop to select only month and day
 for (i in seq_along(splash.month.1997)) {
@@ -1067,51 +753,8 @@ file.list.1998 <- setNames(file.list.1998,
 ## Read files based on 'splash' read_csv function
 splash.readin.1998 <- lapply(file.list.1998, read_csv)
 
-## Remove duplicate rows in sites that received more than one site visit
-# Brazos 2020-18
-splash.readin.1998$Brazos_2020_18.1998splash$sf <- splash.readin.1998$Brazos_2020_18.1998splash$sf[seq_along(splash.readin.1998$Brazos_2020_18.1998splash$sf) %% 2 > 0]
-splash.readin.1998$Brazos_2020_18.1998splash$tair <- splash.readin.1998$Brazos_2020_18.1998splash$tair[seq_along(splash.readin.1998$Brazos_2020_18.1998splash$tair) %% 2 > 0]
-splash.readin.1998$Brazos_2020_18.1998splash$pn <- splash.readin.1998$Brazos_2020_18.1998splash$pn[seq_along(splash.readin.1998$Brazos_2020_18.1998splash$pn) %% 2 > 0]
-splash.readin.1998$Brazos_2020_18.1998splash$num_lines <- 365
-
-# Harris 2020-03
-splash.readin.1998$Harris_2020_03.1998splash$sf <- splash.readin.1998$Harris_2020_03.1998splash$sf[seq_along(splash.readin.1998$Harris_2020_03.1998splash$sf) %% 2 > 0]
-splash.readin.1998$Harris_2020_03.1998splash$tair <- splash.readin.1998$Harris_2020_03.1998splash$tair[seq_along(splash.readin.1998$Harris_2020_03.1998splash$tair) %% 2 > 0]
-splash.readin.1998$Harris_2020_03.1998splash$pn <- splash.readin.1998$Harris_2020_03.1998splash$pn[seq_along(splash.readin.1998$Harris_2020_03.1998splash$pn) %% 2 > 0]
-splash.readin.1998$Harris_2020_03.1998splash$num_lines <- 365
-
-# Menard 2020-01
-splash.readin.1998$Menard_2020_01.1998splash$sf <- splash.readin.1998$Menard_2020_01.1998splash$sf[seq_along(splash.readin.1998$Menard_2020_01.1998splash$sf) %% 2 > 0]
-splash.readin.1998$Menard_2020_01.1998splash$tair <- splash.readin.1998$Menard_2020_01.1998splash$tair[seq_along(splash.readin.1998$Menard_2020_01.1998splash$tair) %% 2 > 0]
-splash.readin.1998$Menard_2020_01.1998splash$pn <- splash.readin.1998$Menard_2020_01.1998splash$pn[seq_along(splash.readin.1998$Menard_2020_01.1998splash$pn) %% 2 > 0]
-splash.readin.1998$Menard_2020_01.1998splash$num_lines <- 365
-
-# Uvalde 2020-02
-splash.readin.1998$Uvalde_2020_02.1998splash$sf <- splash.readin.1998$Uvalde_2020_02.1998splash$sf[seq_along(splash.readin.1998$Uvalde_2020_02.1998splash$sf) %% 2 > 0]
-splash.readin.1998$Uvalde_2020_02.1998splash$tair <- splash.readin.1998$Uvalde_2020_02.1998splash$tair[seq_along(splash.readin.1998$Uvalde_2020_02.1998splash$tair) %% 2 > 0]
-splash.readin.1998$Uvalde_2020_02.1998splash$pn <- splash.readin.1998$Uvalde_2020_02.1998splash$pn[seq_along(splash.readin.1998$Uvalde_2020_02.1998splash$pn) %% 2 > 0]
-splash.readin.1998$Uvalde_2020_02.1998splash$num_lines <- 365
-
 ## Load ancillary details needed to run 'spin_up" and 'run_one_day'
 splash.month.1998 <- lapply(file.list.1998, read.csv)
-
-## Remove multiple dates for sites visited more than one growing season
-# Brazos 2020-18
-splash.month.1998[["Brazos_2020_18.1998splash"]] <- splash.month.1998[["Brazos_2020_18.1998splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Harris 2020-03
-splash.month.1998[["Harris_2020_03.1998splash"]] <- splash.month.1998[["Harris_2020_03.1998splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Menard 2020-01
-splash.month.1998[["Menard_2020_01.1998splash"]] <- splash.month.1998[["Menard_2020_01.1998splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Uvalde 2020-02
-splash.month.1998[["Uvalde_2020_02.1998splash"]] <- splash.month.1998[["Uvalde_2020_02.1998splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
 
 ## Loop to select only month and day
 for (i in seq_along(splash.month.1998)) {
@@ -1143,8 +786,6 @@ for (i in seq_along(splash.total.1998)) {
   splash.total.1998[[i]][["daily_totals"]] <- spin_up(mdat = splash.total.1998[[i]],
                                                       dtot = splash.total.1998[[i]]$daily_totals)
 }
-
-
 
 ## Convert list of lists to data.frame (for run_one_day), revise column names
 splash.water.1998 <- map(splash.total.1998, as.data.table)
@@ -1214,50 +855,8 @@ file.list.1999 <- setNames(file.list.1999,
 ## Read files based on 'splash' read_csv function
 splash.readin.1999 <- lapply(file.list.1999, read_csv)
 
-## Remove duplicate rows in sites that received more than one site visit
-# Brazos 2020-18
-splash.readin.1999$Brazos_2020_18.1999splash$sf <- splash.readin.1999$Brazos_2020_18.1999splash$sf[seq_along(splash.readin.1999$Brazos_2020_18.1999splash$sf) %% 2 > 0]
-splash.readin.1999$Brazos_2020_18.1999splash$tair <- splash.readin.1999$Brazos_2020_18.1999splash$tair[seq_along(splash.readin.1999$Brazos_2020_18.1999splash$tair) %% 2 > 0]
-splash.readin.1999$Brazos_2020_18.1999splash$pn <- splash.readin.1999$Brazos_2020_18.1999splash$pn[seq_along(splash.readin.1999$Brazos_2020_18.1999splash$pn) %% 2 > 0]
-splash.readin.1999$Brazos_2020_18.1999splash$num_lines <- 365
-
-# Harris 2020-03
-splash.readin.1999$Harris_2020_03.1999splash$sf <- splash.readin.1999$Harris_2020_03.1999splash$sf[seq_along(splash.readin.1999$Harris_2020_03.1999splash$sf) %% 2 > 0]
-splash.readin.1999$Harris_2020_03.1999splash$tair <- splash.readin.1999$Harris_2020_03.1999splash$tair[seq_along(splash.readin.1999$Harris_2020_03.1999splash$tair) %% 2 > 0]
-splash.readin.1999$Harris_2020_03.1999splash$pn <- splash.readin.1999$Harris_2020_03.1999splash$pn[seq_along(splash.readin.1999$Harris_2020_03.1999splash$pn) %% 2 > 0]
-splash.readin.1999$Harris_2020_03.1999splash$num_lines <- 365
-
-# Menard 2020-01
-splash.readin.1999$Menard_2020_01.1999splash$sf <- splash.readin.1999$Menard_2020_01.1999splash$sf[seq_along(splash.readin.1999$Menard_2020_01.1999splash$sf) %% 2 > 0]
-splash.readin.1999$Menard_2020_01.1999splash$tair <- splash.readin.1999$Menard_2020_01.1999splash$tair[seq_along(splash.readin.1999$Menard_2020_01.1999splash$tair) %% 2 > 0]
-splash.readin.1999$Menard_2020_01.1999splash$pn <- splash.readin.1999$Menard_2020_01.1999splash$pn[seq_along(splash.readin.1999$Menard_2020_01.1999splash$pn) %% 2 > 0]
-splash.readin.1999$Menard_2020_01.1999splash$num_lines <- 365
-
-# Uvalde 2020-02
-splash.readin.1999$Uvalde_2020_02.1999splash$sf <- splash.readin.1999$Uvalde_2020_02.1999splash$sf[seq_along(splash.readin.1999$Uvalde_2020_02.1999splash$sf) %% 2 > 0]
-splash.readin.1999$Uvalde_2020_02.1999splash$tair <- splash.readin.1999$Uvalde_2020_02.1999splash$tair[seq_along(splash.readin.1999$Uvalde_2020_02.1999splash$tair) %% 2 > 0]
-splash.readin.1999$Uvalde_2020_02.1999splash$pn <- splash.readin.1999$Uvalde_2020_02.1999splash$pn[seq_along(splash.readin.1999$Uvalde_2020_02.1999splash$pn) %% 2 > 0]
-splash.readin.1999$Uvalde_2020_02.1999splash$num_lines <- 365
-
 ## Load ancillary details needed to run 'spin_up" and 'run_one_day'
 splash.month.1999 <- lapply(file.list.1999, read.csv)
-
-## Remove multiple dates for sites visited more than one growing season
-# Brazos 2020-18
-splash.month.1999[["Brazos_2020_18.1999splash"]] <- splash.month.1999[["Brazos_2020_18.1999splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Harris 2020-03
-splash.month.1999[["Harris_2020_03.1999splash"]] <- splash.month.1999[["Harris_2020_03.1999splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Menard 2020-01
-splash.month.1999[["Menard_2020_01.1999splash"]] <- splash.month.1999[["Menard_2020_01.1999splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Uvalde 2020-02
-splash.month.1999[["Uvalde_2020_02.1999splash"]] <- splash.month.1999[["Uvalde_2020_02.1999splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
 
 ## Loop to select only month and day
 for (i in seq_along(splash.month.1999)) {
@@ -1358,51 +957,8 @@ file.list.2000 <- setNames(file.list.2000,
 ## Read files based on 'splash' read_csv function
 splash.readin.2000 <- lapply(file.list.2000, read_csv)
 
-## Remove duplicate rows in sites that received more than one site visit
-# Brazos 2020-18
-splash.readin.2000$Brazos_2020_18.2000splash$sf <- splash.readin.2000$Brazos_2020_18.2000splash$sf[seq_along(splash.readin.2000$Brazos_2020_18.2000splash$sf) %% 2 > 0]
-splash.readin.2000$Brazos_2020_18.2000splash$tair <- splash.readin.2000$Brazos_2020_18.2000splash$tair[seq_along(splash.readin.2000$Brazos_2020_18.2000splash$tair) %% 2 > 0]
-splash.readin.2000$Brazos_2020_18.2000splash$pn <- splash.readin.2000$Brazos_2020_18.2000splash$pn[seq_along(splash.readin.2000$Brazos_2020_18.2000splash$pn) %% 2 > 0]
-splash.readin.2000$Brazos_2020_18.2000splash$num_lines <- 366
-
-# Harris 2020-03
-splash.readin.2000$Harris_2020_03.2000splash$sf <- splash.readin.2000$Harris_2020_03.2000splash$sf[seq_along(splash.readin.2000$Harris_2020_03.2000splash$sf) %% 2 > 0]
-splash.readin.2000$Harris_2020_03.2000splash$tair <- splash.readin.2000$Harris_2020_03.2000splash$tair[seq_along(splash.readin.2000$Harris_2020_03.2000splash$tair) %% 2 > 0]
-splash.readin.2000$Harris_2020_03.2000splash$pn <- splash.readin.2000$Harris_2020_03.2000splash$pn[seq_along(splash.readin.2000$Harris_2020_03.2000splash$pn) %% 2 > 0]
-splash.readin.2000$Harris_2020_03.2000splash$num_lines <- 366
-
-# Menard 2020-01
-splash.readin.2000$Menard_2020_01.2000splash$sf <- splash.readin.2000$Menard_2020_01.2000splash$sf[seq_along(splash.readin.2000$Menard_2020_01.2000splash$sf) %% 2 > 0]
-splash.readin.2000$Menard_2020_01.2000splash$tair <- splash.readin.2000$Menard_2020_01.2000splash$tair[seq_along(splash.readin.2000$Menard_2020_01.2000splash$tair) %% 2 > 0]
-splash.readin.2000$Menard_2020_01.2000splash$pn <- splash.readin.2000$Menard_2020_01.2000splash$pn[seq_along(splash.readin.2000$Menard_2020_01.2000splash$pn) %% 2 > 0]
-splash.readin.2000$Menard_2020_01.2000splash$num_lines <- 366
-
-# Uvalde 2020-02
-splash.readin.2000$Uvalde_2020_02.2000splash$sf <- splash.readin.2000$Uvalde_2020_02.2000splash$sf[seq_along(splash.readin.2000$Uvalde_2020_02.2000splash$sf) %% 2 > 0]
-splash.readin.2000$Uvalde_2020_02.2000splash$tair <- splash.readin.2000$Uvalde_2020_02.2000splash$tair[seq_along(splash.readin.2000$Uvalde_2020_02.2000splash$tair) %% 2 > 0]
-splash.readin.2000$Uvalde_2020_02.2000splash$pn <- splash.readin.2000$Uvalde_2020_02.2000splash$pn[seq_along(splash.readin.2000$Uvalde_2020_02.2000splash$pn) %% 2 > 0]
-splash.readin.2000$Uvalde_2020_02.2000splash$num_lines <- 366
-
 ## Load ancillary details needed to run 'spin_up" and 'run_one_day'
 splash.month.2000 <- lapply(file.list.2000, read.csv)
-
-## Remove multiple dates for sites visited more than one growing season
-# Brazos 2020-18
-splash.month.2000[["Brazos_2020_18.2000splash"]] <- splash.month.2000[["Brazos_2020_18.2000splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Harris 2020-03
-splash.month.2000[["Harris_2020_03.2000splash"]] <- splash.month.2000[["Harris_2020_03.2000splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Menard 2020-01
-splash.month.2000[["Menard_2020_01.2000splash"]] <- splash.month.2000[["Menard_2020_01.2000splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Uvalde 2020-02
-splash.month.2000[["Uvalde_2020_02.2000splash"]] <- splash.month.2000[["Uvalde_2020_02.2000splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
 
 ## Loop to select only month and day
 for (i in seq_along(splash.month.2000)) {
@@ -1503,50 +1059,8 @@ file.list.2001 <- setNames(file.list.2001,
 ## Read files based on 'splash' read_csv function
 splash.readin.2001 <- lapply(file.list.2001, read_csv)
 
-## Remove duplicate rows in sites that received more than one site visit
-# Brazos 2020-18
-splash.readin.2001$Brazos_2020_18.2001splash$sf <- splash.readin.2001$Brazos_2020_18.2001splash$sf[seq_along(splash.readin.2001$Brazos_2020_18.2001splash$sf) %% 2 > 0]
-splash.readin.2001$Brazos_2020_18.2001splash$tair <- splash.readin.2001$Brazos_2020_18.2001splash$tair[seq_along(splash.readin.2001$Brazos_2020_18.2001splash$tair) %% 2 > 0]
-splash.readin.2001$Brazos_2020_18.2001splash$pn <- splash.readin.2001$Brazos_2020_18.2001splash$pn[seq_along(splash.readin.2001$Brazos_2020_18.2001splash$pn) %% 2 > 0]
-splash.readin.2001$Brazos_2020_18.2001splash$num_lines <- 365
-
-# Harris 2020-03
-splash.readin.2001$Harris_2020_03.2001splash$sf <- splash.readin.2001$Harris_2020_03.2001splash$sf[seq_along(splash.readin.2001$Harris_2020_03.2001splash$sf) %% 2 > 0]
-splash.readin.2001$Harris_2020_03.2001splash$tair <- splash.readin.2001$Harris_2020_03.2001splash$tair[seq_along(splash.readin.2001$Harris_2020_03.2001splash$tair) %% 2 > 0]
-splash.readin.2001$Harris_2020_03.2001splash$pn <- splash.readin.2001$Harris_2020_03.2001splash$pn[seq_along(splash.readin.2001$Harris_2020_03.2001splash$pn) %% 2 > 0]
-splash.readin.2001$Harris_2020_03.2001splash$num_lines <- 365
-
-# Menard 2020-01
-splash.readin.2001$Menard_2020_01.2001splash$sf <- splash.readin.2001$Menard_2020_01.2001splash$sf[seq_along(splash.readin.2001$Menard_2020_01.2001splash$sf) %% 2 > 0]
-splash.readin.2001$Menard_2020_01.2001splash$tair <- splash.readin.2001$Menard_2020_01.2001splash$tair[seq_along(splash.readin.2001$Menard_2020_01.2001splash$tair) %% 2 > 0]
-splash.readin.2001$Menard_2020_01.2001splash$pn <- splash.readin.2001$Menard_2020_01.2001splash$pn[seq_along(splash.readin.2001$Menard_2020_01.2001splash$pn) %% 2 > 0]
-splash.readin.2001$Menard_2020_01.2001splash$num_lines <- 365
-
-# Uvalde 2020-02
-splash.readin.2001$Uvalde_2020_02.2001splash$sf <- splash.readin.2001$Uvalde_2020_02.2001splash$sf[seq_along(splash.readin.2001$Uvalde_2020_02.2001splash$sf) %% 2 > 0]
-splash.readin.2001$Uvalde_2020_02.2001splash$tair <- splash.readin.2001$Uvalde_2020_02.2001splash$tair[seq_along(splash.readin.2001$Uvalde_2020_02.2001splash$tair) %% 2 > 0]
-splash.readin.2001$Uvalde_2020_02.2001splash$pn <- splash.readin.2001$Uvalde_2020_02.2001splash$pn[seq_along(splash.readin.2001$Uvalde_2020_02.2001splash$pn) %% 2 > 0]
-splash.readin.2001$Uvalde_2020_02.2001splash$num_lines <- 365
-
 ## Load ancillary details needed to run 'spin_up" and 'run_one_day'
 splash.month.2001 <- lapply(file.list.2001, read.csv)
-
-## Remove multiple dates for sites visited more than one growing season
-# Brazos 2020-18
-splash.month.2001[["Brazos_2020_18.2001splash"]] <- splash.month.2001[["Brazos_2020_18.2001splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Harris 2020-03
-splash.month.2001[["Harris_2020_03.2001splash"]] <- splash.month.2001[["Harris_2020_03.2001splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Menard 2020-01
-splash.month.2001[["Menard_2020_01.2001splash"]] <- splash.month.2001[["Menard_2020_01.2001splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Uvalde 2020-02
-splash.month.2001[["Uvalde_2020_02.2001splash"]] <- splash.month.2001[["Uvalde_2020_02.2001splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
 
 ## Loop to select only month and day
 for (i in seq_along(splash.month.2001)) {
@@ -1647,50 +1161,8 @@ file.list.2002 <- setNames(file.list.2002,
 ## Read files based on 'splash' read_csv function
 splash.readin.2002 <- lapply(file.list.2002, read_csv)
 
-## Remove duplicate rows in sites that received more than one site visit
-# Brazos 2020-18
-splash.readin.2002$Brazos_2020_18.2002splash$sf <- splash.readin.2002$Brazos_2020_18.2002splash$sf[seq_along(splash.readin.2002$Brazos_2020_18.2002splash$sf) %% 2 > 0]
-splash.readin.2002$Brazos_2020_18.2002splash$tair <- splash.readin.2002$Brazos_2020_18.2002splash$tair[seq_along(splash.readin.2002$Brazos_2020_18.2002splash$tair) %% 2 > 0]
-splash.readin.2002$Brazos_2020_18.2002splash$pn <- splash.readin.2002$Brazos_2020_18.2002splash$pn[seq_along(splash.readin.2002$Brazos_2020_18.2002splash$pn) %% 2 > 0]
-splash.readin.2002$Brazos_2020_18.2002splash$num_lines <- 365
-
-# Harris 2020-03
-splash.readin.2002$Harris_2020_03.2002splash$sf <- splash.readin.2002$Harris_2020_03.2002splash$sf[seq_along(splash.readin.2002$Harris_2020_03.2002splash$sf) %% 2 > 0]
-splash.readin.2002$Harris_2020_03.2002splash$tair <- splash.readin.2002$Harris_2020_03.2002splash$tair[seq_along(splash.readin.2002$Harris_2020_03.2002splash$tair) %% 2 > 0]
-splash.readin.2002$Harris_2020_03.2002splash$pn <- splash.readin.2002$Harris_2020_03.2002splash$pn[seq_along(splash.readin.2002$Harris_2020_03.2002splash$pn) %% 2 > 0]
-splash.readin.2002$Harris_2020_03.2002splash$num_lines <- 365
-
-# Menard 2020-01
-splash.readin.2002$Menard_2020_01.2002splash$sf <- splash.readin.2002$Menard_2020_01.2002splash$sf[seq_along(splash.readin.2002$Menard_2020_01.2002splash$sf) %% 2 > 0]
-splash.readin.2002$Menard_2020_01.2002splash$tair <- splash.readin.2002$Menard_2020_01.2002splash$tair[seq_along(splash.readin.2002$Menard_2020_01.2002splash$tair) %% 2 > 0]
-splash.readin.2002$Menard_2020_01.2002splash$pn <- splash.readin.2002$Menard_2020_01.2002splash$pn[seq_along(splash.readin.2002$Menard_2020_01.2002splash$pn) %% 2 > 0]
-splash.readin.2002$Menard_2020_01.2002splash$num_lines <- 365
-
-# Uvalde 2020-02
-splash.readin.2002$Uvalde_2020_02.2002splash$sf <- splash.readin.2002$Uvalde_2020_02.2002splash$sf[seq_along(splash.readin.2002$Uvalde_2020_02.2002splash$sf) %% 2 > 0]
-splash.readin.2002$Uvalde_2020_02.2002splash$tair <- splash.readin.2002$Uvalde_2020_02.2002splash$tair[seq_along(splash.readin.2002$Uvalde_2020_02.2002splash$tair) %% 2 > 0]
-splash.readin.2002$Uvalde_2020_02.2002splash$pn <- splash.readin.2002$Uvalde_2020_02.2002splash$pn[seq_along(splash.readin.2002$Uvalde_2020_02.2002splash$pn) %% 2 > 0]
-splash.readin.2002$Uvalde_2020_02.2002splash$num_lines <- 365
-
 ## Load ancillary details needed to run 'spin_up" and 'run_one_day'
 splash.month.2002 <- lapply(file.list.2002, read.csv)
-
-## Remove multiple dates for sites visited more than one growing season
-# Brazos 2020-18
-splash.month.2002[["Brazos_2020_18.2002splash"]] <- splash.month.2002[["Brazos_2020_18.2002splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Harris 2020-03
-splash.month.2002[["Harris_2020_03.2002splash"]] <- splash.month.2002[["Harris_2020_03.2002splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Menard 2020-01
-splash.month.2002[["Menard_2020_01.2002splash"]] <- splash.month.2002[["Menard_2020_01.2002splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Uvalde 2020-02
-splash.month.2002[["Uvalde_2020_02.2002splash"]] <- splash.month.2002[["Uvalde_2020_02.2002splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
 
 ## Loop to select only month and day
 for (i in seq_along(splash.month.2002)) {
@@ -1791,50 +1263,8 @@ file.list.2003 <- setNames(file.list.2003,
 ## Read files based on 'splash' read_csv function
 splash.readin.2003 <- lapply(file.list.2003, read_csv)
 
-## Remove duplicate rows in sites that received more than one site visit
-# Brazos 2020-18
-splash.readin.2003$Brazos_2020_18.2003splash$sf <- splash.readin.2003$Brazos_2020_18.2003splash$sf[seq_along(splash.readin.2003$Brazos_2020_18.2003splash$sf) %% 2 > 0]
-splash.readin.2003$Brazos_2020_18.2003splash$tair <- splash.readin.2003$Brazos_2020_18.2003splash$tair[seq_along(splash.readin.2003$Brazos_2020_18.2003splash$tair) %% 2 > 0]
-splash.readin.2003$Brazos_2020_18.2003splash$pn <- splash.readin.2003$Brazos_2020_18.2003splash$pn[seq_along(splash.readin.2003$Brazos_2020_18.2003splash$pn) %% 2 > 0]
-splash.readin.2003$Brazos_2020_18.2003splash$num_lines <- 365
-
-# Harris 2020-03
-splash.readin.2003$Harris_2020_03.2003splash$sf <- splash.readin.2003$Harris_2020_03.2003splash$sf[seq_along(splash.readin.2003$Harris_2020_03.2003splash$sf) %% 2 > 0]
-splash.readin.2003$Harris_2020_03.2003splash$tair <- splash.readin.2003$Harris_2020_03.2003splash$tair[seq_along(splash.readin.2003$Harris_2020_03.2003splash$tair) %% 2 > 0]
-splash.readin.2003$Harris_2020_03.2003splash$pn <- splash.readin.2003$Harris_2020_03.2003splash$pn[seq_along(splash.readin.2003$Harris_2020_03.2003splash$pn) %% 2 > 0]
-splash.readin.2003$Harris_2020_03.2003splash$num_lines <- 365
-
-# Menard 2020-01
-splash.readin.2003$Menard_2020_01.2003splash$sf <- splash.readin.2003$Menard_2020_01.2003splash$sf[seq_along(splash.readin.2003$Menard_2020_01.2003splash$sf) %% 2 > 0]
-splash.readin.2003$Menard_2020_01.2003splash$tair <- splash.readin.2003$Menard_2020_01.2003splash$tair[seq_along(splash.readin.2003$Menard_2020_01.2003splash$tair) %% 2 > 0]
-splash.readin.2003$Menard_2020_01.2003splash$pn <- splash.readin.2003$Menard_2020_01.2003splash$pn[seq_along(splash.readin.2003$Menard_2020_01.2003splash$pn) %% 2 > 0]
-splash.readin.2003$Menard_2020_01.2003splash$num_lines <- 365
-
-# Uvalde 2020-02
-splash.readin.2003$Uvalde_2020_02.2003splash$sf <- splash.readin.2003$Uvalde_2020_02.2003splash$sf[seq_along(splash.readin.2003$Uvalde_2020_02.2003splash$sf) %% 2 > 0]
-splash.readin.2003$Uvalde_2020_02.2003splash$tair <- splash.readin.2003$Uvalde_2020_02.2003splash$tair[seq_along(splash.readin.2003$Uvalde_2020_02.2003splash$tair) %% 2 > 0]
-splash.readin.2003$Uvalde_2020_02.2003splash$pn <- splash.readin.2003$Uvalde_2020_02.2003splash$pn[seq_along(splash.readin.2003$Uvalde_2020_02.2003splash$pn) %% 2 > 0]
-splash.readin.2003$Uvalde_2020_02.2003splash$num_lines <- 365
-
 ## Load ancillary details needed to run 'spin_up" and 'run_one_day'
 splash.month.2003 <- lapply(file.list.2003, read.csv)
-
-## Remove multiple dates for sites visited more than one growing season
-# Brazos 2020-18
-splash.month.2003[["Brazos_2020_18.2003splash"]] <- splash.month.2003[["Brazos_2020_18.2003splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Harris 2020-03
-splash.month.2003[["Harris_2020_03.2003splash"]] <- splash.month.2003[["Harris_2020_03.2003splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Menard 2020-01
-splash.month.2003[["Menard_2020_01.2003splash"]] <- splash.month.2003[["Menard_2020_01.2003splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Uvalde 2020-02
-splash.month.2003[["Uvalde_2020_02.2003splash"]] <- splash.month.2003[["Uvalde_2020_02.2003splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
 
 ## Loop to select only month and day
 for (i in seq_along(splash.month.2003)) {
@@ -1935,51 +1365,8 @@ file.list.2004 <- setNames(file.list.2004,
 ## Read files based on 'splash' read_csv function
 splash.readin.2004 <- lapply(file.list.2004, read_csv)
 
-## Remove duplicate rows in sites that received more than one site visit
-# Brazos 2020-18
-splash.readin.2004$Brazos_2020_18.2004splash$sf <- splash.readin.2004$Brazos_2020_18.2004splash$sf[seq_along(splash.readin.2004$Brazos_2020_18.2004splash$sf) %% 2 > 0]
-splash.readin.2004$Brazos_2020_18.2004splash$tair <- splash.readin.2004$Brazos_2020_18.2004splash$tair[seq_along(splash.readin.2004$Brazos_2020_18.2004splash$tair) %% 2 > 0]
-splash.readin.2004$Brazos_2020_18.2004splash$pn <- splash.readin.2004$Brazos_2020_18.2004splash$pn[seq_along(splash.readin.2004$Brazos_2020_18.2004splash$pn) %% 2 > 0]
-splash.readin.2004$Brazos_2020_18.2004splash$num_lines <- 366
-
-# Harris 2020-03
-splash.readin.2004$Harris_2020_03.2004splash$sf <- splash.readin.2004$Harris_2020_03.2004splash$sf[seq_along(splash.readin.2004$Harris_2020_03.2004splash$sf) %% 2 > 0]
-splash.readin.2004$Harris_2020_03.2004splash$tair <- splash.readin.2004$Harris_2020_03.2004splash$tair[seq_along(splash.readin.2004$Harris_2020_03.2004splash$tair) %% 2 > 0]
-splash.readin.2004$Harris_2020_03.2004splash$pn <- splash.readin.2004$Harris_2020_03.2004splash$pn[seq_along(splash.readin.2004$Harris_2020_03.2004splash$pn) %% 2 > 0]
-splash.readin.2004$Harris_2020_03.2004splash$num_lines <- 366
-
-# Menard 2020-01
-splash.readin.2004$Menard_2020_01.2004splash$sf <- splash.readin.2004$Menard_2020_01.2004splash$sf[seq_along(splash.readin.2004$Menard_2020_01.2004splash$sf) %% 2 > 0]
-splash.readin.2004$Menard_2020_01.2004splash$tair <- splash.readin.2004$Menard_2020_01.2004splash$tair[seq_along(splash.readin.2004$Menard_2020_01.2004splash$tair) %% 2 > 0]
-splash.readin.2004$Menard_2020_01.2004splash$pn <- splash.readin.2004$Menard_2020_01.2004splash$pn[seq_along(splash.readin.2004$Menard_2020_01.2004splash$pn) %% 2 > 0]
-splash.readin.2004$Menard_2020_01.2004splash$num_lines <- 366
-
-# Uvalde 2020-02
-splash.readin.2004$Uvalde_2020_02.2004splash$sf <- splash.readin.2004$Uvalde_2020_02.2004splash$sf[seq_along(splash.readin.2004$Uvalde_2020_02.2004splash$sf) %% 2 > 0]
-splash.readin.2004$Uvalde_2020_02.2004splash$tair <- splash.readin.2004$Uvalde_2020_02.2004splash$tair[seq_along(splash.readin.2004$Uvalde_2020_02.2004splash$tair) %% 2 > 0]
-splash.readin.2004$Uvalde_2020_02.2004splash$pn <- splash.readin.2004$Uvalde_2020_02.2004splash$pn[seq_along(splash.readin.2004$Uvalde_2020_02.2004splash$pn) %% 2 > 0]
-splash.readin.2004$Uvalde_2020_02.2004splash$num_lines <- 366
-
 ## Load ancillary details needed to run 'spin_up" and 'run_one_day'
 splash.month.2004 <- lapply(file.list.2004, read.csv)
-
-## Remove multiple dates for sites visited more than one growing season
-# Brazos 2020-18
-splash.month.2004[["Brazos_2020_18.2004splash"]] <- splash.month.2004[["Brazos_2020_18.2004splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Harris 2020-03
-splash.month.2004[["Harris_2020_03.2004splash"]] <- splash.month.2004[["Harris_2020_03.2004splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Menard 2020-01
-splash.month.2004[["Menard_2020_01.2004splash"]] <- splash.month.2004[["Menard_2020_01.2004splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Uvalde 2020-02
-splash.month.2004[["Uvalde_2020_02.2004splash"]] <- splash.month.2004[["Uvalde_2020_02.2004splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
 
 ## Loop to select only month and day
 for (i in seq_along(splash.month.2004)) {
@@ -2080,51 +1467,8 @@ file.list.2005 <- setNames(file.list.2005,
 ## Read files based on 'splash' read_csv function
 splash.readin.2005 <- lapply(file.list.2005, read_csv)
 
-## Remove duplicate rows in sites that received more than one site visit
-# Brazos 2020-18
-splash.readin.2005$Brazos_2020_18.2005splash$sf <- splash.readin.2005$Brazos_2020_18.2005splash$sf[seq_along(splash.readin.2005$Brazos_2020_18.2005splash$sf) %% 2 > 0]
-splash.readin.2005$Brazos_2020_18.2005splash$tair <- splash.readin.2005$Brazos_2020_18.2005splash$tair[seq_along(splash.readin.2005$Brazos_2020_18.2005splash$tair) %% 2 > 0]
-splash.readin.2005$Brazos_2020_18.2005splash$pn <- splash.readin.2005$Brazos_2020_18.2005splash$pn[seq_along(splash.readin.2005$Brazos_2020_18.2005splash$pn) %% 2 > 0]
-splash.readin.2005$Brazos_2020_18.2005splash$num_lines <- 365
-
-# Harris 2020-03
-splash.readin.2005$Harris_2020_03.2005splash$sf <- splash.readin.2005$Harris_2020_03.2005splash$sf[seq_along(splash.readin.2005$Harris_2020_03.2005splash$sf) %% 2 > 0]
-splash.readin.2005$Harris_2020_03.2005splash$tair <- splash.readin.2005$Harris_2020_03.2005splash$tair[seq_along(splash.readin.2005$Harris_2020_03.2005splash$tair) %% 2 > 0]
-splash.readin.2005$Harris_2020_03.2005splash$pn <- splash.readin.2005$Harris_2020_03.2005splash$pn[seq_along(splash.readin.2005$Harris_2020_03.2005splash$pn) %% 2 > 0]
-splash.readin.2005$Harris_2020_03.2005splash$num_lines <- 365
-
-# Menard 2020-01
-splash.readin.2005$Menard_2020_01.2005splash$sf <- splash.readin.2005$Menard_2020_01.2005splash$sf[seq_along(splash.readin.2005$Menard_2020_01.2005splash$sf) %% 2 > 0]
-splash.readin.2005$Menard_2020_01.2005splash$tair <- splash.readin.2005$Menard_2020_01.2005splash$tair[seq_along(splash.readin.2005$Menard_2020_01.2005splash$tair) %% 2 > 0]
-splash.readin.2005$Menard_2020_01.2005splash$pn <- splash.readin.2005$Menard_2020_01.2005splash$pn[seq_along(splash.readin.2005$Menard_2020_01.2005splash$pn) %% 2 > 0]
-splash.readin.2005$Menard_2020_01.2005splash$num_lines <- 365
-
-# Uvalde 2020-02
-splash.readin.2005$Uvalde_2020_02.2005splash$sf <- splash.readin.2005$Uvalde_2020_02.2005splash$sf[seq_along(splash.readin.2005$Uvalde_2020_02.2005splash$sf) %% 2 > 0]
-splash.readin.2005$Uvalde_2020_02.2005splash$tair <- splash.readin.2005$Uvalde_2020_02.2005splash$tair[seq_along(splash.readin.2005$Uvalde_2020_02.2005splash$tair) %% 2 > 0]
-splash.readin.2005$Uvalde_2020_02.2005splash$pn <- splash.readin.2005$Uvalde_2020_02.2005splash$pn[seq_along(splash.readin.2005$Uvalde_2020_02.2005splash$pn) %% 2 > 0]
-splash.readin.2005$Uvalde_2020_02.2005splash$num_lines <- 365
-
 ## Load ancillary details needed to run 'spin_up" and 'run_one_day'
 splash.month.2005 <- lapply(file.list.2005, read.csv)
-
-## Remove multiple dates for sites visited more than one growing season
-# Brazos 2020-18
-splash.month.2005[["Brazos_2020_18.2005splash"]] <- splash.month.2005[["Brazos_2020_18.2005splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Harris 2020-03
-splash.month.2005[["Harris_2020_03.2005splash"]] <- splash.month.2005[["Harris_2020_03.2005splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Menard 2020-01
-splash.month.2005[["Menard_2020_01.2005splash"]] <- splash.month.2005[["Menard_2020_01.2005splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Uvalde 2020-02
-splash.month.2005[["Uvalde_2020_02.2005splash"]] <- splash.month.2005[["Uvalde_2020_02.2005splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
 
 ## Loop to select only month and day
 for (i in seq_along(splash.month.2005)) {
@@ -2225,51 +1569,8 @@ file.list.2006 <- setNames(file.list.2006,
 ## Read files based on 'splash' read_csv function
 splash.readin.2006 <- lapply(file.list.2006, read_csv)
 
-## Remove duplicate rows in sites that received more than one site visit
-# Brazos 2020-18
-splash.readin.2006$Brazos_2020_18.2006splash$sf <- splash.readin.2006$Brazos_2020_18.2006splash$sf[seq_along(splash.readin.2006$Brazos_2020_18.2006splash$sf) %% 2 > 0]
-splash.readin.2006$Brazos_2020_18.2006splash$tair <- splash.readin.2006$Brazos_2020_18.2006splash$tair[seq_along(splash.readin.2006$Brazos_2020_18.2006splash$tair) %% 2 > 0]
-splash.readin.2006$Brazos_2020_18.2006splash$pn <- splash.readin.2006$Brazos_2020_18.2006splash$pn[seq_along(splash.readin.2006$Brazos_2020_18.2006splash$pn) %% 2 > 0]
-splash.readin.2006$Brazos_2020_18.2006splash$num_lines <- 365
-
-# Harris 2020-03
-splash.readin.2006$Harris_2020_03.2006splash$sf <- splash.readin.2006$Harris_2020_03.2006splash$sf[seq_along(splash.readin.2006$Harris_2020_03.2006splash$sf) %% 2 > 0]
-splash.readin.2006$Harris_2020_03.2006splash$tair <- splash.readin.2006$Harris_2020_03.2006splash$tair[seq_along(splash.readin.2006$Harris_2020_03.2006splash$tair) %% 2 > 0]
-splash.readin.2006$Harris_2020_03.2006splash$pn <- splash.readin.2006$Harris_2020_03.2006splash$pn[seq_along(splash.readin.2006$Harris_2020_03.2006splash$pn) %% 2 > 0]
-splash.readin.2006$Harris_2020_03.2006splash$num_lines <- 365
-
-# Menard 2020-01
-splash.readin.2006$Menard_2020_01.2006splash$sf <- splash.readin.2006$Menard_2020_01.2006splash$sf[seq_along(splash.readin.2006$Menard_2020_01.2006splash$sf) %% 2 > 0]
-splash.readin.2006$Menard_2020_01.2006splash$tair <- splash.readin.2006$Menard_2020_01.2006splash$tair[seq_along(splash.readin.2006$Menard_2020_01.2006splash$tair) %% 2 > 0]
-splash.readin.2006$Menard_2020_01.2006splash$pn <- splash.readin.2006$Menard_2020_01.2006splash$pn[seq_along(splash.readin.2006$Menard_2020_01.2006splash$pn) %% 2 > 0]
-splash.readin.2006$Menard_2020_01.2006splash$num_lines <- 365
-
-# Uvalde 2020-02
-splash.readin.2006$Uvalde_2020_02.2006splash$sf <- splash.readin.2006$Uvalde_2020_02.2006splash$sf[seq_along(splash.readin.2006$Uvalde_2020_02.2006splash$sf) %% 2 > 0]
-splash.readin.2006$Uvalde_2020_02.2006splash$tair <- splash.readin.2006$Uvalde_2020_02.2006splash$tair[seq_along(splash.readin.2006$Uvalde_2020_02.2006splash$tair) %% 2 > 0]
-splash.readin.2006$Uvalde_2020_02.2006splash$pn <- splash.readin.2006$Uvalde_2020_02.2006splash$pn[seq_along(splash.readin.2006$Uvalde_2020_02.2006splash$pn) %% 2 > 0]
-splash.readin.2006$Uvalde_2020_02.2006splash$num_lines <- 365
-
 ## Load ancillary details needed to run 'spin_up" and 'run_one_day'
 splash.month.2006 <- lapply(file.list.2006, read.csv)
-
-## Remove multiple dates for sites visited more than one growing season
-# Brazos 2020-18
-splash.month.2006[["Brazos_2020_18.2006splash"]] <- splash.month.2006[["Brazos_2020_18.2006splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Harris 2020-03
-splash.month.2006[["Harris_2020_03.2006splash"]] <- splash.month.2006[["Harris_2020_03.2006splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Menard 2020-01
-splash.month.2006[["Menard_2020_01.2006splash"]] <- splash.month.2006[["Menard_2020_01.2006splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Uvalde 2020-02
-splash.month.2006[["Uvalde_2020_02.2006splash"]] <- splash.month.2006[["Uvalde_2020_02.2006splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
 
 ## Loop to select only month and day
 for (i in seq_along(splash.month.2006)) {
@@ -2370,51 +1671,8 @@ file.list.2007 <- setNames(file.list.2007,
 ## Read files based on 'splash' read_csv function
 splash.readin.2007 <- lapply(file.list.2007, read_csv)
 
-## Remove duplicate rows in sites that received more than one site visit
-# Brazos 2020-18
-splash.readin.2007$Brazos_2020_18.2007splash$sf <- splash.readin.2007$Brazos_2020_18.2007splash$sf[seq_along(splash.readin.2007$Brazos_2020_18.2007splash$sf) %% 2 > 0]
-splash.readin.2007$Brazos_2020_18.2007splash$tair <- splash.readin.2007$Brazos_2020_18.2007splash$tair[seq_along(splash.readin.2007$Brazos_2020_18.2007splash$tair) %% 2 > 0]
-splash.readin.2007$Brazos_2020_18.2007splash$pn <- splash.readin.2007$Brazos_2020_18.2007splash$pn[seq_along(splash.readin.2007$Brazos_2020_18.2007splash$pn) %% 2 > 0]
-splash.readin.2007$Brazos_2020_18.2007splash$num_lines <- 365
-
-# Harris 2020-03
-splash.readin.2007$Harris_2020_03.2007splash$sf <- splash.readin.2007$Harris_2020_03.2007splash$sf[seq_along(splash.readin.2007$Harris_2020_03.2007splash$sf) %% 2 > 0]
-splash.readin.2007$Harris_2020_03.2007splash$tair <- splash.readin.2007$Harris_2020_03.2007splash$tair[seq_along(splash.readin.2007$Harris_2020_03.2007splash$tair) %% 2 > 0]
-splash.readin.2007$Harris_2020_03.2007splash$pn <- splash.readin.2007$Harris_2020_03.2007splash$pn[seq_along(splash.readin.2007$Harris_2020_03.2007splash$pn) %% 2 > 0]
-splash.readin.2007$Harris_2020_03.2007splash$num_lines <- 365
-
-# Menard 2020-01
-splash.readin.2007$Menard_2020_01.2007splash$sf <- splash.readin.2007$Menard_2020_01.2007splash$sf[seq_along(splash.readin.2007$Menard_2020_01.2007splash$sf) %% 2 > 0]
-splash.readin.2007$Menard_2020_01.2007splash$tair <- splash.readin.2007$Menard_2020_01.2007splash$tair[seq_along(splash.readin.2007$Menard_2020_01.2007splash$tair) %% 2 > 0]
-splash.readin.2007$Menard_2020_01.2007splash$pn <- splash.readin.2007$Menard_2020_01.2007splash$pn[seq_along(splash.readin.2007$Menard_2020_01.2007splash$pn) %% 2 > 0]
-splash.readin.2007$Menard_2020_01.2007splash$num_lines <- 365
-
-# Uvalde 2020-02
-splash.readin.2007$Uvalde_2020_02.2007splash$sf <- splash.readin.2007$Uvalde_2020_02.2007splash$sf[seq_along(splash.readin.2007$Uvalde_2020_02.2007splash$sf) %% 2 > 0]
-splash.readin.2007$Uvalde_2020_02.2007splash$tair <- splash.readin.2007$Uvalde_2020_02.2007splash$tair[seq_along(splash.readin.2007$Uvalde_2020_02.2007splash$tair) %% 2 > 0]
-splash.readin.2007$Uvalde_2020_02.2007splash$pn <- splash.readin.2007$Uvalde_2020_02.2007splash$pn[seq_along(splash.readin.2007$Uvalde_2020_02.2007splash$pn) %% 2 > 0]
-splash.readin.2007$Uvalde_2020_02.2007splash$num_lines <- 365
-
 ## Load ancillary details needed to run 'spin_up" and 'run_one_day'
 splash.month.2007 <- lapply(file.list.2007, read.csv)
-
-## Remove multiple dates for sites visited more than one growing season
-# Brazos 2020-18
-splash.month.2007[["Brazos_2020_18.2007splash"]] <- splash.month.2007[["Brazos_2020_18.2007splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Harris 2020-03
-splash.month.2007[["Harris_2020_03.2007splash"]] <- splash.month.2007[["Harris_2020_03.2007splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Menard 2020-01
-splash.month.2007[["Menard_2020_01.2007splash"]] <- splash.month.2007[["Menard_2020_01.2007splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Uvalde 2020-02
-splash.month.2007[["Uvalde_2020_02.2007splash"]] <- splash.month.2007[["Uvalde_2020_02.2007splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
 
 ## Loop to select only month and day
 for (i in seq_along(splash.month.2007)) {
@@ -2515,51 +1773,8 @@ file.list.2008 <- setNames(file.list.2008,
 ## Read files based on 'splash' read_csv function
 splash.readin.2008 <- lapply(file.list.2008, read_csv)
 
-## Remove duplicate rows in sites that received more than one site visit
-# Brazos 2020-18
-splash.readin.2008$Brazos_2020_18.2008splash$sf <- splash.readin.2008$Brazos_2020_18.2008splash$sf[seq_along(splash.readin.2008$Brazos_2020_18.2008splash$sf) %% 2 > 0]
-splash.readin.2008$Brazos_2020_18.2008splash$tair <- splash.readin.2008$Brazos_2020_18.2008splash$tair[seq_along(splash.readin.2008$Brazos_2020_18.2008splash$tair) %% 2 > 0]
-splash.readin.2008$Brazos_2020_18.2008splash$pn <- splash.readin.2008$Brazos_2020_18.2008splash$pn[seq_along(splash.readin.2008$Brazos_2020_18.2008splash$pn) %% 2 > 0]
-splash.readin.2008$Brazos_2020_18.2008splash$num_lines <- 366
-
-# Harris 2020-03
-splash.readin.2008$Harris_2020_03.2008splash$sf <- splash.readin.2008$Harris_2020_03.2008splash$sf[seq_along(splash.readin.2008$Harris_2020_03.2008splash$sf) %% 2 > 0]
-splash.readin.2008$Harris_2020_03.2008splash$tair <- splash.readin.2008$Harris_2020_03.2008splash$tair[seq_along(splash.readin.2008$Harris_2020_03.2008splash$tair) %% 2 > 0]
-splash.readin.2008$Harris_2020_03.2008splash$pn <- splash.readin.2008$Harris_2020_03.2008splash$pn[seq_along(splash.readin.2008$Harris_2020_03.2008splash$pn) %% 2 > 0]
-splash.readin.2008$Harris_2020_03.2008splash$num_lines <- 366
-
-# Menard 2020-01
-splash.readin.2008$Menard_2020_01.2008splash$sf <- splash.readin.2008$Menard_2020_01.2008splash$sf[seq_along(splash.readin.2008$Menard_2020_01.2008splash$sf) %% 2 > 0]
-splash.readin.2008$Menard_2020_01.2008splash$tair <- splash.readin.2008$Menard_2020_01.2008splash$tair[seq_along(splash.readin.2008$Menard_2020_01.2008splash$tair) %% 2 > 0]
-splash.readin.2008$Menard_2020_01.2008splash$pn <- splash.readin.2008$Menard_2020_01.2008splash$pn[seq_along(splash.readin.2008$Menard_2020_01.2008splash$pn) %% 2 > 0]
-splash.readin.2008$Menard_2020_01.2008splash$num_lines <- 366
-
-# Uvalde 2020-02
-splash.readin.2008$Uvalde_2020_02.2008splash$sf <- splash.readin.2008$Uvalde_2020_02.2008splash$sf[seq_along(splash.readin.2008$Uvalde_2020_02.2008splash$sf) %% 2 > 0]
-splash.readin.2008$Uvalde_2020_02.2008splash$tair <- splash.readin.2008$Uvalde_2020_02.2008splash$tair[seq_along(splash.readin.2008$Uvalde_2020_02.2008splash$tair) %% 2 > 0]
-splash.readin.2008$Uvalde_2020_02.2008splash$pn <- splash.readin.2008$Uvalde_2020_02.2008splash$pn[seq_along(splash.readin.2008$Uvalde_2020_02.2008splash$pn) %% 2 > 0]
-splash.readin.2008$Uvalde_2020_02.2008splash$num_lines <- 366
-
 ## Load ancillary details needed to run 'spin_up" and 'run_one_day'
 splash.month.2008 <- lapply(file.list.2008, read.csv)
-
-## Remove multiple dates for sites visited more than one growing season
-# Brazos 2020-18
-splash.month.2008[["Brazos_2020_18.2008splash"]] <- splash.month.2008[["Brazos_2020_18.2008splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Harris 2020-03
-splash.month.2008[["Harris_2020_03.2008splash"]] <- splash.month.2008[["Harris_2020_03.2008splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Menard 2020-01
-splash.month.2008[["Menard_2020_01.2008splash"]] <- splash.month.2008[["Menard_2020_01.2008splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Uvalde 2020-02
-splash.month.2008[["Uvalde_2020_02.2008splash"]] <- splash.month.2008[["Uvalde_2020_02.2008splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
 
 ## Loop to select only month and day
 for (i in seq_along(splash.month.2008)) {
@@ -2660,51 +1875,8 @@ file.list.2009 <- setNames(file.list.2009,
 ## Read files based on 'splash' read_csv function
 splash.readin.2009 <- lapply(file.list.2009, read_csv)
 
-## Remove duplicate rows in sites that received more than one site visit
-# Brazos 2020-18
-splash.readin.2009$Brazos_2020_18.2009splash$sf <- splash.readin.2009$Brazos_2020_18.2009splash$sf[seq_along(splash.readin.2009$Brazos_2020_18.2009splash$sf) %% 2 > 0]
-splash.readin.2009$Brazos_2020_18.2009splash$tair <- splash.readin.2009$Brazos_2020_18.2009splash$tair[seq_along(splash.readin.2009$Brazos_2020_18.2009splash$tair) %% 2 > 0]
-splash.readin.2009$Brazos_2020_18.2009splash$pn <- splash.readin.2009$Brazos_2020_18.2009splash$pn[seq_along(splash.readin.2009$Brazos_2020_18.2009splash$pn) %% 2 > 0]
-splash.readin.2009$Brazos_2020_18.2009splash$num_lines <- 365
-
-# Harris 2020-03
-splash.readin.2009$Harris_2020_03.2009splash$sf <- splash.readin.2009$Harris_2020_03.2009splash$sf[seq_along(splash.readin.2009$Harris_2020_03.2009splash$sf) %% 2 > 0]
-splash.readin.2009$Harris_2020_03.2009splash$tair <- splash.readin.2009$Harris_2020_03.2009splash$tair[seq_along(splash.readin.2009$Harris_2020_03.2009splash$tair) %% 2 > 0]
-splash.readin.2009$Harris_2020_03.2009splash$pn <- splash.readin.2009$Harris_2020_03.2009splash$pn[seq_along(splash.readin.2009$Harris_2020_03.2009splash$pn) %% 2 > 0]
-splash.readin.2009$Harris_2020_03.2009splash$num_lines <- 365
-
-# Menard 2020-01
-splash.readin.2009$Menard_2020_01.2009splash$sf <- splash.readin.2009$Menard_2020_01.2009splash$sf[seq_along(splash.readin.2009$Menard_2020_01.2009splash$sf) %% 2 > 0]
-splash.readin.2009$Menard_2020_01.2009splash$tair <- splash.readin.2009$Menard_2020_01.2009splash$tair[seq_along(splash.readin.2009$Menard_2020_01.2009splash$tair) %% 2 > 0]
-splash.readin.2009$Menard_2020_01.2009splash$pn <- splash.readin.2009$Menard_2020_01.2009splash$pn[seq_along(splash.readin.2009$Menard_2020_01.2009splash$pn) %% 2 > 0]
-splash.readin.2009$Menard_2020_01.2009splash$num_lines <- 365
-
-# Uvalde 2020-02
-splash.readin.2009$Uvalde_2020_02.2009splash$sf <- splash.readin.2009$Uvalde_2020_02.2009splash$sf[seq_along(splash.readin.2009$Uvalde_2020_02.2009splash$sf) %% 2 > 0]
-splash.readin.2009$Uvalde_2020_02.2009splash$tair <- splash.readin.2009$Uvalde_2020_02.2009splash$tair[seq_along(splash.readin.2009$Uvalde_2020_02.2009splash$tair) %% 2 > 0]
-splash.readin.2009$Uvalde_2020_02.2009splash$pn <- splash.readin.2009$Uvalde_2020_02.2009splash$pn[seq_along(splash.readin.2009$Uvalde_2020_02.2009splash$pn) %% 2 > 0]
-splash.readin.2009$Uvalde_2020_02.2009splash$num_lines <- 365
-
 ## Load ancillary details needed to run 'spin_up" and 'run_one_day'
 splash.month.2009 <- lapply(file.list.2009, read.csv)
-
-## Remove multiple dates for sites visited more than one growing season
-# Brazos 2020-18
-splash.month.2009[["Brazos_2020_18.2009splash"]] <- splash.month.2009[["Brazos_2020_18.2009splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Harris 2020-03
-splash.month.2009[["Harris_2020_03.2009splash"]] <- splash.month.2009[["Harris_2020_03.2009splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Menard 2020-01
-splash.month.2009[["Menard_2020_01.2009splash"]] <- splash.month.2009[["Menard_2020_01.2009splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Uvalde 2020-02
-splash.month.2009[["Uvalde_2020_02.2009splash"]] <- splash.month.2009[["Uvalde_2020_02.2009splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
 
 ## Loop to select only month and day
 for (i in seq_along(splash.month.2009)) {
@@ -2806,51 +1978,8 @@ file.list.2010 <- setNames(file.list.2010,
 ## Read files based on 'splash' read_csv function
 splash.readin.2010 <- lapply(file.list.2010, read_csv)
 
-## Remove duplicate rows in sites that received more than one site visit
-# Brazos 2020-18
-splash.readin.2010$Brazos_2020_18.2010splash$sf <- splash.readin.2010$Brazos_2020_18.2010splash$sf[seq_along(splash.readin.2010$Brazos_2020_18.2010splash$sf) %% 2 > 0]
-splash.readin.2010$Brazos_2020_18.2010splash$tair <- splash.readin.2010$Brazos_2020_18.2010splash$tair[seq_along(splash.readin.2010$Brazos_2020_18.2010splash$tair) %% 2 > 0]
-splash.readin.2010$Brazos_2020_18.2010splash$pn <- splash.readin.2010$Brazos_2020_18.2010splash$pn[seq_along(splash.readin.2010$Brazos_2020_18.2010splash$pn) %% 2 > 0]
-splash.readin.2010$Brazos_2020_18.2010splash$num_lines <- 365
-
-# Harris 2020-03
-splash.readin.2010$Harris_2020_03.2010splash$sf <- splash.readin.2010$Harris_2020_03.2010splash$sf[seq_along(splash.readin.2010$Harris_2020_03.2010splash$sf) %% 2 > 0]
-splash.readin.2010$Harris_2020_03.2010splash$tair <- splash.readin.2010$Harris_2020_03.2010splash$tair[seq_along(splash.readin.2010$Harris_2020_03.2010splash$tair) %% 2 > 0]
-splash.readin.2010$Harris_2020_03.2010splash$pn <- splash.readin.2010$Harris_2020_03.2010splash$pn[seq_along(splash.readin.2010$Harris_2020_03.2010splash$pn) %% 2 > 0]
-splash.readin.2010$Harris_2020_03.2010splash$num_lines <- 365
-
-# Menard 2020-01
-splash.readin.2010$Menard_2020_01.2010splash$sf <- splash.readin.2010$Menard_2020_01.2010splash$sf[seq_along(splash.readin.2010$Menard_2020_01.2010splash$sf) %% 2 > 0]
-splash.readin.2010$Menard_2020_01.2010splash$tair <- splash.readin.2010$Menard_2020_01.2010splash$tair[seq_along(splash.readin.2010$Menard_2020_01.2010splash$tair) %% 2 > 0]
-splash.readin.2010$Menard_2020_01.2010splash$pn <- splash.readin.2010$Menard_2020_01.2010splash$pn[seq_along(splash.readin.2010$Menard_2020_01.2010splash$pn) %% 2 > 0]
-splash.readin.2010$Menard_2020_01.2010splash$num_lines <- 365
-
-# Uvalde 2020-02
-splash.readin.2010$Uvalde_2020_02.2010splash$sf <- splash.readin.2010$Uvalde_2020_02.2010splash$sf[seq_along(splash.readin.2010$Uvalde_2020_02.2010splash$sf) %% 2 > 0]
-splash.readin.2010$Uvalde_2020_02.2010splash$tair <- splash.readin.2010$Uvalde_2020_02.2010splash$tair[seq_along(splash.readin.2010$Uvalde_2020_02.2010splash$tair) %% 2 > 0]
-splash.readin.2010$Uvalde_2020_02.2010splash$pn <- splash.readin.2010$Uvalde_2020_02.2010splash$pn[seq_along(splash.readin.2010$Uvalde_2020_02.2010splash$pn) %% 2 > 0]
-splash.readin.2010$Uvalde_2020_02.2010splash$num_lines <- 365
-
 ## Load ancillary details needed to run 'spin_up" and 'run_one_day'
 splash.month.2010 <- lapply(file.list.2010, read.csv)
-
-## Remove multiple dates for sites visited more than one growing season
-# Brazos 2020-18
-splash.month.2010[["Brazos_2020_18.2010splash"]] <- splash.month.2010[["Brazos_2020_18.2010splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Harris 2020-03
-splash.month.2010[["Harris_2020_03.2010splash"]] <- splash.month.2010[["Harris_2020_03.2010splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Menard 2020-01
-splash.month.2010[["Menard_2020_01.2010splash"]] <- splash.month.2010[["Menard_2020_01.2010splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Uvalde 2020-02
-splash.month.2010[["Uvalde_2020_02.2010splash"]] <- splash.month.2010[["Uvalde_2020_02.2010splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
 
 ## Loop to select only month and day
 for (i in seq_along(splash.month.2010)) {
@@ -2951,51 +2080,8 @@ file.list.2011 <- setNames(file.list.2011,
 ## Read files based on 'splash' read_csv function
 splash.readin.2011 <- lapply(file.list.2011, read_csv)
 
-## Remove duplicate rows in sites that received more than one site visit
-# Brazos 2020-18
-splash.readin.2011$Brazos_2020_18.2011splash$sf <- splash.readin.2011$Brazos_2020_18.2011splash$sf[seq_along(splash.readin.2011$Brazos_2020_18.2011splash$sf) %% 2 > 0]
-splash.readin.2011$Brazos_2020_18.2011splash$tair <- splash.readin.2011$Brazos_2020_18.2011splash$tair[seq_along(splash.readin.2011$Brazos_2020_18.2011splash$tair) %% 2 > 0]
-splash.readin.2011$Brazos_2020_18.2011splash$pn <- splash.readin.2011$Brazos_2020_18.2011splash$pn[seq_along(splash.readin.2011$Brazos_2020_18.2011splash$pn) %% 2 > 0]
-splash.readin.2011$Brazos_2020_18.2011splash$num_lines <- 365
-
-# Harris 2020-03
-splash.readin.2011$Harris_2020_03.2011splash$sf <- splash.readin.2011$Harris_2020_03.2011splash$sf[seq_along(splash.readin.2011$Harris_2020_03.2011splash$sf) %% 2 > 0]
-splash.readin.2011$Harris_2020_03.2011splash$tair <- splash.readin.2011$Harris_2020_03.2011splash$tair[seq_along(splash.readin.2011$Harris_2020_03.2011splash$tair) %% 2 > 0]
-splash.readin.2011$Harris_2020_03.2011splash$pn <- splash.readin.2011$Harris_2020_03.2011splash$pn[seq_along(splash.readin.2011$Harris_2020_03.2011splash$pn) %% 2 > 0]
-splash.readin.2011$Harris_2020_03.2011splash$num_lines <- 365
-
-# Menard 2020-01
-splash.readin.2011$Menard_2020_01.2011splash$sf <- splash.readin.2011$Menard_2020_01.2011splash$sf[seq_along(splash.readin.2011$Menard_2020_01.2011splash$sf) %% 2 > 0]
-splash.readin.2011$Menard_2020_01.2011splash$tair <- splash.readin.2011$Menard_2020_01.2011splash$tair[seq_along(splash.readin.2011$Menard_2020_01.2011splash$tair) %% 2 > 0]
-splash.readin.2011$Menard_2020_01.2011splash$pn <- splash.readin.2011$Menard_2020_01.2011splash$pn[seq_along(splash.readin.2011$Menard_2020_01.2011splash$pn) %% 2 > 0]
-splash.readin.2011$Menard_2020_01.2011splash$num_lines <- 365
-
-# Uvalde 2020-02
-splash.readin.2011$Uvalde_2020_02.2011splash$sf <- splash.readin.2011$Uvalde_2020_02.2011splash$sf[seq_along(splash.readin.2011$Uvalde_2020_02.2011splash$sf) %% 2 > 0]
-splash.readin.2011$Uvalde_2020_02.2011splash$tair <- splash.readin.2011$Uvalde_2020_02.2011splash$tair[seq_along(splash.readin.2011$Uvalde_2020_02.2011splash$tair) %% 2 > 0]
-splash.readin.2011$Uvalde_2020_02.2011splash$pn <- splash.readin.2011$Uvalde_2020_02.2011splash$pn[seq_along(splash.readin.2011$Uvalde_2020_02.2011splash$pn) %% 2 > 0]
-splash.readin.2011$Uvalde_2020_02.2011splash$num_lines <- 365
-
 ## Load ancillary details needed to run 'spin_up" and 'run_one_day'
 splash.month.2011 <- lapply(file.list.2011, read.csv)
-
-## Remove multiple dates for sites visited more than one growing season
-# Brazos 2020-18
-splash.month.2011[["Brazos_2020_18.2011splash"]] <- splash.month.2011[["Brazos_2020_18.2011splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Harris 2020-03
-splash.month.2011[["Harris_2020_03.2011splash"]] <- splash.month.2011[["Harris_2020_03.2011splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Menard 2020-01
-splash.month.2011[["Menard_2020_01.2011splash"]] <- splash.month.2011[["Menard_2020_01.2011splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Uvalde 2020-02
-splash.month.2011[["Uvalde_2020_02.2011splash"]] <- splash.month.2011[["Uvalde_2020_02.2011splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
 
 ## Loop to select only month and day
 for (i in seq_along(splash.month.2011)) {
@@ -3096,51 +2182,8 @@ file.list.2012 <- setNames(file.list.2012,
 ## Read files based on 'splash' read_csv function
 splash.readin.2012 <- lapply(file.list.2012, read_csv)
 
-## Remove duplicate rows in sites that received more than one site visit
-# Brazos 2020-18
-splash.readin.2012$Brazos_2020_18.2012splash$sf <- splash.readin.2012$Brazos_2020_18.2012splash$sf[seq_along(splash.readin.2012$Brazos_2020_18.2012splash$sf) %% 2 > 0]
-splash.readin.2012$Brazos_2020_18.2012splash$tair <- splash.readin.2012$Brazos_2020_18.2012splash$tair[seq_along(splash.readin.2012$Brazos_2020_18.2012splash$tair) %% 2 > 0]
-splash.readin.2012$Brazos_2020_18.2012splash$pn <- splash.readin.2012$Brazos_2020_18.2012splash$pn[seq_along(splash.readin.2012$Brazos_2020_18.2012splash$pn) %% 2 > 0]
-splash.readin.2012$Brazos_2020_18.2012splash$num_lines <- 366
-
-# Harris 2020-03
-splash.readin.2012$Harris_2020_03.2012splash$sf <- splash.readin.2012$Harris_2020_03.2012splash$sf[seq_along(splash.readin.2012$Harris_2020_03.2012splash$sf) %% 2 > 0]
-splash.readin.2012$Harris_2020_03.2012splash$tair <- splash.readin.2012$Harris_2020_03.2012splash$tair[seq_along(splash.readin.2012$Harris_2020_03.2012splash$tair) %% 2 > 0]
-splash.readin.2012$Harris_2020_03.2012splash$pn <- splash.readin.2012$Harris_2020_03.2012splash$pn[seq_along(splash.readin.2012$Harris_2020_03.2012splash$pn) %% 2 > 0]
-splash.readin.2012$Harris_2020_03.2012splash$num_lines <- 366
-
-# Menard 2020-01
-splash.readin.2012$Menard_2020_01.2012splash$sf <- splash.readin.2012$Menard_2020_01.2012splash$sf[seq_along(splash.readin.2012$Menard_2020_01.2012splash$sf) %% 2 > 0]
-splash.readin.2012$Menard_2020_01.2012splash$tair <- splash.readin.2012$Menard_2020_01.2012splash$tair[seq_along(splash.readin.2012$Menard_2020_01.2012splash$tair) %% 2 > 0]
-splash.readin.2012$Menard_2020_01.2012splash$pn <- splash.readin.2012$Menard_2020_01.2012splash$pn[seq_along(splash.readin.2012$Menard_2020_01.2012splash$pn) %% 2 > 0]
-splash.readin.2012$Menard_2020_01.2012splash$num_lines <- 366
-
-# Uvalde 2020-02
-splash.readin.2012$Uvalde_2020_02.2012splash$sf <- splash.readin.2012$Uvalde_2020_02.2012splash$sf[seq_along(splash.readin.2012$Uvalde_2020_02.2012splash$sf) %% 2 > 0]
-splash.readin.2012$Uvalde_2020_02.2012splash$tair <- splash.readin.2012$Uvalde_2020_02.2012splash$tair[seq_along(splash.readin.2012$Uvalde_2020_02.2012splash$tair) %% 2 > 0]
-splash.readin.2012$Uvalde_2020_02.2012splash$pn <- splash.readin.2012$Uvalde_2020_02.2012splash$pn[seq_along(splash.readin.2012$Uvalde_2020_02.2012splash$pn) %% 2 > 0]
-splash.readin.2012$Uvalde_2020_02.2012splash$num_lines <- 366
-
 ## Load ancillary details needed to run 'spin_up" and 'run_one_day'
 splash.month.2012 <- lapply(file.list.2012, read.csv)
-
-## Remove multiple dates for sites visited more than one growing season
-# Brazos 2020-18
-splash.month.2012[["Brazos_2020_18.2012splash"]] <- splash.month.2012[["Brazos_2020_18.2012splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Harris 2020-03
-splash.month.2012[["Harris_2020_03.2012splash"]] <- splash.month.2012[["Harris_2020_03.2012splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Menard 2020-01
-splash.month.2012[["Menard_2020_01.2012splash"]] <- splash.month.2012[["Menard_2020_01.2012splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Uvalde 2020-02
-splash.month.2012[["Uvalde_2020_02.2012splash"]] <- splash.month.2012[["Uvalde_2020_02.2012splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
 
 ## Loop to select only month and day
 for (i in seq_along(splash.month.2012)) {
@@ -3241,51 +2284,8 @@ file.list.2013 <- setNames(file.list.2013,
 ## Read files based on 'splash' read_csv function
 splash.readin.2013 <- lapply(file.list.2013, read_csv)
 
-## Remove duplicate rows in sites that received more than one site visit
-# Brazos 2020-18
-splash.readin.2013$Brazos_2020_18.2013splash$sf <- splash.readin.2013$Brazos_2020_18.2013splash$sf[seq_along(splash.readin.2013$Brazos_2020_18.2013splash$sf) %% 2 > 0]
-splash.readin.2013$Brazos_2020_18.2013splash$tair <- splash.readin.2013$Brazos_2020_18.2013splash$tair[seq_along(splash.readin.2013$Brazos_2020_18.2013splash$tair) %% 2 > 0]
-splash.readin.2013$Brazos_2020_18.2013splash$pn <- splash.readin.2013$Brazos_2020_18.2013splash$pn[seq_along(splash.readin.2013$Brazos_2020_18.2013splash$pn) %% 2 > 0]
-splash.readin.2013$Brazos_2020_18.2013splash$num_lines <- 365
-
-# Harris 2020-03
-splash.readin.2013$Harris_2020_03.2013splash$sf <- splash.readin.2013$Harris_2020_03.2013splash$sf[seq_along(splash.readin.2013$Harris_2020_03.2013splash$sf) %% 2 > 0]
-splash.readin.2013$Harris_2020_03.2013splash$tair <- splash.readin.2013$Harris_2020_03.2013splash$tair[seq_along(splash.readin.2013$Harris_2020_03.2013splash$tair) %% 2 > 0]
-splash.readin.2013$Harris_2020_03.2013splash$pn <- splash.readin.2013$Harris_2020_03.2013splash$pn[seq_along(splash.readin.2013$Harris_2020_03.2013splash$pn) %% 2 > 0]
-splash.readin.2013$Harris_2020_03.2013splash$num_lines <- 365
-
-# Menard 2020-01
-splash.readin.2013$Menard_2020_01.2013splash$sf <- splash.readin.2013$Menard_2020_01.2013splash$sf[seq_along(splash.readin.2013$Menard_2020_01.2013splash$sf) %% 2 > 0]
-splash.readin.2013$Menard_2020_01.2013splash$tair <- splash.readin.2013$Menard_2020_01.2013splash$tair[seq_along(splash.readin.2013$Menard_2020_01.2013splash$tair) %% 2 > 0]
-splash.readin.2013$Menard_2020_01.2013splash$pn <- splash.readin.2013$Menard_2020_01.2013splash$pn[seq_along(splash.readin.2013$Menard_2020_01.2013splash$pn) %% 2 > 0]
-splash.readin.2013$Menard_2020_01.2013splash$num_lines <- 365
-
-# Uvalde 2020-02
-splash.readin.2013$Uvalde_2020_02.2013splash$sf <- splash.readin.2013$Uvalde_2020_02.2013splash$sf[seq_along(splash.readin.2013$Uvalde_2020_02.2013splash$sf) %% 2 > 0]
-splash.readin.2013$Uvalde_2020_02.2013splash$tair <- splash.readin.2013$Uvalde_2020_02.2013splash$tair[seq_along(splash.readin.2013$Uvalde_2020_02.2013splash$tair) %% 2 > 0]
-splash.readin.2013$Uvalde_2020_02.2013splash$pn <- splash.readin.2013$Uvalde_2020_02.2013splash$pn[seq_along(splash.readin.2013$Uvalde_2020_02.2013splash$pn) %% 2 > 0]
-splash.readin.2013$Uvalde_2020_02.2013splash$num_lines <- 365
-
 ## Load ancillary details needed to run 'spin_up" and 'run_one_day'
 splash.month.2013 <- lapply(file.list.2013, read.csv)
-
-## Remove multiple dates for sites visited more than one growing season
-# Brazos 2020-18
-splash.month.2013[["Brazos_2020_18.2013splash"]] <- splash.month.2013[["Brazos_2020_18.2013splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Harris 2020-03
-splash.month.2013[["Harris_2020_03.2013splash"]] <- splash.month.2013[["Harris_2020_03.2013splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Menard 2020-01
-splash.month.2013[["Menard_2020_01.2013splash"]] <- splash.month.2013[["Menard_2020_01.2013splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Uvalde 2020-02
-splash.month.2013[["Uvalde_2020_02.2013splash"]] <- splash.month.2013[["Uvalde_2020_02.2013splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
 
 ## Loop to select only month and day
 for (i in seq_along(splash.month.2013)) {
@@ -3387,51 +2387,8 @@ file.list.2014 <- setNames(file.list.2014,
 ## Read files based on 'splash' read_csv function
 splash.readin.2014 <- lapply(file.list.2014, read_csv)
 
-## Remove duplicate rows in sites that received more than one site visit
-# Brazos 2020-18
-splash.readin.2014$Brazos_2020_18.2014splash$sf <- splash.readin.2014$Brazos_2020_18.2014splash$sf[seq_along(splash.readin.2014$Brazos_2020_18.2014splash$sf) %% 2 > 0]
-splash.readin.2014$Brazos_2020_18.2014splash$tair <- splash.readin.2014$Brazos_2020_18.2014splash$tair[seq_along(splash.readin.2014$Brazos_2020_18.2014splash$tair) %% 2 > 0]
-splash.readin.2014$Brazos_2020_18.2014splash$pn <- splash.readin.2014$Brazos_2020_18.2014splash$pn[seq_along(splash.readin.2014$Brazos_2020_18.2014splash$pn) %% 2 > 0]
-splash.readin.2014$Brazos_2020_18.2014splash$num_lines <- 365
-
-# Harris 2020-03
-splash.readin.2014$Harris_2020_03.2014splash$sf <- splash.readin.2014$Harris_2020_03.2014splash$sf[seq_along(splash.readin.2014$Harris_2020_03.2014splash$sf) %% 2 > 0]
-splash.readin.2014$Harris_2020_03.2014splash$tair <- splash.readin.2014$Harris_2020_03.2014splash$tair[seq_along(splash.readin.2014$Harris_2020_03.2014splash$tair) %% 2 > 0]
-splash.readin.2014$Harris_2020_03.2014splash$pn <- splash.readin.2014$Harris_2020_03.2014splash$pn[seq_along(splash.readin.2014$Harris_2020_03.2014splash$pn) %% 2 > 0]
-splash.readin.2014$Harris_2020_03.2014splash$num_lines <- 365
-
-# Menard 2020-01
-splash.readin.2014$Menard_2020_01.2014splash$sf <- splash.readin.2014$Menard_2020_01.2014splash$sf[seq_along(splash.readin.2014$Menard_2020_01.2014splash$sf) %% 2 > 0]
-splash.readin.2014$Menard_2020_01.2014splash$tair <- splash.readin.2014$Menard_2020_01.2014splash$tair[seq_along(splash.readin.2014$Menard_2020_01.2014splash$tair) %% 2 > 0]
-splash.readin.2014$Menard_2020_01.2014splash$pn <- splash.readin.2014$Menard_2020_01.2014splash$pn[seq_along(splash.readin.2014$Menard_2020_01.2014splash$pn) %% 2 > 0]
-splash.readin.2014$Menard_2020_01.2014splash$num_lines <- 365
-
-# Uvalde 2020-02
-splash.readin.2014$Uvalde_2020_02.2014splash$sf <- splash.readin.2014$Uvalde_2020_02.2014splash$sf[seq_along(splash.readin.2014$Uvalde_2020_02.2014splash$sf) %% 2 > 0]
-splash.readin.2014$Uvalde_2020_02.2014splash$tair <- splash.readin.2014$Uvalde_2020_02.2014splash$tair[seq_along(splash.readin.2014$Uvalde_2020_02.2014splash$tair) %% 2 > 0]
-splash.readin.2014$Uvalde_2020_02.2014splash$pn <- splash.readin.2014$Uvalde_2020_02.2014splash$pn[seq_along(splash.readin.2014$Uvalde_2020_02.2014splash$pn) %% 2 > 0]
-splash.readin.2014$Uvalde_2020_02.2014splash$num_lines <- 365
-
 ## Load ancillary details needed to run 'spin_up" and 'run_one_day'
 splash.month.2014 <- lapply(file.list.2014, read.csv)
-
-## Remove multiple dates for sites visited more than one growing season
-# Brazos 2020-18
-splash.month.2014[["Brazos_2020_18.2014splash"]] <- splash.month.2014[["Brazos_2020_18.2014splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Harris 2020-03
-splash.month.2014[["Harris_2020_03.2014splash"]] <- splash.month.2014[["Harris_2020_03.2014splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Menard 2020-01
-splash.month.2014[["Menard_2020_01.2014splash"]] <- splash.month.2014[["Menard_2020_01.2014splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Uvalde 2020-02
-splash.month.2014[["Uvalde_2020_02.2014splash"]] <- splash.month.2014[["Uvalde_2020_02.2014splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
 
 ## Loop to select only month and day
 for (i in seq_along(splash.month.2014)) {
@@ -3532,51 +2489,8 @@ file.list.2015 <- setNames(file.list.2015,
 ## Read files based on 'splash' read_csv function
 splash.readin.2015 <- lapply(file.list.2015, read_csv)
 
-## Remove duplicate rows in sites that received more than one site visit
-# Brazos 2020-18
-splash.readin.2015$Brazos_2020_18.2015splash$sf <- splash.readin.2015$Brazos_2020_18.2015splash$sf[seq_along(splash.readin.2015$Brazos_2020_18.2015splash$sf) %% 2 > 0]
-splash.readin.2015$Brazos_2020_18.2015splash$tair <- splash.readin.2015$Brazos_2020_18.2015splash$tair[seq_along(splash.readin.2015$Brazos_2020_18.2015splash$tair) %% 2 > 0]
-splash.readin.2015$Brazos_2020_18.2015splash$pn <- splash.readin.2015$Brazos_2020_18.2015splash$pn[seq_along(splash.readin.2015$Brazos_2020_18.2015splash$pn) %% 2 > 0]
-splash.readin.2015$Brazos_2020_18.2015splash$num_lines <- 365
-
-# Harris 2020-03
-splash.readin.2015$Harris_2020_03.2015splash$sf <- splash.readin.2015$Harris_2020_03.2015splash$sf[seq_along(splash.readin.2015$Harris_2020_03.2015splash$sf) %% 2 > 0]
-splash.readin.2015$Harris_2020_03.2015splash$tair <- splash.readin.2015$Harris_2020_03.2015splash$tair[seq_along(splash.readin.2015$Harris_2020_03.2015splash$tair) %% 2 > 0]
-splash.readin.2015$Harris_2020_03.2015splash$pn <- splash.readin.2015$Harris_2020_03.2015splash$pn[seq_along(splash.readin.2015$Harris_2020_03.2015splash$pn) %% 2 > 0]
-splash.readin.2015$Harris_2020_03.2015splash$num_lines <- 365
-
-# Menard 2020-01
-splash.readin.2015$Menard_2020_01.2015splash$sf <- splash.readin.2015$Menard_2020_01.2015splash$sf[seq_along(splash.readin.2015$Menard_2020_01.2015splash$sf) %% 2 > 0]
-splash.readin.2015$Menard_2020_01.2015splash$tair <- splash.readin.2015$Menard_2020_01.2015splash$tair[seq_along(splash.readin.2015$Menard_2020_01.2015splash$tair) %% 2 > 0]
-splash.readin.2015$Menard_2020_01.2015splash$pn <- splash.readin.2015$Menard_2020_01.2015splash$pn[seq_along(splash.readin.2015$Menard_2020_01.2015splash$pn) %% 2 > 0]
-splash.readin.2015$Menard_2020_01.2015splash$num_lines <- 365
-
-# Uvalde 2020-02
-splash.readin.2015$Uvalde_2020_02.2015splash$sf <- splash.readin.2015$Uvalde_2020_02.2015splash$sf[seq_along(splash.readin.2015$Uvalde_2020_02.2015splash$sf) %% 2 > 0]
-splash.readin.2015$Uvalde_2020_02.2015splash$tair <- splash.readin.2015$Uvalde_2020_02.2015splash$tair[seq_along(splash.readin.2015$Uvalde_2020_02.2015splash$tair) %% 2 > 0]
-splash.readin.2015$Uvalde_2020_02.2015splash$pn <- splash.readin.2015$Uvalde_2020_02.2015splash$pn[seq_along(splash.readin.2015$Uvalde_2020_02.2015splash$pn) %% 2 > 0]
-splash.readin.2015$Uvalde_2020_02.2015splash$num_lines <- 365
-
 ## Load ancillary details needed to run 'spin_up" and 'run_one_day'
 splash.month.2015 <- lapply(file.list.2015, read.csv)
-
-## Remove multiple dates for sites visited more than one growing season
-# Brazos 2020-18
-splash.month.2015[["Brazos_2020_18.2015splash"]] <- splash.month.2015[["Brazos_2020_18.2015splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Harris 2020-03
-splash.month.2015[["Harris_2020_03.2015splash"]] <- splash.month.2015[["Harris_2020_03.2015splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Menard 2020-01
-splash.month.2015[["Menard_2020_01.2015splash"]] <- splash.month.2015[["Menard_2020_01.2015splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Uvalde 2020-02
-splash.month.2015[["Uvalde_2020_02.2015splash"]] <- splash.month.2015[["Uvalde_2020_02.2015splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
 
 ## Loop to select only month and day
 for (i in seq_along(splash.month.2015)) {
@@ -3677,51 +2591,8 @@ file.list.2016 <- setNames(file.list.2016,
 ## Read files based on 'splash' read_csv function
 splash.readin.2016 <- lapply(file.list.2016, read_csv)
 
-## Remove duplicate rows in sites that received more than one site visit
-# Brazos 2020-18
-splash.readin.2016$Brazos_2020_18.2016splash$sf <- splash.readin.2016$Brazos_2020_18.2016splash$sf[seq_along(splash.readin.2016$Brazos_2020_18.2016splash$sf) %% 2 > 0]
-splash.readin.2016$Brazos_2020_18.2016splash$tair <- splash.readin.2016$Brazos_2020_18.2016splash$tair[seq_along(splash.readin.2016$Brazos_2020_18.2016splash$tair) %% 2 > 0]
-splash.readin.2016$Brazos_2020_18.2016splash$pn <- splash.readin.2016$Brazos_2020_18.2016splash$pn[seq_along(splash.readin.2016$Brazos_2020_18.2016splash$pn) %% 2 > 0]
-splash.readin.2016$Brazos_2020_18.2016splash$num_lines <- 366
-
-# Harris 2020-03
-splash.readin.2016$Harris_2020_03.2016splash$sf <- splash.readin.2016$Harris_2020_03.2016splash$sf[seq_along(splash.readin.2016$Harris_2020_03.2016splash$sf) %% 2 > 0]
-splash.readin.2016$Harris_2020_03.2016splash$tair <- splash.readin.2016$Harris_2020_03.2016splash$tair[seq_along(splash.readin.2016$Harris_2020_03.2016splash$tair) %% 2 > 0]
-splash.readin.2016$Harris_2020_03.2016splash$pn <- splash.readin.2016$Harris_2020_03.2016splash$pn[seq_along(splash.readin.2016$Harris_2020_03.2016splash$pn) %% 2 > 0]
-splash.readin.2016$Harris_2020_03.2016splash$num_lines <- 366
-
-# Menard 2020-01
-splash.readin.2016$Menard_2020_01.2016splash$sf <- splash.readin.2016$Menard_2020_01.2016splash$sf[seq_along(splash.readin.2016$Menard_2020_01.2016splash$sf) %% 2 > 0]
-splash.readin.2016$Menard_2020_01.2016splash$tair <- splash.readin.2016$Menard_2020_01.2016splash$tair[seq_along(splash.readin.2016$Menard_2020_01.2016splash$tair) %% 2 > 0]
-splash.readin.2016$Menard_2020_01.2016splash$pn <- splash.readin.2016$Menard_2020_01.2016splash$pn[seq_along(splash.readin.2016$Menard_2020_01.2016splash$pn) %% 2 > 0]
-splash.readin.2016$Menard_2020_01.2016splash$num_lines <- 366
-
-# Uvalde 2020-02
-splash.readin.2016$Uvalde_2020_02.2016splash$sf <- splash.readin.2016$Uvalde_2020_02.2016splash$sf[seq_along(splash.readin.2016$Uvalde_2020_02.2016splash$sf) %% 2 > 0]
-splash.readin.2016$Uvalde_2020_02.2016splash$tair <- splash.readin.2016$Uvalde_2020_02.2016splash$tair[seq_along(splash.readin.2016$Uvalde_2020_02.2016splash$tair) %% 2 > 0]
-splash.readin.2016$Uvalde_2020_02.2016splash$pn <- splash.readin.2016$Uvalde_2020_02.2016splash$pn[seq_along(splash.readin.2016$Uvalde_2020_02.2016splash$pn) %% 2 > 0]
-splash.readin.2016$Uvalde_2020_02.2016splash$num_lines <- 366
-
 ## Load ancillary details needed to run 'spin_up" and 'run_one_day'
 splash.month.2016 <- lapply(file.list.2016, read.csv)
-
-## Remove multiple dates for sites visited more than one growing season
-# Brazos 2020-18
-splash.month.2016[["Brazos_2020_18.2016splash"]] <- splash.month.2016[["Brazos_2020_18.2016splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Harris 2020-03
-splash.month.2016[["Harris_2020_03.2016splash"]] <- splash.month.2016[["Harris_2020_03.2016splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Menard 2020-01
-splash.month.2016[["Menard_2020_01.2016splash"]] <- splash.month.2016[["Menard_2020_01.2016splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Uvalde 2020-02
-splash.month.2016[["Uvalde_2020_02.2016splash"]] <- splash.month.2016[["Uvalde_2020_02.2016splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
 
 ## Loop to select only month and day
 for (i in seq_along(splash.month.2016)) {
@@ -3822,51 +2693,8 @@ file.list.2017 <- setNames(file.list.2017,
 ## Read files based on 'splash' read_csv function
 splash.readin.2017 <- lapply(file.list.2017, read_csv)
 
-## Remove duplicate rows in sites that received more than one site visit
-# Brazos 2020-18
-splash.readin.2017$Brazos_2020_18.2017splash$sf <- splash.readin.2017$Brazos_2020_18.2017splash$sf[seq_along(splash.readin.2017$Brazos_2020_18.2017splash$sf) %% 2 > 0]
-splash.readin.2017$Brazos_2020_18.2017splash$tair <- splash.readin.2017$Brazos_2020_18.2017splash$tair[seq_along(splash.readin.2017$Brazos_2020_18.2017splash$tair) %% 2 > 0]
-splash.readin.2017$Brazos_2020_18.2017splash$pn <- splash.readin.2017$Brazos_2020_18.2017splash$pn[seq_along(splash.readin.2017$Brazos_2020_18.2017splash$pn) %% 2 > 0]
-splash.readin.2017$Brazos_2020_18.2017splash$num_lines <- 365
-
-# Harris 2020-03
-splash.readin.2017$Harris_2020_03.2017splash$sf <- splash.readin.2017$Harris_2020_03.2017splash$sf[seq_along(splash.readin.2017$Harris_2020_03.2017splash$sf) %% 2 > 0]
-splash.readin.2017$Harris_2020_03.2017splash$tair <- splash.readin.2017$Harris_2020_03.2017splash$tair[seq_along(splash.readin.2017$Harris_2020_03.2017splash$tair) %% 2 > 0]
-splash.readin.2017$Harris_2020_03.2017splash$pn <- splash.readin.2017$Harris_2020_03.2017splash$pn[seq_along(splash.readin.2017$Harris_2020_03.2017splash$pn) %% 2 > 0]
-splash.readin.2017$Harris_2020_03.2017splash$num_lines <- 365
-
-# Menard 2020-01
-splash.readin.2017$Menard_2020_01.2017splash$sf <- splash.readin.2017$Menard_2020_01.2017splash$sf[seq_along(splash.readin.2017$Menard_2020_01.2017splash$sf) %% 2 > 0]
-splash.readin.2017$Menard_2020_01.2017splash$tair <- splash.readin.2017$Menard_2020_01.2017splash$tair[seq_along(splash.readin.2017$Menard_2020_01.2017splash$tair) %% 2 > 0]
-splash.readin.2017$Menard_2020_01.2017splash$pn <- splash.readin.2017$Menard_2020_01.2017splash$pn[seq_along(splash.readin.2017$Menard_2020_01.2017splash$pn) %% 2 > 0]
-splash.readin.2017$Menard_2020_01.2017splash$num_lines <- 365
-
-# Uvalde 2020-02
-splash.readin.2017$Uvalde_2020_02.2017splash$sf <- splash.readin.2017$Uvalde_2020_02.2017splash$sf[seq_along(splash.readin.2017$Uvalde_2020_02.2017splash$sf) %% 2 > 0]
-splash.readin.2017$Uvalde_2020_02.2017splash$tair <- splash.readin.2017$Uvalde_2020_02.2017splash$tair[seq_along(splash.readin.2017$Uvalde_2020_02.2017splash$tair) %% 2 > 0]
-splash.readin.2017$Uvalde_2020_02.2017splash$pn <- splash.readin.2017$Uvalde_2020_02.2017splash$pn[seq_along(splash.readin.2017$Uvalde_2020_02.2017splash$pn) %% 2 > 0]
-splash.readin.2017$Uvalde_2020_02.2017splash$num_lines <- 365
-
 ## Load ancillary details needed to run 'spin_up" and 'run_one_day'
 splash.month.2017 <- lapply(file.list.2017, read.csv)
-
-## Remove multiple dates for sites visited more than one growing season
-# Brazos 2020-18
-splash.month.2017[["Brazos_2020_18.2017splash"]] <- splash.month.2017[["Brazos_2020_18.2017splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Harris 2020-03
-splash.month.2017[["Harris_2020_03.2017splash"]] <- splash.month.2017[["Harris_2020_03.2017splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Menard 2020-01
-splash.month.2017[["Menard_2020_01.2017splash"]] <- splash.month.2017[["Menard_2020_01.2017splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Uvalde 2020-02
-splash.month.2017[["Uvalde_2020_02.2017splash"]] <- splash.month.2017[["Uvalde_2020_02.2017splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
 
 ## Loop to select only month and day
 for (i in seq_along(splash.month.2017)) {
@@ -3967,51 +2795,8 @@ file.list.2018 <- setNames(file.list.2018,
 ## Read files based on 'splash' read_csv function
 splash.readin.2018 <- lapply(file.list.2018, read_csv)
 
-## Remove duplicate rows in sites that received more than one site visit
-# Brazos 2020-18
-splash.readin.2018$Brazos_2020_18.2018splash$sf <- splash.readin.2018$Brazos_2020_18.2018splash$sf[seq_along(splash.readin.2018$Brazos_2020_18.2018splash$sf) %% 2 > 0]
-splash.readin.2018$Brazos_2020_18.2018splash$tair <- splash.readin.2018$Brazos_2020_18.2018splash$tair[seq_along(splash.readin.2018$Brazos_2020_18.2018splash$tair) %% 2 > 0]
-splash.readin.2018$Brazos_2020_18.2018splash$pn <- splash.readin.2018$Brazos_2020_18.2018splash$pn[seq_along(splash.readin.2018$Brazos_2020_18.2018splash$pn) %% 2 > 0]
-splash.readin.2018$Brazos_2020_18.2018splash$num_lines <- 365
-
-# Harris 2020-03
-splash.readin.2018$Harris_2020_03.2018splash$sf <- splash.readin.2018$Harris_2020_03.2018splash$sf[seq_along(splash.readin.2018$Harris_2020_03.2018splash$sf) %% 2 > 0]
-splash.readin.2018$Harris_2020_03.2018splash$tair <- splash.readin.2018$Harris_2020_03.2018splash$tair[seq_along(splash.readin.2018$Harris_2020_03.2018splash$tair) %% 2 > 0]
-splash.readin.2018$Harris_2020_03.2018splash$pn <- splash.readin.2018$Harris_2020_03.2018splash$pn[seq_along(splash.readin.2018$Harris_2020_03.2018splash$pn) %% 2 > 0]
-splash.readin.2018$Harris_2020_03.2018splash$num_lines <- 365
-
-# Menard 2020-01
-splash.readin.2018$Menard_2020_01.2018splash$sf <- splash.readin.2018$Menard_2020_01.2018splash$sf[seq_along(splash.readin.2018$Menard_2020_01.2018splash$sf) %% 2 > 0]
-splash.readin.2018$Menard_2020_01.2018splash$tair <- splash.readin.2018$Menard_2020_01.2018splash$tair[seq_along(splash.readin.2018$Menard_2020_01.2018splash$tair) %% 2 > 0]
-splash.readin.2018$Menard_2020_01.2018splash$pn <- splash.readin.2018$Menard_2020_01.2018splash$pn[seq_along(splash.readin.2018$Menard_2020_01.2018splash$pn) %% 2 > 0]
-splash.readin.2018$Menard_2020_01.2018splash$num_lines <- 365
-
-# Uvalde 2020-02
-splash.readin.2018$Uvalde_2020_02.2018splash$sf <- splash.readin.2018$Uvalde_2020_02.2018splash$sf[seq_along(splash.readin.2018$Uvalde_2020_02.2018splash$sf) %% 2 > 0]
-splash.readin.2018$Uvalde_2020_02.2018splash$tair <- splash.readin.2018$Uvalde_2020_02.2018splash$tair[seq_along(splash.readin.2018$Uvalde_2020_02.2018splash$tair) %% 2 > 0]
-splash.readin.2018$Uvalde_2020_02.2018splash$pn <- splash.readin.2018$Uvalde_2020_02.2018splash$pn[seq_along(splash.readin.2018$Uvalde_2020_02.2018splash$pn) %% 2 > 0]
-splash.readin.2018$Uvalde_2020_02.2018splash$num_lines <- 365
-
 ## Load ancillary details needed to run 'spin_up" and 'run_one_day'
 splash.month.2018 <- lapply(file.list.2018, read.csv)
-
-## Remove multiple dates for sites visited more than one growing season
-# Brazos 2020-18
-splash.month.2018[["Brazos_2020_18.2018splash"]] <- splash.month.2018[["Brazos_2020_18.2018splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Harris 2020-03
-splash.month.2018[["Harris_2020_03.2018splash"]] <- splash.month.2018[["Harris_2020_03.2018splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Menard 2020-01
-splash.month.2018[["Menard_2020_01.2018splash"]] <- splash.month.2018[["Menard_2020_01.2018splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Uvalde 2020-02
-splash.month.2018[["Uvalde_2020_02.2018splash"]] <- splash.month.2018[["Uvalde_2020_02.2018splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
 
 ## Loop to select only month and day
 for (i in seq_along(splash.month.2018)) {
@@ -4112,51 +2897,8 @@ file.list.2019 <- setNames(file.list.2019,
 ## Read files based on 'splash' read_csv function
 splash.readin.2019 <- lapply(file.list.2019, read_csv)
 
-## Remove duplicate rows in sites that received more than one site visit
-# Brazos 2020-18
-splash.readin.2019$Brazos_2020_18.2019splash$sf <- splash.readin.2019$Brazos_2020_18.2019splash$sf[seq_along(splash.readin.2019$Brazos_2020_18.2019splash$sf) %% 2 > 0]
-splash.readin.2019$Brazos_2020_18.2019splash$tair <- splash.readin.2019$Brazos_2020_18.2019splash$tair[seq_along(splash.readin.2019$Brazos_2020_18.2019splash$tair) %% 2 > 0]
-splash.readin.2019$Brazos_2020_18.2019splash$pn <- splash.readin.2019$Brazos_2020_18.2019splash$pn[seq_along(splash.readin.2019$Brazos_2020_18.2019splash$pn) %% 2 > 0]
-splash.readin.2019$Brazos_2020_18.2019splash$num_lines <- 365
-
-# Harris 2020-03
-splash.readin.2019$Harris_2020_03.2019splash$sf <- splash.readin.2019$Harris_2020_03.2019splash$sf[seq_along(splash.readin.2019$Harris_2020_03.2019splash$sf) %% 2 > 0]
-splash.readin.2019$Harris_2020_03.2019splash$tair <- splash.readin.2019$Harris_2020_03.2019splash$tair[seq_along(splash.readin.2019$Harris_2020_03.2019splash$tair) %% 2 > 0]
-splash.readin.2019$Harris_2020_03.2019splash$pn <- splash.readin.2019$Harris_2020_03.2019splash$pn[seq_along(splash.readin.2019$Harris_2020_03.2019splash$pn) %% 2 > 0]
-splash.readin.2019$Harris_2020_03.2019splash$num_lines <- 365
-
-# Menard 2020-01
-splash.readin.2019$Menard_2020_01.2019splash$sf <- splash.readin.2019$Menard_2020_01.2019splash$sf[seq_along(splash.readin.2019$Menard_2020_01.2019splash$sf) %% 2 > 0]
-splash.readin.2019$Menard_2020_01.2019splash$tair <- splash.readin.2019$Menard_2020_01.2019splash$tair[seq_along(splash.readin.2019$Menard_2020_01.2019splash$tair) %% 2 > 0]
-splash.readin.2019$Menard_2020_01.2019splash$pn <- splash.readin.2019$Menard_2020_01.2019splash$pn[seq_along(splash.readin.2019$Menard_2020_01.2019splash$pn) %% 2 > 0]
-splash.readin.2019$Menard_2020_01.2019splash$num_lines <- 365
-
-# Uvalde 2020-02
-splash.readin.2019$Uvalde_2020_02.2019splash$sf <- splash.readin.2019$Uvalde_2020_02.2019splash$sf[seq_along(splash.readin.2019$Uvalde_2020_02.2019splash$sf) %% 2 > 0]
-splash.readin.2019$Uvalde_2020_02.2019splash$tair <- splash.readin.2019$Uvalde_2020_02.2019splash$tair[seq_along(splash.readin.2019$Uvalde_2020_02.2019splash$tair) %% 2 > 0]
-splash.readin.2019$Uvalde_2020_02.2019splash$pn <- splash.readin.2019$Uvalde_2020_02.2019splash$pn[seq_along(splash.readin.2019$Uvalde_2020_02.2019splash$pn) %% 2 > 0]
-splash.readin.2019$Uvalde_2020_02.2019splash$num_lines <- 365
-
 ## Load ancillary details needed to run 'spin_up" and 'run_one_day'
 splash.month.2019 <- lapply(file.list.2019, read.csv)
-
-## Remove multiple dates for sites visited more than one growing season
-# Brazos 2020-18
-splash.month.2019[["Brazos_2020_18.2019splash"]] <- splash.month.2019[["Brazos_2020_18.2019splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Harris 2020-03
-splash.month.2019[["Harris_2020_03.2019splash"]] <- splash.month.2019[["Harris_2020_03.2019splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Menard 2020-01
-splash.month.2019[["Menard_2020_01.2019splash"]] <- splash.month.2019[["Menard_2020_01.2019splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Uvalde 2020-02
-splash.month.2019[["Uvalde_2020_02.2019splash"]] <- splash.month.2019[["Uvalde_2020_02.2019splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
 
 ## Loop to select only month and day
 for (i in seq_along(splash.month.2019)) {
@@ -4256,52 +2998,8 @@ file.list.2020 <- setNames(file.list.2020,
 
 ## Read files based on 'splash' read_csv function
 splash.readin.2020 <- lapply(file.list.2020, read_csv)
-
-## Remove duplicate rows in sites that received more than one site visit
-# Brazos 2020-18
-splash.readin.2020$Brazos_2020_18.2020splash$sf <- splash.readin.2020$Brazos_2020_18.2020splash$sf[seq_along(splash.readin.2020$Brazos_2020_18.2020splash$sf) %% 2 > 0]
-splash.readin.2020$Brazos_2020_18.2020splash$tair <- splash.readin.2020$Brazos_2020_18.2020splash$tair[seq_along(splash.readin.2020$Brazos_2020_18.2020splash$tair) %% 2 > 0]
-splash.readin.2020$Brazos_2020_18.2020splash$pn <- splash.readin.2020$Brazos_2020_18.2020splash$pn[seq_along(splash.readin.2020$Brazos_2020_18.2020splash$pn) %% 2 > 0]
-splash.readin.2020$Brazos_2020_18.2020splash$num_lines <- 366
-
-# Harris 2020-03
-splash.readin.2020$Harris_2020_03.2020splash$sf <- splash.readin.2020$Harris_2020_03.2020splash$sf[seq_along(splash.readin.2020$Harris_2020_03.2020splash$sf) %% 2 > 0]
-splash.readin.2020$Harris_2020_03.2020splash$tair <- splash.readin.2020$Harris_2020_03.2020splash$tair[seq_along(splash.readin.2020$Harris_2020_03.2020splash$tair) %% 2 > 0]
-splash.readin.2020$Harris_2020_03.2020splash$pn <- splash.readin.2020$Harris_2020_03.2020splash$pn[seq_along(splash.readin.2020$Harris_2020_03.2020splash$pn) %% 2 > 0]
-splash.readin.2020$Harris_2020_03.2020splash$num_lines <- 366
-
-# Menard 2020-01
-splash.readin.2020$Menard_2020_01.2020splash$sf <- splash.readin.2020$Menard_2020_01.2020splash$sf[seq_along(splash.readin.2020$Menard_2020_01.2020splash$sf) %% 2 > 0]
-splash.readin.2020$Menard_2020_01.2020splash$tair <- splash.readin.2020$Menard_2020_01.2020splash$tair[seq_along(splash.readin.2020$Menard_2020_01.2020splash$tair) %% 2 > 0]
-splash.readin.2020$Menard_2020_01.2020splash$pn <- splash.readin.2020$Menard_2020_01.2020splash$pn[seq_along(splash.readin.2020$Menard_2020_01.2020splash$pn) %% 2 > 0]
-splash.readin.2020$Menard_2020_01.2020splash$num_lines <- 366
-
-# Uvalde 2020-02
-splash.readin.2020$Uvalde_2020_02.2020splash$sf <- splash.readin.2020$Uvalde_2020_02.2020splash$sf[seq_along(splash.readin.2020$Uvalde_2020_02.2020splash$sf) %% 2 > 0]
-splash.readin.2020$Uvalde_2020_02.2020splash$tair <- splash.readin.2020$Uvalde_2020_02.2020splash$tair[seq_along(splash.readin.2020$Uvalde_2020_02.2020splash$tair) %% 2 > 0]
-splash.readin.2020$Uvalde_2020_02.2020splash$pn <- splash.readin.2020$Uvalde_2020_02.2020splash$pn[seq_along(splash.readin.2020$Uvalde_2020_02.2020splash$pn) %% 2 > 0]
-splash.readin.2020$Uvalde_2020_02.2020splash$num_lines <- 366
-
 ## Load ancillary details needed to run 'spin_up" and 'run_one_day'
 splash.month.2020 <- lapply(file.list.2020, read.csv)
-
-## Remove multiple dates for sites visited more than one growing season
-# Brazos 2020-18
-splash.month.2020[["Brazos_2020_18.2020splash"]] <- splash.month.2020[["Brazos_2020_18.2020splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Harris 2020-03
-splash.month.2020[["Harris_2020_03.2020splash"]] <- splash.month.2020[["Harris_2020_03.2020splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Menard 2020-01
-splash.month.2020[["Menard_2020_01.2020splash"]] <- splash.month.2020[["Menard_2020_01.2020splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Uvalde 2020-02
-splash.month.2020[["Uvalde_2020_02.2020splash"]] <- splash.month.2020[["Uvalde_2020_02.2020splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
 
 ## Loop to select only month and day
 for (i in seq_along(splash.month.2020)) {
@@ -4402,51 +3100,8 @@ file.list.2021 <- setNames(file.list.2021,
 ## Read files based on 'splash' read_csv function
 splash.readin.2021 <- lapply(file.list.2021, read_csv)
 
-## Remove duplicate rows in sites that received more than one site visit
-# Brazos 2020-18
-splash.readin.2021$Brazos_2020_18.2021splash$sf <- splash.readin.2021$Brazos_2020_18.2021splash$sf[seq_along(splash.readin.2021$Brazos_2020_18.2021splash$sf) %% 2 > 0]
-splash.readin.2021$Brazos_2020_18.2021splash$tair <- splash.readin.2021$Brazos_2020_18.2021splash$tair[seq_along(splash.readin.2021$Brazos_2020_18.2021splash$tair) %% 2 > 0]
-splash.readin.2021$Brazos_2020_18.2021splash$pn <- splash.readin.2021$Brazos_2020_18.2021splash$pn[seq_along(splash.readin.2021$Brazos_2020_18.2021splash$pn) %% 2 > 0]
-splash.readin.2021$Brazos_2020_18.2021splash$num_lines <- 211
-
-# Harris 2020-03
-splash.readin.2021$Harris_2020_03.2021splash$sf <- splash.readin.2021$Harris_2020_03.2021splash$sf[seq_along(splash.readin.2021$Harris_2020_03.2021splash$sf) %% 2 > 0]
-splash.readin.2021$Harris_2020_03.2021splash$tair <- splash.readin.2021$Harris_2020_03.2021splash$tair[seq_along(splash.readin.2021$Harris_2020_03.2021splash$tair) %% 2 > 0]
-splash.readin.2021$Harris_2020_03.2021splash$pn <- splash.readin.2021$Harris_2020_03.2021splash$pn[seq_along(splash.readin.2021$Harris_2020_03.2021splash$pn) %% 2 > 0]
-splash.readin.2021$Harris_2020_03.2021splash$num_lines <- 211
-
-# Menard 2020-01
-splash.readin.2021$Menard_2020_01.2021splash$sf <- splash.readin.2021$Menard_2020_01.2021splash$sf[seq_along(splash.readin.2021$Menard_2020_01.2021splash$sf) %% 2 > 0]
-splash.readin.2021$Menard_2020_01.2021splash$tair <- splash.readin.2021$Menard_2020_01.2021splash$tair[seq_along(splash.readin.2021$Menard_2020_01.2021splash$tair) %% 2 > 0]
-splash.readin.2021$Menard_2020_01.2021splash$pn <- splash.readin.2021$Menard_2020_01.2021splash$pn[seq_along(splash.readin.2021$Menard_2020_01.2021splash$pn) %% 2 > 0]
-splash.readin.2021$Menard_2020_01.2021splash$num_lines <- 211
-
-# Uvalde 2020-02
-splash.readin.2021$Uvalde_2020_02.2021splash$sf <- splash.readin.2021$Uvalde_2020_02.2021splash$sf[seq_along(splash.readin.2021$Uvalde_2020_02.2021splash$sf) %% 2 > 0]
-splash.readin.2021$Uvalde_2020_02.2021splash$tair <- splash.readin.2021$Uvalde_2020_02.2021splash$tair[seq_along(splash.readin.2021$Uvalde_2020_02.2021splash$tair) %% 2 > 0]
-splash.readin.2021$Uvalde_2020_02.2021splash$pn <- splash.readin.2021$Uvalde_2020_02.2021splash$pn[seq_along(splash.readin.2021$Uvalde_2020_02.2021splash$pn) %% 2 > 0]
-splash.readin.2021$Uvalde_2020_02.2021splash$num_lines <- 211
-
 ## Load ancillary details needed to run 'spin_up" and 'run_one_day'
 splash.month.2021 <- lapply(file.list.2021, read.csv)
-
-## Remove multiple dates for sites visited more than one growing season
-# Brazos 2020-18
-splash.month.2021[["Brazos_2020_18.2021splash"]] <- splash.month.2021[["Brazos_2020_18.2021splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Harris 2020-03
-splash.month.2021[["Harris_2020_03.2021splash"]] <- splash.month.2021[["Harris_2020_03.2021splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Menard 2020-01
-splash.month.2021[["Menard_2020_01.2021splash"]] <- splash.month.2021[["Menard_2020_01.2021splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
-# Uvalde 2020-02
-splash.month.2021[["Uvalde_2020_02.2021splash"]] <- splash.month.2021[["Uvalde_2020_02.2021splash"]] %>%
-  slice(which(row_number() %% 2 == 1))
-
 
 ## Loop to select only month and day
 for (i in seq_along(splash.month.2021)) {
