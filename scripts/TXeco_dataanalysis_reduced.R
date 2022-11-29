@@ -136,7 +136,14 @@ r.squaredGLMM(narea)
 
 ## Post hoc comparisons
 test(emtrends(narea, ~1, "beta"))
-test(emtrends(narea, ~pft, "beta"))
+test(emtrends(narea, pairwise~pft, "beta"))
+
+test(emtrends(narea, 
+              ~wn3_perc, "soil.no3n", 
+              at = list(wn3_perc = seq(0, 1, 0.1))))
+
+
+
 emmeans(narea, pairwise~pft)
 
 ##########################################################################
