@@ -178,11 +178,12 @@ models <- ' # regressions
             no3n.std ~ c*wn3.std
 
             # covariates
-            beta.std ~~ chi.std
+            beta.std ~~ f*chi.std
 
             # indirect effect of soil N and soil moisture on leaf N
             soiln.indirect:=a*b
             moist.indirect:=c*a*b
+            chi.narea.indirect:=f*b
             temp.chi.indirect:= d*e'
 
 test_fit <- sem(models, data = df.sem)
