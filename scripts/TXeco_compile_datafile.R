@@ -30,7 +30,7 @@ spp.info <- read.csv("../data_sheets/TXeco_species_id.csv",
 soil <- read.csv("../data_sheets/TXeco_soil_characteristics.csv")
 soilgrids <- read.csv("../data_sheets/TXeco_soilgrid_data.csv")
 
-names(soilgrids)[4:23] <- str_c("sg.", names(soilgrids)[4:23])
+names(soilgrids)[2:21] <- str_c("sg.", names(soilgrids)[2:21])
 
 ##########################################################################
 ## Import raw costech files
@@ -109,7 +109,6 @@ full.df <- leaf %>%
                              calc_chi_c4(d13C),
                              calc_chi_c3(d13C))) %>%
   full_join(soilgrids) %>%
-  dplyr::select(-lat, -long) %>%
   mutate(across(wn1:wn90, list(perc =~./ whc)))
 
 ## Add chi column
@@ -118,4 +117,4 @@ full.df$beta <- calc_beta(chi = full.df$chi, temp = full.df$tavg7,
                           vpd = full.df$vpd7 * 10, z = full.df$elevation.m)
 hist(full.df$beta)
 ## Write csv
-write.csv(full.df, "../data_sheets/TXeco_compiled_datasheet.csv")
+write.csv(full.df, "../data_sheets/TXeco_compiled_datasheet.csv", row.names = FALSE)

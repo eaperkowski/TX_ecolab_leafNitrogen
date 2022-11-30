@@ -85,7 +85,7 @@ aicc.results.wn <- wn30.modelSelect %>%
   full_join(wn2.modelSelect) %>% full_join(wn1.modelSelect) %>%
   arrange(day) %>%
   dplyr::select(day, aicc.wn = AICc, rmse.wn = RMSE)
-# 90-day soil moisture is best model
+# 3-day soil moisture is best model
 
 plot(aicc.results.wn$aicc.wn)
 
@@ -244,7 +244,7 @@ wn.beta <- ggplot(data = aicc.results, aes(x = day, y = aicc.wn)) +
   scale_x_continuous(limits = c(0, 90), breaks = seq(0, 90, 30)) +
   scale_y_continuous(limits = c(1270, 1290), breaks = seq(1270, 1290, 5)) +
   labs(x = NULL, y = expression(bold("AIC"["c"])),
-       title = expression("Soil moisture (% of water-holding capacity)")) +
+       title = expression("Soil moisture (% WHC)")) +
   theme_bw(base_size = 18) +
   theme(panel.grid.minor = element_blank())
 
@@ -273,6 +273,6 @@ vpd.chi <- ggplot(data = aicc.results, aes(x = day, y = aicc.vpd)) +
   theme(panel.grid.minor = element_blank())
 
 png(filename = "../working_drafts/figs/TXeco_figS2_aicc_results.png",
-    width = 12, height = 4, units = 'in', res = 600)
+    width = 12.5, height = 4, units = 'in', res = 600)
 ggarrange(wn.beta, temp.chi, vpd.chi, ncol = 3, align = "hv")
 dev.off()

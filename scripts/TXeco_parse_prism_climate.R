@@ -257,6 +257,7 @@ daily.clim <- read.csv("../climate_data/TXeco_PRISM_daily.csv") %>%
 
 ## Visualize dataset
 head(daily.clim)
+unique(daily.clim$site)
 
 ## Obtain sunrise/sunset times given lat/long and date
 sunlight <- getSunlightTimes(data = daily.clim, tz = "America/Chicago")
@@ -279,26 +280,28 @@ daily.clim <- daily.clim %>%
   dplyr::select(site:date, m:year, elevation.m, 
                 daily.prcp:daily.vpdmin, sun.hours, sf)
 
+daily.clim$sun.hours[daily.clim$site == "Harris_2020_03"]
+
 ###############################################################################
 ## Calculate water holding capacity of each site
 ###############################################################################
 whc.data <- soilgrids %>%
-  mutate(calc_soil_water(id = id, fsand = perc.sand/100,
+  dplyr::mutate(calc_soil_water(id = site, fsand = perc.sand/100,
                          fclay = perc.clay/100,
-                         fom = om/100,
+                         fom = om/1000,
                          fgravel = perc.gravel/100,
                          zbed = bedrock),
          wfc = wfc*1000, 
          pwp = pwp*1000,
          whc = whc*1000) %>%
-  dplyr::rename(site = id)
+  dplyr::select(-id, -lat, -long)
 
 write.csv(whc.data, "../data_sheets/TXeco_soilgrid_data.csv", row.names = FALSE)
 
 ## Join water holding capacity data with compiled daily climate dataframe
 daily.clim <- daily.clim %>%
-  full_join(whc.data) %>%
-  distinct(site,date, .keep_all = TRUE)
+  full_join(whc.data, by = "site") %>%
+  distinct(site, date, .keep_all = TRUE)
 
 ###############################################################################
 ## Write daily climate .csv

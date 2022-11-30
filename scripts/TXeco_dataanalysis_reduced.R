@@ -43,7 +43,6 @@ df$pft <- factor(df$pft, levels = c("c3_legume", "c4_nonlegume", "c3_nonlegume")
 ## Convert VPD from hPa (PRISM units) to kPa (standard)
 df$vpd4 <- df$vpd4 / 10
 
-
 ##########################################################################
 ## Beta
 ##########################################################################
@@ -142,8 +141,6 @@ test(emtrends(narea,
               ~wn3_perc, "soil.no3n", 
               at = list(wn3_perc = seq(0, 1, 0.1))))
 
-
-
 emmeans(narea, pairwise~pft)
 
 ##########################################################################
@@ -179,12 +176,14 @@ models <- ' # regressions
 
             # covariates
             beta.std ~~ f*chi.std
+            beta.std ~~ vpd4.std
 
             # indirect effect of soil N and soil moisture on leaf N
-            soiln.indirect:=a*b
-            moist.indirect:=c*a*b
-            chi.narea.indirect:=f*b
-            temp.chi.indirect:= d*e'
+            soiln.beta.ind:=a*b
+            sm.beta.ind:=c*b
+            sm.n.beta.ind:=c*a*b
+            chi.beta.ind:=f*b
+            temp.ind:= d*e'
 
 test_fit <- sem(models, data = df.sem)
 summary(test_fit, standardized = TRUE,
@@ -193,7 +192,7 @@ fitMeasures(test_fit, c("cfi", "rmsea", "srmr"))
 
 
 summary.coefs <- data.frame(summary(test_fit, standardized = TRUE,
-                                    ci = TRUE, fit.measures = TRUE)$pe[c(1:14, 26:28),])
+                                    ci = TRUE, fit.measures = TRUE)$pe[c(1:15, 27:31),])
 summary.coefs$line <- abs(summary.coefs$est)
 summary.coefs$line_std <- scale(summary.coefs$line) * 2 + 4
 
@@ -335,9 +334,11 @@ write.csv(table4, "../working_drafts/tables/TXeco_table4_leafN.csv",
 table5 <- summary.coefs %>%
   mutate(slope_ci = str_c(est, " [", ci.lower, ", ", ci.upper, "]", sep = "")) %>%
   dplyr::select(resp, pred, slope_ci, z, pvalue)
-table5[15, c(1,2)] <- c("narea.std", "no3n*beta")
-table5[16, c(1,2)] <- c("narea.std", "wn3*no3n*beta")
-table5[17, c(1,2)] <- c("chi.std", "tavg4*vpd4")
+table5[16, c(1,2)] <- c("narea.std", "no3n*beta")
+table5[17, c(1,2)] <- c("narea.std", "wn3*beta")
+table5[18, c(1,2)] <- c("narea.std", "wn3*no3n*beta")
+table5[19, c(1,2)] <- c("narea.std", "chi*beta")
+table5[20, c(1,2)] <- c("chi.std", "tavg4*vpd4")
 
 table5 <- table5 %>% 
   mutate(resp = ifelse(resp == "narea.std", 
