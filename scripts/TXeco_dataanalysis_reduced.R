@@ -160,16 +160,6 @@ df.sem$chi[484] <- NA
 df.sem$narea[df.sem$narea > 10] <- NA
 df.sem$narea[509] <- NA
 
-## Standardize and center vars
-df.sem$beta <- scale(df.sem$beta)
-df.sem$soil.no3n <- scale(df.sem$soil.no3n)
-df.sem$wn3_perc <- scale(df.sem$wn3_perc)
-df.sem$vpd4 <- scale(df.sem$vpd4)
-df.sem$tavg4 <- scale(df.sem$tavg4)
-df.sem$chi <- scale(df.sem$chi)
-df.sem$narea <- scale(df.sem$narea)
-
-
 df.sem$n.fixer <- ifelse(df.sem$n.fixer == "yes", 1, 0)
 df.sem$photo <- ifelse(df$photo == "c3", 1, 0)
 
@@ -177,7 +167,8 @@ df.sem$photo <- ifelse(df$photo == "c3", 1, 0)
 test_psem <- psem(
   
   ## Narea model
-  narea = lme(narea ~ beta + chi + soil.no3n + wn3_perc + photo + n.fixer,
+  narea = lme(narea ~ beta + chi + soil.no3n + wn3_perc + photo + n.fixer +
+                tavg4 + vpd4,
               random = ~ 1 | NCRS.code, 
               data = df.sem, na.action = na.omit),
   
@@ -186,7 +177,7 @@ test_psem <- psem(
             data = df.sem, na.action = na.omit),
   
   ## Beta model
-  beta = lme(beta ~ soil.no3n + wn3_perc + chi + n.fixer,
+  beta = lme(beta ~ soil.no3n + wn3_perc + chi + n.fixer + vpd4 + tavg4,
              random = ~ 1 | NCRS.code, data = df.sem, 
              na.action = na.omit),
   
@@ -198,89 +189,17 @@ test_psem <- psem(
   vpd = lme(vpd4 ~ tavg4, random = ~ 1 | NCRS.code, data = df.sem, 
             na.action = na.omit),
   
-  ## Covariances
+  ## Correlated errors (i.e. relationship is not presumed to
+  ## be causally linked)
   beta %~~% chi,
   beta %~~% vpd4)
 
-psem_summary <- summary(test_psem)
-coefs(test_psem, test.statistic = "chi.square")
-anova(test_psem, )
-cerror(test_psem)
+summary(test_psem)
 
-
-
-psem_boot <- bootEff(test_psem, R = 100, seed = 2,
-                     ran.eff = "NCRS.code", parallel = "snow")
-
-
-
-plot(
-  test_psem,
-  return = FALSE,
-  node_attrs = data.frame(shape = "rectangle", color = "black", fillcolor = "white",
-                          fixedsize = TRUE, fontsize = 8),
-  edge_attrs = data.frame(style = "solid", color = "black", size = 5),
-  ns_dashed = T,
-  alpha = 0.05,
-  show = "std",
-  digits = 3,
-  add_edge_label_spaces = TRUE
-)
-
-car::Anova()
-
-summary(semEff(psem_boot), c("narea", "beta", "chi"))
+summary(semEff(psem_boot), c("narea"))
 summary(semEff(psem_boot), "beta")
 summary(semEff(psem_boot), "chi")
 
-## Add models to be tested in SEM
-models <- ' # regressions
-            narea.std ~ c*beta.std + chi.std + no3n.std + wn3.std + pft
-            beta.std ~ b*wn3.std + a*no3n.std + pft
-            chi.std ~ d*vpd4.std + tavg4.std + pft
-            vpd4.std ~ f*tavg4.std
-            no3n.std ~ e*wn3.std
-
-            # covariates
-            beta.std ~~ g*chi.std
-            beta.std ~~ h*vpd4.std
-
-            # indirect effect of soil N and soil moisture on leaf N
-            sn.bt.nr:= a*c
-            sm.bt.nr:= b*c
-            sm.sn.bt.nr:= e*a*c
-            ch.bt.nr:= g*c
-            vpd.ch.bt.nr:= d*g*c
-            t.vpd.ch.bt.nr:= f*d*g*c
-            vpd.bt.nr:= h*c
-            t.vpd.ch:= f*d'
-## Indirect path syntax: sn = soil N, bt = beta, nr = narea,
-## sm = soil moisture, ch = chi, vpd = vpd, t = temperature
-
-test_fit <- sem(models, data = df.sem)
-summary(test_fit, standardized = TRUE,
-        ci = TRUE, fit.measures = TRUE)
-fitMeasures(test_fit, c("cfi", "rmsea", "srmr"))
-
-
-summary.coefs <- data.frame(summary(test_fit, standardized = TRUE,
-                                    ci = TRUE, fit.measures = TRUE)$pe[c(1:15, 27:34),])
-summary.coefs$line <- abs(summary.coefs$est)
-summary.coefs$line_std <- scale(summary.coefs$line) * 2 + 4
-
-summary.coefs[,c(5:16)] <- round(summary.coefs[, c(5:16)], digits = 3)
-summary.coefs <- summary.coefs %>% 
-  mutate(se = ifelse(se < 0.001 & se >= 0, "<0.001", se),
-         pvalue = ifelse(pvalue < 0.001 & pvalue >= 0, "<0.001", pvalue)) %>%
-  dplyr::select(resp = lhs, pred = rhs, everything(),
-                -op, -label, -exo, -std.nox)
-
-write.csv(summary.coefs,
-          "../working_drafts/tables/TXeco_tableS2_SEMresults.csv",
-          row.names = FALSE)
-
-## Get R2 values of each fitted value
-lavInspect(test_fit, "rsquare")
 
 ##########################################################################
 ## Tables
@@ -402,46 +321,30 @@ write.csv(table4, "../working_drafts/tables/TXeco_table4_leafN.csv",
 
 
 ## Table 5 (SEM results)
-table5 <- summary.coefs %>%
-  mutate(slope_ci = str_c(est, " [", ci.lower, ", ", ci.upper, "]", sep = "")) %>%
-  dplyr::select(resp, pred, slope_ci, z, pvalue)
-table5[16, c(1,2)] <- c("narea.std", "no3n*beta")
-table5[17, c(1,2)] <- c("narea.std", "wn3*beta")
-table5[18, c(1,2)] <- c("narea.std", "wn3*no3n*beta")
-table5[19, c(1,2)] <- c("narea.std", "chi*beta")
-table5[20, c(1,2)] <- c("narea.std", "vpd*chi*beta")
-table5[21, c(1,2)] <- c("narea.std", "tavg4*vpd4*chi*beta")
-table5[22, c(1,2)] <- c("narea.std", "vpd4*beta")
-table5[23, c(1,2)] <- c("chi.std", "tavg4*vpd4")
 
-table5 <- table5 %>% 
-  mutate(resp = ifelse(resp == "narea.std", 
-                       "Narea",
-                       ifelse(resp == "beta.std", 
-                              "beta",
-                              ifelse(resp == "chi.std", 
-                                     "chi",
-                                     ifelse(resp == "vpd4.std",
-                                            "vpd",
-                                            ifelse(resp == "no3n.std",
-                                                   "no3n", 
-                                                   NA))))),
-         pred = ifelse(pred == "beta.std", "beta",
-                       ifelse(pred == "chi.std",
-                              "chi",
-                              ifelse(pred == "no3n.std",
-                                     "no3n",
-                                     ifelse(pred == "pft",
-                                            "pft",
-                                            ifelse(pred == "wn3.std",
-                                                   "wn3",
-                                                   ifelse(pred == "vpd4.std",
-                                                          "vpd",
-                                                          ifelse(pred == "tavg4.std",
-                                                                 "tavg",
-                                                                 pred))))))), 
-         resp = factor(resp, levels = c("Narea", "beta", "chi", "vpd", "no3n"))) %>%
-  arrange(resp)
+coefs(test_psem, standardize = "scale")
+dSep(test_psem)
+rsquared(test_psem)
+
+table5.coefs <- summary(test_psem)$coefficients[c(1:15), c(1:8)] %>%
+  as.data.frame() %>%
+  mutate(Std.Error = ifelse(Std.Error == "-", NA, Std.Error),
+         across(Estimate:Std.Estimate, as.numeric),
+         z_score = Estimate / Std.Error,
+         p_val = 2*pnorm(q=z_score, lower.tail = FALSE),
+         p_val = ifelse(p_val > 1, 2-p_val, p_val),
+         across(Estimate:p_val, round, 3),
+         p_val = ifelse(p_val < 0.001, "<0.001", p_val),
+         linesize = abs(scale(z_score) + abs(scale(Std.Estimate))*log(60))) %>%
+  dplyr::select(resp = Response, pred = Predictor, std_est = Std.Estimate, 
+         z_score, p_val, linesize)
+
+table5 <- summary(test_psem)$R2 %>%
+  dplyr::select(resp = Response, r2_marg = Marginal,
+                r2_cond = Conditional) %>%
+  full_join(table5.coefs) %>%
+  dplyr::select(resp, pred, r2_marg, r2_cond, std_est:p_val)
+
 
 write.csv(table5, "../working_drafts/tables/TXeco_table5_SEMclean.csv", 
           row.names = FALSE)
