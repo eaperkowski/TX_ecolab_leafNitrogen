@@ -112,6 +112,69 @@ emmeans(chi, pairwise~pft)
 test(emtrends(chi, ~1, "vpd4"))
 test(emtrends(chi, ~1, "wn3_perc"))
 
+
+##########################################################################
+## Nmass
+##########################################################################
+df$n.leaf[c(375, 509)] <- NA
+
+
+# Fit model
+nmass <- lmer(n.leaf ~ (beta + chi + (soil.no3n * wn3_perc)) * pft + (1 | NCRS.code),
+              data = df)
+
+# Check model assumptions
+plot(nmass)
+qqnorm(residuals(nmass))
+qqline(residuals(nmass))
+hist(residuals(nmass))
+densityPlot(residuals(nmass))
+shapiro.test(residuals(nmass))
+outlierTest(nmass)
+
+# Model output
+format(summary(nmass)$coefficients, scientific = TRUE, digits = 3)
+Anova(nmass)
+r.squaredGLMM(nmass)
+
+# Post hoc tests
+test(emtrends(nmass, ~1, "soil.no3n"))
+test(emtrends(nmass, ~1, "wn3_perc"))
+test(emtrends(nmass, ~wn3_perc, "soil.no3n", at = list(wn3_perc = seq(0, 1, 0.25))))
+
+
+##########################################################################
+## Marea
+##########################################################################
+df$marea[df$marea > 1000] <- NA
+df$marea[c(20, 21)] <- NA
+
+# Fit model
+marea <- lmer(log(marea) ~ (beta + chi + (soil.no3n * wn3_perc)) * pft + (1 | NCRS.code),
+              data = df)
+
+# Check model assumptions
+plot(marea)
+qqnorm(residuals(marea))
+qqline(residuals(marea))
+hist(residuals(marea))
+densityPlot(residuals(marea))
+shapiro.test(residuals(marea))
+outlierTest(marea)
+
+# Model output
+format(summary(marea)$coefficients, scientific = TRUE, digits = 3)
+
+
+round(summary(marea)$coefficients, digits = 3)
+Anova(marea)
+r.squaredGLMM(marea)
+
+test(emtrends(marea, ~1, "beta"))
+test(emtrends(marea, ~pft, "beta"))
+
+
+
 ##########################################################################
 ## Narea
 ##########################################################################
@@ -168,9 +231,18 @@ test_psem <- psem(
   
   ## Narea model
   narea = lme(narea ~ beta + chi + soil.no3n + wn3_perc + photo + n.fixer +
-                tavg4 + vpd4,
+                tavg4 + vpd4 + n.leaf + marea,
               random = ~ 1 | NCRS.code, 
               data = df.sem, na.action = na.omit),
+  
+  ## Nmass model
+  nmass = lme(n.leaf ~ beta + soil.no3n + wn3_perc + photo + n.fixer,
+              random = ~ 1 | NCRS.code, data = df.sem, na.action = na.omit),
+  
+  ## Marea model
+  nmass = lme(n.leaf ~ beta + soil.no3n + wn3_perc + photo + n.fixer,
+              random = ~ 1 | NCRS.code, data = df.sem, na.action = na.omit),
+  
   
   ## Chi model
   chi = lme(chi ~ vpd4 + tavg4 + photo, random = ~ 1 | NCRS.code,
@@ -195,10 +267,6 @@ test_psem <- psem(
   beta %~~% vpd4)
 
 summary(test_psem)
-
-summary(semEff(psem_boot), c("narea"))
-summary(semEff(psem_boot), "beta")
-summary(semEff(psem_boot), "chi")
 
 
 ##########################################################################
