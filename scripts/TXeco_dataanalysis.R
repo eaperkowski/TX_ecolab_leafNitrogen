@@ -46,10 +46,13 @@ df$vpd4 <- df$vpd4 / 10
 ##########################################################################
 ## Beta
 ##########################################################################
-df$beta[c(84, 117)] <- NA
+df.beta <- df
+
+df.beta$beta[c(84, 117)] <- NA
 
 
-beta <- lmer(log(beta) ~ wn3_perc * soil.no3n * pft + (1 | NCRS.code), data = df)
+beta <- lmer(log(beta) ~ wn3_perc * soil.no3n * pft + (1 | NCRS.code), 
+             data = df.beta)
 
 # Check model assumptions
 plot(beta)
@@ -76,16 +79,18 @@ emmeans(beta, pairwise~pft)
 ##########################################################################
 ## Chi
 ##########################################################################
-df$chi[c(117, 322, 481)] <- NA
-df$chi[c(62, 315)] <- NA
-df$chi[c(456)] <- NA
-df$chi[c(317, 483)] <- NA
-df$chi[c(292, 484)] <- NA
-df$chi[284] <- NA
-df$chi[484] <- NA
+df.chi <- df
+
+df.chi$chi[c(117, 322, 481)] <- NA
+df.chi$chi[c(62, 315)] <- NA
+df.chi$chi[c(456)] <- NA
+df.chi$chi[c(317, 483)] <- NA
+df.chi$chi[c(292, 484)] <- NA
+df.chi$chi[284] <- NA
+df.chi$chi[484] <- NA
 
 chi <- lmer(chi ~ (vpd4 + tavg4 + (wn3_perc * soil.no3n)) * pft + 
-              (1 | NCRS.code), data = df)
+              (1 | NCRS.code), data = df.chi)
 
 # Check model assumptions
 plot(chi)
@@ -113,12 +118,14 @@ test(emtrends(chi, ~1, "wn3_perc"))
 ##########################################################################
 ## Nmass
 ##########################################################################
-df$n.leaf[c(375, 509)] <- NA
+df.nmass <- df
+
+df.nmass$n.leaf[c(509)] <- NA
 
 
 # Fit model
-nmass <- lmer(n.leaf ~ (beta + chi + (soil.no3n * wn3_perc)) * pft + (1 | NCRS.code),
-              data = df)
+nmass <- lmer(log(n.leaf) ~ (beta + chi + (soil.no3n * wn3_perc)) * pft + (1 | NCRS.code),
+              data = df.nmass)
 
 # Check model assumptions
 plot(nmass)
@@ -135,20 +142,26 @@ Anova(nmass)
 r.squaredGLMM(nmass)
 
 # Post hoc tests
+test(emtrends(nmass, ~pft, "beta"))
+
+
 test(emtrends(nmass, ~1, "soil.no3n"))
 test(emtrends(nmass, ~1, "wn3_perc"))
 test(emtrends(nmass, ~wn3_perc, "soil.no3n", at = list(wn3_perc = seq(0, 1, 0.25))))
 
+emmeans(nmass, pairwise~pft)
 
 ##########################################################################
 ## Marea
 ##########################################################################
-df$marea[df$marea > 1000] <- NA
-df$marea[c(20, 21)] <- NA
+df.marea <- df
+
+df.marea$marea[df.marea$marea > 1000] <- NA
+df.marea$marea[c(20, 21)] <- NA
 
 # Fit model
 marea <- lmer(log(marea) ~ (beta + chi + (soil.no3n * wn3_perc)) * pft + (1 | NCRS.code),
-              data = df)
+              data = df.marea)
 
 # Check model assumptions
 plot(marea)
@@ -160,9 +173,6 @@ shapiro.test(residuals(marea))
 outlierTest(marea)
 
 # Model output
-format(summary(marea)$coefficients, scientific = TRUE, digits = 3)
-
-
 round(summary(marea)$coefficients, digits = 3)
 Anova(marea)
 r.squaredGLMM(marea)
@@ -170,17 +180,21 @@ r.squaredGLMM(marea)
 test(emtrends(marea, ~1, "beta"))
 test(emtrends(marea, ~pft, "beta"))
 
-
+test(emtrends(marea, ~wn3_perc, "soil.no3n",
+              at = list(wn3_perc = seq(0,1,0.25))))
+test(emtrends(marea, ~pft, "soil.no3n"))
 
 ##########################################################################
 ## Narea
 ##########################################################################
-df$narea[df$narea > 10] <- NA
-df$narea[509] <- NA
+df.narea <- df
+
+df.narea$narea[df.narea$narea > 10] <- NA
+df.narea$narea[509] <- NA
 
 # Fit model
 narea <- lmer(log(narea) ~ (beta + chi + (soil.no3n * wn3_perc)) * pft + (1 | NCRS.code),
-                   data = df)
+                   data = df.narea)
 
 # Check model assumptions
 plot(narea)
@@ -212,24 +226,14 @@ emmeans(narea, pairwise~pft)
 df$n.fixer <- ifelse(df$n.fixer == "yes", 1, 0)
 df$photo <- ifelse(df$photo == "c3", 1, 0)
 
-## Run PSEM model
-test_psem <- psem(
+## Narea PSEM model
+narea_psem <- psem(
   
   ## Narea model
-  narea = lme(narea ~ beta + chi + soil.no3n + wn3_perc + photo + n.fixer +
-                n.leaf + marea,
+  narea = lme(narea ~ beta + chi + soil.no3n + wn3_perc + photo + n.fixer,
               random = ~ 1 | NCRS.code, 
               data = df, na.action = na.omit),
-  
-  ## Nmass model
-  nmass = lme(n.leaf ~ beta + soil.no3n + wn3_perc + photo + n.fixer,
-              random = ~ 1 | NCRS.code, data = df, na.action = na.omit),
-  
-  ## Marea model
-  marea = lme(marea ~ beta + soil.no3n + wn3_perc + photo + n.fixer,
-              random = ~ 1 | NCRS.code, data = df, na.action = na.omit),
-  
-  
+
   ## Chi model
   chi = lme(chi ~ vpd4 + tavg4 + photo, random = ~ 1 | NCRS.code,
             data = df, na.action = na.omit),
@@ -252,7 +256,71 @@ test_psem <- psem(
   # beta %~~% chi,
   # beta %~~% vpd4)
 
-summary(test_psem)
+summary(narea_psem)
+
+## Nmass PSEM model
+nmass_psem <- psem(
+  
+  ## Narea model
+  nmass = lme(n.leaf ~ beta + chi + soil.no3n + wn3_perc + photo + n.fixer,
+              random = ~ 1 | NCRS.code, 
+              data = df, na.action = na.omit),
+  
+  ## Chi model
+  chi = lme(chi ~ vpd4 + tavg4 + photo, random = ~ 1 | NCRS.code,
+            data = df, na.action = na.omit),
+  
+  ## Beta model
+  beta = lme(beta ~ soil.no3n + wn3_perc + chi + n.fixer,
+             random = ~ 1 | NCRS.code, data = df, 
+             na.action = na.omit),
+  
+  ## Soil N model
+  soiln = lme(soil.no3n ~ wn3_perc, random = ~ 1 | NCRS.code, 
+              data = df, na.action = na.omit),
+  
+  ## Temperature model
+  vpd = lme(vpd4 ~ tavg4, random = ~ 1 | NCRS.code, data = df, 
+            na.action = na.omit))
+
+## Correlated errors (i.e. relationship is not presumed to
+## be causally linked)
+# beta %~~% chi,
+# beta %~~% vpd4)
+
+## Nmass PSEM model
+marea_psem <- psem(
+  
+  ## Narea model
+  marea = lme(marea ~ beta + chi + soil.no3n + wn3_perc + photo + n.fixer,
+              random = ~ 1 | NCRS.code, 
+              data = df, na.action = na.omit),
+  
+  ## Chi model
+  chi = lme(chi ~ vpd4 + tavg4 + photo, random = ~ 1 | NCRS.code,
+            data = df, na.action = na.omit),
+  
+  ## Beta model
+  beta = lme(beta ~ soil.no3n + wn3_perc + chi + n.fixer,
+             random = ~ 1 | NCRS.code, data = df, 
+             na.action = na.omit),
+  
+  ## Soil N model
+  soiln = lme(soil.no3n ~ wn3_perc, random = ~ 1 | NCRS.code, 
+              data = df, na.action = na.omit),
+  
+  ## Temperature model
+  vpd = lme(vpd4 ~ tavg4, random = ~ 1 | NCRS.code, data = df, 
+            na.action = na.omit))
+
+## Correlated errors (i.e. relationship is not presumed to
+## be causally linked)
+# beta %~~% chi,
+# beta %~~% vpd4)
+
+summary(narea_psem)
+summary(nmass_psem)
+summary(marea_psem)
 
 
 ##########################################################################
@@ -336,37 +404,93 @@ write.csv(table3, "../working_drafts/tables/TXeco_table3_chi.csv",
 ## Table 4 (Coefficients + model results summary)
 narea.coefs <- data.frame(summary(narea)$coefficient) %>%
   mutate(treatment = row.names(.),
-         coef.nobeta = format(Estimate, scientific = TRUE, digits = 3),
-         se.nobeta = round(Std..Error, digits = 3),
-         t.value.nobeta = round(t.value, digits = 3)) %>%
-  dplyr::select(treatment, coef.nobeta, se.nobeta, t.value.nobeta) %>%
+         coef.narea = format(Estimate, scientific = TRUE, digits = 3),
+         se = round(Std..Error, digits = 3),
+         t.value = round(t.value, digits = 3)) %>%
+  dplyr::select(treatment, coef.narea) %>%
   filter(treatment == "(Intercept)" | treatment == "beta" |
            treatment == "chi" | treatment == "soil.no3n" | 
            treatment == "wn3_perc" | 
            treatment == "soil.no3n:wn3_perc") %>%
-  mutate(coef.nobeta = ifelse(coef.nobeta <0.001 & coef.nobeta >= 0, 
-                              "<0.001", coef.nobeta)) %>%
+  mutate(coef.narea = ifelse(coef.narea <0.001 & coef.narea >= 0,
+                       "<0.001", coef.narea)) %>%
   print(., row.names = FALSE)
 
-table4 <- data.frame(Anova(narea)) %>%
+narea.table <- data.frame(Anova(narea)) %>%
   mutate(treatment = row.names(.),
-         Chisq.nobeta = round(Chisq, 3),
-         P_value.nobeta = ifelse(Pr..Chisq. < 0.001, "<0.001",
-                          round(Pr..Chisq., 3))) %>%
+         Chisq.narea = round(Chisq, 3),
+         P_value.narea = ifelse(Pr..Chisq. < 0.001, "<0.001",
+                                 round(Pr..Chisq., 3))) %>%
   full_join(narea.coefs) %>%
-  mutate(treatment = factor(treatment, levels = c("(Intercept)",
-                                                  "beta",
-                                                  "chi",
-                                                  "soil.no3n",
-                                                  "wn3_perc",
-                                                  "pft",
-                                                  "soil.no3n:wn3_perc",
-                                                  "beta:pft",
-                                                  "chi:pft",
-                                                  "soil.no3n:pft",
-                                                  "wn3_perc:pft",
-                                                  "soil.no3n:wn3_perc:pft"))) %>%
-  dplyr::select(treatment, df = Df, coef.nobeta, Chisq.nobeta, P_value.nobeta) %>%
+  mutate(treatment = factor(
+    treatment, levels = c("(Intercept)", "beta", "chi", "soil.no3n",
+                          "wn3_perc", "pft", "soil.no3n:wn3_perc",
+                          "beta:pft", "chi:pft", "soil.no3n:pft",
+                          "wn3_perc:pft", "soil.no3n:wn3_perc:pft"))) %>%
+  dplyr::select(treatment, df = Df, coef.narea, Chisq.narea, P_value.narea) %>%
+  arrange(treatment) %>%
+  replace(is.na(.), "-")
+
+nmass.coefs <- data.frame(summary(nmass)$coefficient) %>%
+  mutate(treatment = row.names(.),
+         coef.nmass = format(Estimate, scientific = TRUE, digits = 3),
+         se = round(Std..Error, digits = 3),
+         t.value = round(t.value, digits = 3)) %>%
+  dplyr::select(treatment, coef.nmass) %>%
+  filter(treatment == "(Intercept)" | treatment == "beta" |
+           treatment == "chi" | treatment == "soil.no3n" | 
+           treatment == "wn3_perc" | 
+           treatment == "soil.no3n:wn3_perc") %>%
+  mutate(coef.nmass = ifelse(coef.nmass <0.001 & coef.nmass >= 0,
+                       "<0.001", coef.nmass)) %>%
+  print(., row.names = FALSE)
+
+nmass.table <- data.frame(Anova(nmass)) %>%
+  mutate(treatment = row.names(.),
+         Chisq.nmass = round(Chisq, 3),
+         P_value.nmass = ifelse(Pr..Chisq. < 0.001, "<0.001",
+                                round(Pr..Chisq., 3))) %>%
+  full_join(nmass.coefs) %>%
+  mutate(treatment = factor(
+    treatment, levels = c("(Intercept)", "beta", "chi", "soil.no3n",
+                          "wn3_perc", "pft", "soil.no3n:wn3_perc",
+                          "beta:pft", "chi:pft", "soil.no3n:pft",
+                          "wn3_perc:pft", "soil.no3n:wn3_perc:pft"))) %>%
+  dplyr::select(treatment, df = Df, coef.nmass, Chisq.nmass, P_value.nmass) %>%
+  arrange(treatment) %>%
+  replace(is.na(.), "-")
+
+marea.coefs <- data.frame(summary(marea)$coefficient) %>%
+  mutate(treatment = row.names(.),
+         coef.marea = format(Estimate, scientific = TRUE, digits = 3),
+         se = round(Std..Error, digits = 3),
+         t.value = round(t.value, digits = 3)) %>%
+  dplyr::select(treatment, coef.marea) %>%
+  filter(treatment == "(Intercept)" | treatment == "beta" |
+           treatment == "chi" | treatment == "soil.no3n" | 
+           treatment == "wn3_perc" | 
+           treatment == "soil.no3n:wn3_perc") %>%
+  mutate(coef.marea = ifelse(coef.marea <0.001 & coef.marea >= 0,
+                             "<0.001", coef.marea)) %>%
+  print(., row.names = FALSE)
+
+marea.table <- data.frame(Anova(marea)) %>%
+  mutate(treatment = row.names(.),
+         Chisq.marea = round(Chisq, 3),
+         P_value.marea = ifelse(Pr..Chisq. < 0.001, "<0.001",
+                                round(Pr..Chisq., 3))) %>%
+  full_join(marea.coefs) %>%
+  mutate(treatment = factor(
+    treatment, levels = c("(Intercept)", "beta", "chi", "soil.no3n",
+                          "wn3_perc", "pft", "soil.no3n:wn3_perc",
+                          "beta:pft", "chi:pft", "soil.no3n:pft",
+                          "wn3_perc:pft", "soil.no3n:wn3_perc:pft"))) %>%
+  dplyr::select(treatment, df = Df, coef.marea, Chisq.marea, P_value.marea) %>%
+  arrange(treatment) %>%
+  replace(is.na(.), "-")
+
+table4 <- narea.table %>% full_join(nmass.table) %>% 
+  full_join(marea.table) %>%
   arrange(treatment) %>%
   replace(is.na(.), "-")
 
@@ -380,7 +504,7 @@ coefs(test_psem, standardize = "scale")
 dSep(test_psem)
 rsquared(test_psem)
 
-table5.coefs <- summary(test_psem)$coefficients[, c(1:8)] %>%
+table5.coefs <- summary(narea_psem)$coefficients[, c(1:8)] %>%
   as.data.frame() %>%
   mutate(Std.Error = ifelse(Std.Error == "-", NA, Std.Error),
          across(Estimate:Std.Estimate, as.numeric),
