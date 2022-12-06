@@ -9,9 +9,7 @@ library(tidyverse)
 library(MuMIn)
 library(multcomp)
 library(multcompView)
-library(lavaan)
 library(piecewiseSEM)
-library(semEff)
 library(nlme)
 
 # Turn off digit rounding in emmean args
@@ -30,7 +28,6 @@ df <- read.csv("../data_sheets/TXeco_compiled_datasheet.csv",
                                     "c3_legume", 
                                     NA))),
          chi = ifelse(chi > 0.95 | chi < 0.20, NA, chi))
-df.sem <- df
 
 ## Add colorblind friendly palette
 cbbPalette <- c("#0077BB", "#33BBEE", "#009988", "#EE7733", "#CC3311")
@@ -212,59 +209,48 @@ emmeans(narea, pairwise~pft)
 ##########################################################################
 ## Structural equation model
 ##########################################################################
-df.sem$beta[c(84, 117)] <- NA
-df.sem$chi[c(117, 322, 481)] <- NA
-df.sem$chi[c(62, 315)] <- NA
-df.sem$chi[c(456)] <- NA
-df.sem$chi[c(317, 483)] <- NA
-df.sem$chi[c(292, 484)] <- NA
-df.sem$chi[284] <- NA
-df.sem$chi[484] <- NA
-df.sem$narea[df.sem$narea > 10] <- NA
-df.sem$narea[509] <- NA
-
-df.sem$n.fixer <- ifelse(df.sem$n.fixer == "yes", 1, 0)
-df.sem$photo <- ifelse(df$photo == "c3", 1, 0)
+df$n.fixer <- ifelse(df$n.fixer == "yes", 1, 0)
+df$photo <- ifelse(df$photo == "c3", 1, 0)
 
 ## Run PSEM model
 test_psem <- psem(
   
   ## Narea model
   narea = lme(narea ~ beta + chi + soil.no3n + wn3_perc + photo + n.fixer +
-                tavg4 + vpd4 + n.leaf + marea,
+                n.leaf + marea,
               random = ~ 1 | NCRS.code, 
-              data = df.sem, na.action = na.omit),
+              data = df, na.action = na.omit),
   
   ## Nmass model
   nmass = lme(n.leaf ~ beta + soil.no3n + wn3_perc + photo + n.fixer,
-              random = ~ 1 | NCRS.code, data = df.sem, na.action = na.omit),
+              random = ~ 1 | NCRS.code, data = df, na.action = na.omit),
   
   ## Marea model
-  nmass = lme(n.leaf ~ beta + soil.no3n + wn3_perc + photo + n.fixer,
-              random = ~ 1 | NCRS.code, data = df.sem, na.action = na.omit),
+  marea = lme(marea ~ beta + soil.no3n + wn3_perc + photo + n.fixer,
+              random = ~ 1 | NCRS.code, data = df, na.action = na.omit),
   
   
   ## Chi model
   chi = lme(chi ~ vpd4 + tavg4 + photo, random = ~ 1 | NCRS.code,
-            data = df.sem, na.action = na.omit),
+            data = df, na.action = na.omit),
   
   ## Beta model
-  beta = lme(beta ~ soil.no3n + wn3_perc + chi + n.fixer + vpd4 + tavg4,
-             random = ~ 1 | NCRS.code, data = df.sem, 
+  beta = lme(beta ~ soil.no3n + wn3_perc + chi + n.fixer,
+             random = ~ 1 | NCRS.code, data = df, 
              na.action = na.omit),
   
   ## Soil N model
   soiln = lme(soil.no3n ~ wn3_perc, random = ~ 1 | NCRS.code, 
-              data = df.sem, na.action = na.omit),
+              data = df, na.action = na.omit),
   
   ## Temperature model
-  vpd = lme(vpd4 ~ tavg4, random = ~ 1 | NCRS.code, data = df.sem, 
-            na.action = na.omit),
+  vpd = lme(vpd4 ~ tavg4, random = ~ 1 | NCRS.code, data = df, 
+            na.action = na.omit))
   
   ## Correlated errors (i.e. relationship is not presumed to
   ## be causally linked)
-  beta %~~% chi,
-  beta %~~% vpd4)
+  # beta %~~% chi,
+  # beta %~~% vpd4)
 
 summary(test_psem)
 
@@ -394,7 +380,7 @@ coefs(test_psem, standardize = "scale")
 dSep(test_psem)
 rsquared(test_psem)
 
-table5.coefs <- summary(test_psem)$coefficients[c(1:15), c(1:8)] %>%
+table5.coefs <- summary(test_psem)$coefficients[, c(1:8)] %>%
   as.data.frame() %>%
   mutate(Std.Error = ifelse(Std.Error == "-", NA, Std.Error),
          across(Estimate:Std.Estimate, as.numeric),
@@ -403,7 +389,7 @@ table5.coefs <- summary(test_psem)$coefficients[c(1:15), c(1:8)] %>%
          p_val = ifelse(p_val > 1, 2-p_val, p_val),
          across(Estimate:p_val, round, 3),
          p_val = ifelse(p_val < 0.001, "<0.001", p_val),
-         linesize = abs(scale(z_score) + abs(scale(Std.Estimate))*log(60))) %>%
+         linesize = abs(scale(z_score) + abs(scale(Std.Estimate))*log(60))/2+3) %>%
   dplyr::select(resp = Response, pred = Predictor, std_est = Std.Estimate, 
          z_score, p_val, linesize)
 
