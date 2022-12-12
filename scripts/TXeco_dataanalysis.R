@@ -230,10 +230,21 @@ df$photo <- ifelse(df$photo == "c3", 1, 0)
 narea_psem <- psem(
   
   ## Narea model
-  narea = lme(narea ~ beta + chi + soil.no3n + wn3_perc + photo + n.fixer,
+  narea = lme(narea ~ beta + chi + soil.no3n + wn3_perc + photo + n.fixer +
+                marea + n.leaf,
               random = ~ 1 | NCRS.code, 
               data = df, na.action = na.omit),
-
+  
+  ## Marea model
+  marea = lme(marea ~ beta + soil.no3n + wn3_perc + photo + n.fixer,
+              random = ~ 1 | NCRS.code, 
+              data = df, na.action = na.omit),
+  
+  ## Nmass model
+  n.leaf = lme(n.leaf ~ beta + soil.no3n + wn3_perc + photo + n.fixer,
+              random = ~ 1 | NCRS.code, 
+              data = df, na.action = na.omit),
+  
   ## Chi model
   chi = lme(chi ~ vpd4 + tavg4 + photo, random = ~ 1 | NCRS.code,
             data = df, na.action = na.omit),
@@ -517,7 +528,7 @@ table5.coefs <- summary(narea_psem)$coefficients[, c(1:8)] %>%
   dplyr::select(resp = Response, pred = Predictor, std_est = Std.Estimate, 
          z_score, p_val, linesize)
 
-table5 <- summary(test_psem)$R2 %>%
+table5 <- summary(narea_psem)$R2 %>%
   dplyr::select(resp = Response, r2_marg = Marginal,
                 r2_cond = Conditional) %>%
   full_join(table5.coefs) %>%
@@ -525,4 +536,51 @@ table5 <- summary(test_psem)$R2 %>%
 
 
 write.csv(table5, "../working_drafts/tables/TXeco_table5_SEMclean.csv", 
+          row.names = FALSE)
+
+
+# Table S3: SEM results for Nmass
+tables3.coefs <- summary(nmass_psem)$coefficients[, c(1:8)] %>%
+  as.data.frame() %>%
+  mutate(Std.Error = ifelse(Std.Error == "-", NA, Std.Error),
+         across(Estimate:Std.Estimate, as.numeric),
+         z_score = Estimate / Std.Error,
+         p_val = 2*pnorm(q=z_score, lower.tail = FALSE),
+         p_val = ifelse(p_val > 1, 2-p_val, p_val),
+         across(Estimate:p_val, round, 3),
+         p_val = ifelse(p_val < 0.001, "<0.001", p_val),
+         linesize = abs(scale(z_score) + abs(scale(Std.Estimate))*log(60))/2+3) %>%
+  dplyr::select(resp = Response, pred = Predictor, std_est = Std.Estimate, 
+                z_score, p_val, linesize)
+
+tables3 <- summary(nmass_psem)$R2 %>%
+  dplyr::select(resp = Response, r2_marg = Marginal,
+                r2_cond = Conditional) %>%
+  full_join(tables3.coefs) %>%
+  dplyr::select(resp, pred, r2_marg, r2_cond, std_est:p_val)
+
+write.csv(tables3, "../working_drafts/tables/TXeco_tableS3_SEM_nmass.csv", 
+          row.names = FALSE)
+
+# Table S4: SEM results for Marea
+tables4.coefs <- summary(marea_psem)$coefficients[, c(1:8)] %>%
+  as.data.frame() %>%
+  mutate(Std.Error = ifelse(Std.Error == "-", NA, Std.Error),
+         across(Estimate:Std.Estimate, as.numeric),
+         z_score = Estimate / Std.Error,
+         p_val = 2*pnorm(q=z_score, lower.tail = FALSE),
+         p_val = ifelse(p_val > 1, 2-p_val, p_val),
+         across(Estimate:p_val, round, 3),
+         p_val = ifelse(p_val < 0.001, "<0.001", p_val),
+         linesize = abs(scale(z_score) + abs(scale(Std.Estimate))*log(60))/2+3) %>%
+  dplyr::select(resp = Response, pred = Predictor, std_est = Std.Estimate, 
+                z_score, p_val, linesize)
+
+tables4 <- summary(marea_psem)$R2 %>%
+  dplyr::select(resp = Response, r2_marg = Marginal,
+                r2_cond = Conditional) %>%
+  full_join(tables4.coefs) %>%
+  dplyr::select(resp, pred, r2_marg, r2_cond, std_est:p_val)
+
+write.csv(tables4, "../working_drafts/tables/TXeco_tableS4_SEM_marea.csv", 
           row.names = FALSE)
