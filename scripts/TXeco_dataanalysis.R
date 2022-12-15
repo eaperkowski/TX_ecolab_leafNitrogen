@@ -246,7 +246,7 @@ narea_psem <- psem(
               data = df, na.action = na.omit),
   
   ## Chi model
-  chi = lme(chi ~ vpd4 + tavg4 + photo, random = ~ 1 | NCRS.code,
+  chi = lme(chi ~ vpd4 + tavg4 + wn3_perc + photo, random = ~ 1 | NCRS.code,
             data = df, na.action = na.omit),
   
   ## Beta model
@@ -278,7 +278,7 @@ nmass_psem <- psem(
               data = df, na.action = na.omit),
   
   ## Chi model
-  chi = lme(chi ~ vpd4 + tavg4 + photo, random = ~ 1 | NCRS.code,
+  chi = lme(chi ~ vpd4 + tavg4 + wn3_perc + photo, random = ~ 1 | NCRS.code,
             data = df, na.action = na.omit),
   
   ## Beta model
@@ -308,7 +308,7 @@ marea_psem <- psem(
               data = df, na.action = na.omit),
   
   ## Chi model
-  chi = lme(chi ~ vpd4 + tavg4 + photo, random = ~ 1 | NCRS.code,
+  chi = lme(chi ~ vpd4 + tavg4 + wn3_perc + photo, random = ~ 1 | NCRS.code,
             data = df, na.action = na.omit),
   
   ## Beta model
@@ -323,16 +323,6 @@ marea_psem <- psem(
   ## Temperature model
   vpd = lme(vpd4 ~ tavg4, random = ~ 1 | NCRS.code, data = df, 
             na.action = na.omit))
-
-## Correlated errors (i.e. relationship is not presumed to
-## be causally linked)
-# beta %~~% chi,
-# beta %~~% vpd4)
-
-summary(narea_psem)
-summary(nmass_psem)
-summary(marea_psem)
-
 
 ##########################################################################
 ## Tables
@@ -510,23 +500,16 @@ write.csv(table4, "../working_drafts/tables/TXeco_table4_leafN.csv",
 
 
 ## Table 5 (SEM results)
-
-coefs(test_psem, standardize = "scale")
-dSep(test_psem)
-rsquared(test_psem)
-
 table5.coefs <- summary(narea_psem)$coefficients[, c(1:8)] %>%
   as.data.frame() %>%
   mutate(Std.Error = ifelse(Std.Error == "-", NA, Std.Error),
          across(Estimate:Std.Estimate, as.numeric),
-         z_score = Estimate / Std.Error,
-         p_val = 2*pnorm(q=z_score, lower.tail = FALSE),
-         p_val = ifelse(p_val > 1, 2-p_val, p_val),
-         across(Estimate:p_val, round, 3),
-         p_val = ifelse(p_val < 0.001, "<0.001", p_val),
-         linesize = abs(scale(z_score) + abs(scale(Std.Estimate))*log(60))/2+3) %>%
+         across(Estimate:Std.Estimate, round, 3),
+         p_val = ifelse(P.Value < 0.001, "<0.001", P.Value),
+         Std.Estimate = round(Std.Estimate, digits = 3),
+         linesize = abs(scale(Std.Estimate) + scale(Std.Estimate))*log(60)/3+3) %>%
   dplyr::select(resp = Response, pred = Predictor, std_est = Std.Estimate, 
-         z_score, p_val, linesize)
+                p_val, linesize)
 
 table5 <- summary(narea_psem)$R2 %>%
   dplyr::select(resp = Response, r2_marg = Marginal,
