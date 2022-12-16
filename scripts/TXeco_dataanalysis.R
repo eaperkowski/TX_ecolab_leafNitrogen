@@ -226,7 +226,7 @@ emmeans(narea, pairwise~pft)
 df$n.fixer <- ifelse(df$n.fixer == "yes", 1, 0)
 df$photo <- ifelse(df$photo == "c3", 1, 0)
 
-## Narea PSEM model
+## Original Narea PSEM model
 narea_psem <- psem(
   
   ## Narea model
@@ -236,21 +236,21 @@ narea_psem <- psem(
               data = df, na.action = na.omit),
   
   ## Marea model
-  marea = lme(marea ~ beta + soil.no3n + wn3_perc + photo + n.fixer,
+  marea = lme(marea ~ beta + chi  + soil.no3n + wn3_perc + photo + n.fixer,
               random = ~ 1 | NCRS.code, 
               data = df, na.action = na.omit),
   
   ## Nmass model
-  n.leaf = lme(n.leaf ~ beta + soil.no3n + wn3_perc + photo + n.fixer,
-              random = ~ 1 | NCRS.code, 
-              data = df, na.action = na.omit),
+  n.leaf = lme(n.leaf ~ beta + chi  + soil.no3n + wn3_perc + photo + n.fixer,
+               random = ~ 1 | NCRS.code, 
+               data = df, na.action = na.omit),
   
   ## Chi model
   chi = lme(chi ~ vpd4 + tavg4 + wn3_perc + photo, random = ~ 1 | NCRS.code,
             data = df, na.action = na.omit),
   
   ## Beta model
-  beta = lme(beta ~ soil.no3n + wn3_perc + chi + n.fixer,
+  beta = lme(beta ~ soil.no3n + chi + wn3_perc + n.fixer,
              random = ~ 1 | NCRS.code, data = df, 
              na.action = na.omit),
   
@@ -260,69 +260,56 @@ narea_psem <- psem(
   
   ## Temperature model
   vpd = lme(vpd4 ~ tavg4, random = ~ 1 | NCRS.code, data = df, 
-            na.action = na.omit))
-  
+            na.action = na.omit),
   ## Correlated errors (i.e. relationship is not presumed to
   ## be causally linked)
-  # beta %~~% chi,
-  # beta %~~% vpd4)
+  beta %~~% chi,
+  beta %~~% vpd4)
 
 summary(narea_psem)
 
-## Nmass PSEM model
-nmass_psem <- psem(
+## Corrected PSEM with added relationships from tests of directed separation:
+narea_psem_corrected <- psem(
   
   ## Narea model
-  nmass = lme(n.leaf ~ beta + chi + soil.no3n + wn3_perc + photo + n.fixer,
+  narea = lme(narea ~ beta + chi + soil.no3n + wn3_perc + photo + n.fixer +
+                marea + n.leaf + tavg4,
               random = ~ 1 | NCRS.code, 
               data = df, na.action = na.omit),
+  
+  ## Marea model
+  marea = lme(marea ~ beta + chi  + soil.no3n + wn3_perc + photo + n.fixer,
+              random = ~ 1 | NCRS.code, 
+              data = df, na.action = na.omit),
+  
+  ## Nmass model
+  n.leaf = lme(n.leaf ~ beta + chi + soil.no3n + wn3_perc + photo + n.fixer +
+                 marea,
+               random = ~ 1 | NCRS.code, 
+               data = df, na.action = na.omit),
   
   ## Chi model
   chi = lme(chi ~ vpd4 + tavg4 + wn3_perc + photo, random = ~ 1 | NCRS.code,
             data = df, na.action = na.omit),
   
   ## Beta model
-  beta = lme(beta ~ soil.no3n + wn3_perc + chi + n.fixer,
+  beta = lme(beta ~ soil.no3n + chi + wn3_perc + n.fixer + photo,
              random = ~ 1 | NCRS.code, data = df, 
              na.action = na.omit),
   
   ## Soil N model
-  soiln = lme(soil.no3n ~ wn3_perc, random = ~ 1 | NCRS.code, 
+  soiln = lme(soil.no3n ~ wn3_perc + tavg4, random = ~ 1 | NCRS.code, 
               data = df, na.action = na.omit),
   
   ## Temperature model
-  vpd = lme(vpd4 ~ tavg4, random = ~ 1 | NCRS.code, data = df, 
-            na.action = na.omit))
+  vpd = lme(vpd4 ~ tavg4 + wn3_perc, random = ~ 1 | NCRS.code, data = df, 
+            na.action = na.omit),
+  ## Correlated errors (i.e. relationship is not presumed to
+  ## be causally linked)
+  beta %~~% chi,
+  beta %~~% vpd4)
 
-## Correlated errors (i.e. relationship is not presumed to
-## be causally linked)
-# beta %~~% chi,
-# beta %~~% vpd4)
-
-## Nmass PSEM model
-marea_psem <- psem(
-  
-  ## Narea model
-  marea = lme(marea ~ beta + chi + soil.no3n + wn3_perc + photo + n.fixer,
-              random = ~ 1 | NCRS.code, 
-              data = df, na.action = na.omit),
-  
-  ## Chi model
-  chi = lme(chi ~ vpd4 + tavg4 + wn3_perc + photo, random = ~ 1 | NCRS.code,
-            data = df, na.action = na.omit),
-  
-  ## Beta model
-  beta = lme(beta ~ soil.no3n + wn3_perc + chi + n.fixer,
-             random = ~ 1 | NCRS.code, data = df, 
-             na.action = na.omit),
-  
-  ## Soil N model
-  soiln = lme(soil.no3n ~ wn3_perc, random = ~ 1 | NCRS.code, 
-              data = df, na.action = na.omit),
-  
-  ## Temperature model
-  vpd = lme(vpd4 ~ tavg4, random = ~ 1 | NCRS.code, data = df, 
-            na.action = na.omit))
+summary(narea_psem_corrected)
 
 ##########################################################################
 ## Tables
@@ -500,18 +487,17 @@ write.csv(table4, "../working_drafts/tables/TXeco_table4_leafN.csv",
 
 
 ## Table 5 (SEM results)
-table5.coefs <- summary(narea_psem)$coefficients[, c(1:8)] %>%
+table5.coefs <- summary(narea_psem_corrected)$coefficients[, c(1:8)] %>%
   as.data.frame() %>%
   mutate(Std.Error = ifelse(Std.Error == "-", NA, Std.Error),
          across(Estimate:Std.Estimate, as.numeric),
          across(Estimate:Std.Estimate, round, 3),
          p_val = ifelse(P.Value < 0.001, "<0.001", P.Value),
-         Std.Estimate = round(Std.Estimate, digits = 3),
-         linesize = abs(scale(Std.Estimate) + scale(Std.Estimate))*log(60)/3+3) %>%
+         Std.Estimate = round(Std.Estimate, digits = 3)) %>%
   dplyr::select(resp = Response, pred = Predictor, std_est = Std.Estimate, 
-                p_val, linesize)
+                p_val)
 
-table5 <- summary(narea_psem)$R2 %>%
+table5 <- summary(narea_psem_corrected)$R2 %>%
   dplyr::select(resp = Response, r2_marg = Marginal,
                 r2_cond = Conditional) %>%
   full_join(table5.coefs) %>%
@@ -521,49 +507,3 @@ table5 <- summary(narea_psem)$R2 %>%
 write.csv(table5, "../working_drafts/tables/TXeco_table5_SEMclean.csv", 
           row.names = FALSE)
 
-
-# Table S3: SEM results for Nmass
-tables3.coefs <- summary(nmass_psem)$coefficients[, c(1:8)] %>%
-  as.data.frame() %>%
-  mutate(Std.Error = ifelse(Std.Error == "-", NA, Std.Error),
-         across(Estimate:Std.Estimate, as.numeric),
-         z_score = Estimate / Std.Error,
-         p_val = 2*pnorm(q=z_score, lower.tail = FALSE),
-         p_val = ifelse(p_val > 1, 2-p_val, p_val),
-         across(Estimate:p_val, round, 3),
-         p_val = ifelse(p_val < 0.001, "<0.001", p_val),
-         linesize = abs(scale(z_score) + abs(scale(Std.Estimate))*log(60))/2+3) %>%
-  dplyr::select(resp = Response, pred = Predictor, std_est = Std.Estimate, 
-                z_score, p_val, linesize)
-
-tables3 <- summary(nmass_psem)$R2 %>%
-  dplyr::select(resp = Response, r2_marg = Marginal,
-                r2_cond = Conditional) %>%
-  full_join(tables3.coefs) %>%
-  dplyr::select(resp, pred, r2_marg, r2_cond, std_est:p_val)
-
-write.csv(tables3, "../working_drafts/tables/TXeco_tableS3_SEM_nmass.csv", 
-          row.names = FALSE)
-
-# Table S4: SEM results for Marea
-tables4.coefs <- summary(marea_psem)$coefficients[, c(1:8)] %>%
-  as.data.frame() %>%
-  mutate(Std.Error = ifelse(Std.Error == "-", NA, Std.Error),
-         across(Estimate:Std.Estimate, as.numeric),
-         z_score = Estimate / Std.Error,
-         p_val = 2*pnorm(q=z_score, lower.tail = FALSE),
-         p_val = ifelse(p_val > 1, 2-p_val, p_val),
-         across(Estimate:p_val, round, 3),
-         p_val = ifelse(p_val < 0.001, "<0.001", p_val),
-         linesize = abs(scale(z_score) + abs(scale(Std.Estimate))*log(60))/2+3) %>%
-  dplyr::select(resp = Response, pred = Predictor, std_est = Std.Estimate, 
-                z_score, p_val, linesize)
-
-tables4 <- summary(marea_psem)$R2 %>%
-  dplyr::select(resp = Response, r2_marg = Marginal,
-                r2_cond = Conditional) %>%
-  full_join(tables4.coefs) %>%
-  dplyr::select(resp, pred, r2_marg, r2_cond, std_est:p_val)
-
-write.csv(tables4, "../working_drafts/tables/TXeco_tableS4_SEM_marea.csv", 
-          row.names = FALSE)
