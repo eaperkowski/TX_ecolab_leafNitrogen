@@ -27,7 +27,8 @@ df <- read.csv("../data_sheets/TXeco_compiled_datasheet.csv",
                              ifelse(pft == "legume", 
                                     "c3_legume", 
                                     NA))),
-         chi = ifelse(chi > 0.95 | chi < 0.20, NA, chi))
+         chi = ifelse(chi > 0.95 | chi < 0.20, NA, chi),
+         marea = ifelse(marea > 1000, NA, marea))
 
 ## Add colorblind friendly palette
 cbbPalette <- c("#0077BB", "#33BBEE", "#009988", "#EE7733", "#CC3311")
@@ -46,13 +47,10 @@ df$vpd4 <- df$vpd4 / 10
 ##########################################################################
 ## Beta
 ##########################################################################
-df.beta <- df
-
-df.beta$beta[c(84, 117)] <- NA
-
+df$beta[c(84, 117)] <- NA
 
 beta <- lmer(log(beta) ~ wn3_perc * soil.no3n * pft + (1 | NCRS.code), 
-             data = df.beta)
+             data = df)
 
 # Check model assumptions
 plot(beta)
@@ -79,18 +77,16 @@ emmeans(beta, pairwise~pft)
 ##########################################################################
 ## Chi
 ##########################################################################
-df.chi <- df
-
-df.chi$chi[c(117, 322, 481)] <- NA
-df.chi$chi[c(62, 315)] <- NA
-df.chi$chi[c(456)] <- NA
-df.chi$chi[c(317, 483)] <- NA
-df.chi$chi[c(292, 484)] <- NA
-df.chi$chi[284] <- NA
-df.chi$chi[484] <- NA
+df$chi[c(117, 322, 481)] <- NA
+df$chi[c(62, 315)] <- NA
+df$chi[c(456)] <- NA
+df$chi[c(317, 483)] <- NA
+df$chi[c(292, 484)] <- NA
+df$chi[284] <- NA
+df$chi[484] <- NA
 
 chi <- lmer(chi ~ (vpd4 + tavg4 + (wn3_perc * soil.no3n)) * pft + 
-              (1 | NCRS.code), data = df.chi)
+              (1 | NCRS.code), data = df)
 
 # Check model assumptions
 plot(chi)
@@ -118,14 +114,12 @@ test(emtrends(chi, ~1, "wn3_perc"))
 ##########################################################################
 ## Nmass
 ##########################################################################
-df.nmass <- df
-
-df.nmass$n.leaf[c(509)] <- NA
+df$n.leaf[c(509)] <- NA
 
 
 # Fit model
 nmass <- lmer(log(n.leaf) ~ (beta + chi + (soil.no3n * wn3_perc)) * pft + (1 | NCRS.code),
-              data = df.nmass)
+              data = df)
 
 # Check model assumptions
 plot(nmass)
@@ -154,14 +148,12 @@ emmeans(nmass, pairwise~pft)
 ##########################################################################
 ## Marea
 ##########################################################################
-df.marea <- df
-
-df.marea$marea[df.marea$marea > 1000] <- NA
-df.marea$marea[c(20, 21)] <- NA
+df$marea[df$marea > 1000] <- NA
+df$marea[c(20, 21)] <- NA
 
 # Fit model
 marea <- lmer(log(marea) ~ (beta + chi + (soil.no3n * wn3_perc)) * pft + (1 | NCRS.code),
-              data = df.marea)
+              data = df)
 
 # Check model assumptions
 plot(marea)
@@ -181,20 +173,18 @@ test(emtrends(marea, ~1, "beta"))
 test(emtrends(marea, ~pft, "beta"))
 
 test(emtrends(marea, ~wn3_perc, "soil.no3n",
-              at = list(wn3_perc = seq(0,1,0.25))))
+              at = list(wn3_perc = seq(0,1,0.05))))
 test(emtrends(marea, ~pft, "soil.no3n"))
 
 ##########################################################################
 ## Narea
 ##########################################################################
-df.narea <- df
-
-df.narea$narea[df.narea$narea > 10] <- NA
-df.narea$narea[509] <- NA
+df$narea[df$narea > 10] <- NA
+df$narea[509] <- NA
 
 # Fit model
 narea <- lmer(log(narea) ~ (beta + chi + (soil.no3n * wn3_perc)) * pft + (1 | NCRS.code),
-                   data = df.narea)
+                   data = df)
 
 # Check model assumptions
 plot(narea)
@@ -260,11 +250,7 @@ narea_psem <- psem(
   
   ## Temperature model
   vpd = lme(vpd4 ~ tavg4, random = ~ 1 | NCRS.code, data = df, 
-            na.action = na.omit),
-  ## Correlated errors (i.e. relationship is not presumed to
-  ## be causally linked)
-  beta %~~% chi,
-  beta %~~% vpd4)
+            na.action = na.omit))
 
 summary(narea_psem)
 
@@ -272,19 +258,18 @@ summary(narea_psem)
 narea_psem_corrected <- psem(
   
   ## Narea model
-  narea = lme(narea ~ beta + chi + soil.no3n + wn3_perc + photo + n.fixer +
-                marea + n.leaf + tavg4,
+  narea = lme(narea ~ beta + chi + soil.no3n + wn3_perc + tavg4 + marea +
+                n.leaf + photo + n.fixer,
               random = ~ 1 | NCRS.code, 
               data = df, na.action = na.omit),
   
   ## Marea model
-  marea = lme(marea ~ beta + chi  + soil.no3n + wn3_perc + photo + n.fixer,
+  marea = lme(marea ~ beta + chi + soil.no3n + wn3_perc + photo + n.fixer,
               random = ~ 1 | NCRS.code, 
               data = df, na.action = na.omit),
   
   ## Nmass model
-  n.leaf = lme(n.leaf ~ beta + chi + soil.no3n + wn3_perc + photo + n.fixer +
-                 marea,
+  n.leaf = lme(n.leaf ~ beta + chi + soil.no3n + wn3_perc + marea + photo + n.fixer,
                random = ~ 1 | NCRS.code, 
                data = df, na.action = na.omit),
   
@@ -293,7 +278,7 @@ narea_psem_corrected <- psem(
             data = df, na.action = na.omit),
   
   ## Beta model
-  beta = lme(beta ~ soil.no3n + chi + wn3_perc + n.fixer + photo,
+  beta = lme(beta ~ chi + soil.no3n + wn3_perc + n.fixer + photo,
              random = ~ 1 | NCRS.code, data = df, 
              na.action = na.omit),
   
@@ -303,13 +288,10 @@ narea_psem_corrected <- psem(
   
   ## Temperature model
   vpd = lme(vpd4 ~ tavg4 + wn3_perc, random = ~ 1 | NCRS.code, data = df, 
-            na.action = na.omit),
-  ## Correlated errors (i.e. relationship is not presumed to
-  ## be causally linked)
-  beta %~~% chi,
-  beta %~~% vpd4)
+            na.action = na.omit))
 
 summary(narea_psem_corrected)
+
 
 ##########################################################################
 ## Tables
