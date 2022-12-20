@@ -250,7 +250,10 @@ narea_psem <- psem(
   
   ## Temperature model
   vpd = lme(vpd4 ~ tavg4, random = ~ 1 | NCRS.code, data = df, 
-            na.action = na.omit))
+            na.action = na.omit),
+  
+  ## Correlated errors
+  vpd4 %~~% wn3_perc)
 
 summary(narea_psem)
 
@@ -287,8 +290,11 @@ narea_psem_corrected <- psem(
               data = df, na.action = na.omit),
   
   ## Temperature model
-  vpd = lme(vpd4 ~ tavg4 + wn3_perc, random = ~ 1 | NCRS.code, data = df, 
-            na.action = na.omit))
+  vpd = lme(vpd4 ~ tavg4, random = ~ 1 | NCRS.code, data = df, 
+            na.action = na.omit),
+  
+  ## Correlated errors
+  vpd4 %~~% wn3_perc)
 
 summary(narea_psem_corrected)
 
