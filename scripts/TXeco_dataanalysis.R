@@ -250,10 +250,7 @@ narea_psem <- psem(
   
   ## Temperature model
   vpd = lme(vpd4 ~ tavg4, random = ~ 1 | NCRS.code, data = df, 
-            na.action = na.omit),
-  
-  ## Correlated errors
-  vpd4 %~~% wn3_perc)
+            na.action = na.omit))
 
 summary(narea_psem)
 
@@ -261,7 +258,7 @@ summary(narea_psem)
 narea_psem_corrected <- psem(
   
   ## Narea model
-  narea = lme(narea ~ beta + chi + soil.no3n + wn3_perc + tavg4 + marea +
+  narea = lme(narea ~ beta + chi + soil.no3n + wn3_perc + marea +
                 n.leaf + photo + n.fixer,
               random = ~ 1 | NCRS.code, 
               data = df, na.action = na.omit),
@@ -290,11 +287,8 @@ narea_psem_corrected <- psem(
               data = df, na.action = na.omit),
   
   ## Temperature model
-  vpd = lme(vpd4 ~ tavg4, random = ~ 1 | NCRS.code, data = df, 
-            na.action = na.omit),
-  
-  ## Correlated errors
-  vpd4 %~~% wn3_perc)
+  vpd = lme(vpd4 ~ tavg4 + wn3_perc, random = ~ 1 | NCRS.code, data = df, 
+            na.action = na.omit))
 
 summary(narea_psem_corrected)
 
@@ -495,3 +489,21 @@ table5 <- summary(narea_psem_corrected)$R2 %>%
 write.csv(table5, "../working_drafts/tables/TXeco_table5_SEMclean.csv", 
           row.names = FALSE)
 
+
+
+###############################
+# Indirect SEM path coefs
+###############################
+sm.vpd = summary(narea_psem_corrected)$coefficients$Std.Estimate[[34]]
+vpd.cica = summary(narea_psem_corrected)$coefficients$Std.Estimate[[22]]
+cica.beta = summary(narea_psem_corrected)$coefficients$Std.Estimate[[26]]
+beta.narea = summary(narea_psem_corrected)$coefficients$Std.Estimate[[1]]
+sm.no3n = summary(narea_psem_corrected)$coefficients$Std.Estimate[[31]]
+no3n.beta = summary(narea_psem_corrected)$coefficients$Std.Estimate[[27]]
+
+## Soil moisture -> soil NO3-N pathway
+sm.no3n * no3n.beta * beta.narea
+
+
+## Soil moisture -> vpd pathway
+sm.vpd * vpd.cica * cica.beta * beta.narea
