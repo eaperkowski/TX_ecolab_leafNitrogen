@@ -500,10 +500,37 @@ cica.beta = summary(narea_psem_corrected)$coefficients$Std.Estimate[[26]]
 beta.narea = summary(narea_psem_corrected)$coefficients$Std.Estimate[[1]]
 sm.no3n = summary(narea_psem_corrected)$coefficients$Std.Estimate[[31]]
 no3n.beta = summary(narea_psem_corrected)$coefficients$Std.Estimate[[27]]
+temp.no3n = summary(narea_psem_corrected)$coefficients$Std.Estimate[[32]]
+temp.vpd = summary(narea_psem_corrected)$coefficients$Std.Estimate[[33]]
+
 
 ## Soil moisture -> soil NO3-N pathway
 sm.no3n * no3n.beta * beta.narea
 
-
 ## Soil moisture -> vpd pathway
 sm.vpd * vpd.cica * cica.beta * beta.narea
+
+## Temp -> vpd pathway
+temp.vpd * vpd.cica * cica.beta * beta.narea
+
+## Temp -> no3n pathway
+temp.no3n * no3n.beta * beta.narea
+
+## Mean and standard deviation of beta
+min(subset(df, pft != "c4_nonlegume")$beta, na.rm = TRUE)
+max(subset(df, pft != "c4_nonlegume")$beta, na.rm = TRUE)
+median(subset(df, pft != "c4_nonlegume")$beta, na.rm = TRUE)
+mean(subset(df, pft != "c4_nonlegume")$beta, na.rm = TRUE)
+sd(subset(df, pft != "c4_nonlegume")$beta, na.rm = TRUE)
+
+min(subset(df, pft == "c4_nonlegume")$beta, na.rm = TRUE)
+max(subset(df, pft == "c4_nonlegume")$beta, na.rm = TRUE)
+median(subset(df, pft == "c4_nonlegume")$beta, na.rm = TRUE)
+mean(subset(df, pft == "c4_nonlegume")$beta, na.rm = TRUE)
+sd(subset(df, pft == "c4_nonlegume")$beta, na.rm = TRUE)
+
+
+
+
+
+
