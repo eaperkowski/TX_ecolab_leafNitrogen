@@ -82,7 +82,7 @@ df$chi[c(62, 315)] <- NA
 df$chi[c(456, 483)] <- NA
 df$chi[c(484)] <- NA
 
-chi <- lmer(chi ~ (vpd4  + (wn3_perc * soil.no3n)) * pft + 
+chi <- lmer(chi ~ (vpd4 + (wn3_perc * soil.no3n)) * pft + 
               (1 | NCRS.code), data = df)
 
 # Check model assumptions
@@ -99,9 +99,8 @@ Anova(chi)
 r.squaredGLMM(chi)
 
 ## Post-hoc comparisons 
-test(emtrends(chi, pairwise~pft, "wn3_perc"))
-test(emtrends(chi, pairwise~pft, "tavg4"))
 test(emtrends(chi, pairwise~pft, "vpd4"))
+test(emtrends(chi, pairwise~pft, "wn3_perc"))
 emmeans(chi, pairwise~pft)
 
 test(emtrends(chi, ~1, "vpd4"))
@@ -133,12 +132,14 @@ Anova(nmass)
 r.squaredGLMM(nmass)
 
 # Post hoc tests
-test(emtrends(nmass, ~pft, "beta"))
+test(emtrends(nmass, ~pft, "chi"))
+test(emtrends(nmass, ~wn3_perc, "soil.no3n",
+              at = list(wn3_perc = seq(0,1,0.05))))
 
 
 test(emtrends(nmass, ~1, "soil.no3n"))
 test(emtrends(nmass, ~1, "wn3_perc"))
-test(emtrends(nmass, ~wn3_perc, "soil.no3n", at = list(wn3_perc = seq(0, 1, 0.25))))
+
 
 emmeans(nmass, pairwise~pft)
 
@@ -149,7 +150,7 @@ df$marea[df$marea > 1000] <- NA
 df$marea[c(20, 21)] <- NA
 
 # Fit model
-marea <- lmer(log(marea) ~ (beta + chi + (soil.no3n * wn3_perc)) * pft + (1 | NCRS.code),
+marea <- lmer(log(marea) ~ (chi + (soil.no3n * wn3_perc)) * pft + (1 | NCRS.code),
               data = df)
 
 # Check model assumptions
@@ -166,12 +167,14 @@ round(summary(marea)$coefficients, digits = 3)
 Anova(marea)
 r.squaredGLMM(marea)
 
-test(emtrends(marea, ~1, "beta"))
-test(emtrends(marea, ~pft, "beta"))
+# Post-hoc comparisons
+test(emtrends(marea, ~1, "chi"))
+test(emtrends(marea, pairwise~pft, "chi"))
 
 test(emtrends(marea, ~wn3_perc, "soil.no3n",
               at = list(wn3_perc = seq(0,1,0.05))))
-test(emtrends(marea, ~pft, "soil.no3n"))
+test(emtrends(marea, ~1, "wn3_perc"))
+test(emtrends(marea, pairwise~pft, "soil.no3n"))
 
 ##########################################################################
 ## Narea
@@ -198,8 +201,8 @@ Anova(narea)
 r.squaredGLMM(narea)
 
 ## Post hoc comparisons
-test(emtrends(narea, ~1, "beta"))
-test(emtrends(narea, pairwise~pft, "beta"))
+test(emtrends(narea, pairwise~pft, "chi"))
+test(emtrends(narea, ~1, "soil.no3n"))
 
 test(emtrends(narea, 
               ~wn3_perc, "soil.no3n", 
@@ -217,33 +220,37 @@ df$photo <- ifelse(df$photo == "c3", 1, 0)
 narea_psem <- psem(
   
   ## Narea model
-  narea = lme(narea ~ chi + soil.no3n + wn3_perc + photo + n.fixer +
-                marea + n.leaf,
+  narea = lme(narea ~ chi + soil.no3n + wn3_perc + marea + n.leaf + photo + n.fixer,
               random = ~ 1 | NCRS.code, 
               data = df, na.action = na.omit),
   
   ## Marea model
-  marea = lme(marea ~ beta + chi + soil.no3n + wn3_perc + photo + n.fixer,
+  marea = lme(marea ~ chi + soil.no3n + wn3_perc + photo + n.fixer,
               random = ~ 1 | NCRS.code, 
               data = df, na.action = na.omit),
   
   ## Nmass model
-  n.leaf = lme(n.leaf ~ beta + chi + soil.no3n + wn3_perc + photo + n.fixer,
+  n.leaf = lme(n.leaf ~ chi + soil.no3n + wn3_perc + photo + n.fixer,
                random = ~ 1 | NCRS.code, 
                data = df, na.action = na.omit),
   
   ## Chi model
-  chi = lme(chi ~ beta + vpd4 + wn3_perc + photo, random = ~ 1 | NCRS.code,
+  chi = lme(chi ~ beta + vpd4, 
+            random = ~ 1 | NCRS.code,
             data = df, na.action = na.omit),
   
   ## Beta model
-  beta = lme(beta ~ soil.no3n + wn3_perc + n.fixer,
+  beta = lme(beta ~ soil.no3n + wn3_perc + photo + n.fixer,
              random = ~ 1 | NCRS.code, data = df, 
              na.action = na.omit),
   
   ## Soil N model
   soiln = lme(soil.no3n ~ wn3_perc, random = ~ 1 | NCRS.code, 
-              data = df, na.action = na.omit))
+                            data = df, na.action = na.omit),
+  
+  ## VPD soil moisture
+  vpd4 = lme(vpd4 ~ wn3_perc, random = ~ 1 | NCRS.code, 
+           data = df, na.action = na.omit))
 
 summary(narea_psem)
 
@@ -251,28 +258,27 @@ summary(narea_psem)
 narea_psem_corrected <- psem(
   
   ## Narea model
-  narea = lme(narea ~ chi + soil.no3n + wn3_perc + photo + n.fixer +
-                marea + n.leaf,
+  narea = lme(narea ~ chi + soil.no3n + wn3_perc + marea + n.leaf + n.fixer + photo,
               random = ~ 1 | NCRS.code, 
               data = df, na.action = na.omit),
   
   ## Marea model
-  marea = lme(marea ~ beta + chi + soil.no3n + wn3_perc +
-                n.leaf + photo + n.fixer,
+  marea = lme(marea ~ chi + soil.no3n + wn3_perc + photo + n.fixer,
               random = ~ 1 | NCRS.code, 
               data = df, na.action = na.omit),
   
   ## Nmass model
-  n.leaf = lme(n.leaf ~ beta + chi + soil.no3n + wn3_perc + photo + n.fixer,
+  n.leaf = lme(n.leaf ~ chi + soil.no3n + wn3_perc + marea + photo + n.fixer,
                random = ~ 1 | NCRS.code, 
                data = df, na.action = na.omit),
   
   ## Chi model
-  chi = lme(chi ~ beta + vpd4 + soil.no3n + wn3_perc + photo, random = ~ 1 | NCRS.code,
+  chi = lme(chi ~ beta + vpd4 + wn3_perc + soil.no3n + photo, 
+            random = ~ 1 | NCRS.code,
             data = df, na.action = na.omit),
   
   ## Beta model
-  beta = lme(beta ~ soil.no3n + wn3_perc + n.fixer + photo,
+  beta = lme(beta ~ soil.no3n + wn3_perc + photo + n.fixer,
              random = ~ 1 | NCRS.code, data = df, 
              na.action = na.omit),
   
@@ -280,13 +286,8 @@ narea_psem_corrected <- psem(
   soiln = lme(soil.no3n ~ wn3_perc, random = ~ 1 | NCRS.code, 
               data = df, na.action = na.omit),
   
-  # vpd4 = lme(vpd4 ~ wn3_perc, random = ~ 1 | NCRS.code, 
-  #            data = df, na.action = na.omit),
-  
-  ## Correlated errors
-  chi %~~% beta,
-  vpd4 %~~% beta,
-  vpd4 %~~% wn3_perc)
+  vpd4 = lme(vpd4 ~ wn3_perc, random = ~ 1 | NCRS.code, data = df, 
+             na.action = na.omit))
 
 summary(narea_psem_corrected)
 
