@@ -106,15 +106,17 @@ full.df <- leaf %>%
   summarize_if(is.numeric, mean, na.rm = TRUE) %>%
   filter(pft != "c3_tree") %>%
   dplyr::mutate(chi = ifelse(pft == "c4_graminoid", 
-                             calc_chi_c4(d13C),
-                             calc_chi_c3(d13C))) %>%
+                             abs(calc_chi_c4(d13C, year = sampling.year)[2]),
+                             calc_chi_c3(d13C, year = sampling.year)[2])) %>%
   full_join(soilgrids) %>%
   mutate(across(wn1:wn90, list(perc =~./ whc)))
+
 
 ## Add chi column
 full.df$chi[full.df$chi < 0.2 | full.df$chi > 0.95] <- NA
 full.df$beta <- calc_beta(chi = full.df$chi, temp = full.df$tavg7, 
                           vpd = full.df$vpd7 * 10, z = full.df$elevation.m)
+full.df$beta[full.df$beta > 400] <- NA
 hist(full.df$beta)
 ## Write csv
 write.csv(full.df, "../data_sheets/TXeco_compiled_datasheet.csv", row.names = FALSE)

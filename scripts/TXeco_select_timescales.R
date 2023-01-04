@@ -89,68 +89,6 @@ aicc.results.wn <- wn30.modelSelect %>%
 
 plot(aicc.results.wn$aicc.wn)
 
-###############################################################################
-# Iterative models for mean air temperature and chi
-###############################################################################
-temp90 <- lmer(chi ~ tavg90 + (1 | NCRS.code), data = df)
-temp60 <- lmer(chi ~ tavg60 + (1 | NCRS.code), data = df)
-temp30 <- lmer(chi ~ tavg30 + (1 | NCRS.code), data = df)
-temp20 <- lmer(chi ~ tavg20 + (1 | NCRS.code), data = df)
-temp15 <- lmer(chi ~ tavg15 + (1 | NCRS.code), data = df)
-temp10 <- lmer(chi ~ tavg10 + (1 | NCRS.code), data = df)
-temp9 <- lmer(chi ~ tavg9 + (1 | NCRS.code), data = df)
-temp8 <- lmer(chi ~ tavg8 + (1 | NCRS.code), data = df)
-temp7 <- lmer(chi ~ tavg7 + (1 | NCRS.code), data = df)
-temp6 <- lmer(chi ~ tavg6 + (1 | NCRS.code), data = df)
-temp5 <- lmer(chi ~ tavg5 + (1 | NCRS.code), data = df)
-temp4 <- lmer(chi ~ tavg4 + (1 | NCRS.code), data = df)
-temp3 <- lmer(chi ~ tavg3 + (1 | NCRS.code), data = df)
-temp2 <- lmer(chi ~ tavg2 + (1 | NCRS.code), data = df)
-temp1 <- lmer(chi ~ tavg1 + (1 | NCRS.code), data = df)
-
-# Model selection across timescales
-temp90.modelSelect <- data.frame(day = 90, var = "temp", AICc = AICc(temp90), 
-                                 RMSE = RMSE.merMod(temp90), r.squaredGLMM(temp90))
-temp60.modelSelect <- data.frame(day = 60, var = "temp", AICc = AICc(temp60), 
-                                 RMSE = RMSE.merMod(temp60), r.squaredGLMM(temp60))
-temp30.modelSelect <- data.frame(day = 30, var = "temp", AICc = AICc(temp30), 
-                                 RMSE = RMSE.merMod(temp30), r.squaredGLMM(temp30))
-temp20.modelSelect <- data.frame(day = 20, var = "temp", AICc = AICc(temp20), 
-                                 RMSE = RMSE.merMod(temp20), r.squaredGLMM(temp20))
-temp15.modelSelect <- data.frame(day = 15, var = "temp", AICc = AICc(temp15), 
-                                 RMSE = RMSE.merMod(temp15), r.squaredGLMM(temp15))
-temp10.modelSelect <- data.frame(day = 10, var = "temp", AICc = AICc(temp10), 
-                                 RMSE = RMSE.merMod(temp10), r.squaredGLMM(temp10))
-temp9.modelSelect <- data.frame(day = 9, var = "temp", AICc = AICc(temp9), 
-                                RMSE = RMSE.merMod(temp9), r.squaredGLMM(temp9))
-temp8.modelSelect <- data.frame(day = 8, var = "temp", AICc = AICc(temp8), 
-                                RMSE = RMSE.merMod(temp8), r.squaredGLMM(temp8))
-temp7.modelSelect <- data.frame(day = 7, var = "temp", AICc = AICc(temp7), 
-                                RMSE = RMSE.merMod(temp7), r.squaredGLMM(temp7))
-temp6.modelSelect <- data.frame(day = 6, var = "temp", AICc = AICc(temp6), 
-                                RMSE = RMSE.merMod(temp6), r.squaredGLMM(temp6))
-temp5.modelSelect <- data.frame(day = 5, var = "temp", AICc = AICc(temp5), 
-                                RMSE = RMSE.merMod(temp5), r.squaredGLMM(temp5))
-temp4.modelSelect <- data.frame(day = 4, var = "temp", AICc = AICc(temp4), 
-                                RMSE = RMSE.merMod(temp4), r.squaredGLMM(temp4))
-temp3.modelSelect <- data.frame(day = 3, var = "temp", AICc = AICc(temp3), 
-                                RMSE = RMSE.merMod(temp3), r.squaredGLMM(temp3))
-temp2.modelSelect <- data.frame(day = 2, var = "temp", AICc = AICc(temp2), 
-                                RMSE = RMSE.merMod(temp2), r.squaredGLMM(temp2))
-temp1.modelSelect <- data.frame(day = 1, var = "temp", AICc = AICc(temp1), 
-                                RMSE = RMSE.merMod(temp1), r.squaredGLMM(temp1))
-
-aicc.results.temp <- temp30.modelSelect %>%
-  full_join(temp90.modelSelect) %>% full_join(temp60.modelSelect) %>%
-  full_join(temp20.modelSelect) %>% full_join(temp15.modelSelect) %>% 
-  full_join(temp10.modelSelect) %>% full_join(temp9.modelSelect) %>% 
-  full_join(temp8.modelSelect) %>% full_join(temp7.modelSelect) %>%
-  full_join(temp6.modelSelect) %>% full_join(temp5.modelSelect) %>% 
-  full_join(temp4.modelSelect) %>% full_join(temp3.modelSelect) %>% 
-  full_join(temp2.modelSelect) %>% full_join(temp1.modelSelect) %>%
-  arrange(day) %>%
-  dplyr::select(day, aicc.temp = AICc, rmse.temp = RMSE)
-## 4-day temperature is best model
 
 ###############################################################################
 # Iterative models for mean VPD and chi
@@ -220,12 +158,9 @@ aicc.results.vpd <- vpd30.modelSelect %>%
 # Merge model selection results
 ###############################################################################
 aicc.results <- aicc.results.wn %>%
-  full_join(aicc.results.temp) %>%
   full_join(aicc.results.vpd) %>%
   mutate(aicc.wn = round(aicc.wn, digits = 2),
          rmse.wn = round(rmse.wn, digits = 4),
-         aicc.temp = round(aicc.temp, digits = 2),
-         rmse.temp = round(rmse.temp, digits = 4),
          aicc.vpd = round(aicc.vpd, digits = 2),
          rmse.vpd = round(rmse.vpd, digits = 4))
 
@@ -238,25 +173,13 @@ write.csv(aicc.results,
 ###############################################################################
 wn.beta <- ggplot(data = aicc.results, aes(x = day, y = aicc.wn)) +
   geom_point() +
-  geom_point(data = subset(aicc.results, day == 3), 
+  geom_point(data = subset(aicc.results, day == 2), 
              fill = "red", size = 3, shape = 21) +
   geom_line() +
   scale_x_continuous(limits = c(0, 90), breaks = seq(0, 90, 30)) +
-  scale_y_continuous(limits = c(1270, 1290), breaks = seq(1270, 1290, 5)) +
+  scale_y_continuous(limits = c(1227, 1232), breaks = seq(1227, 1232, 1)) +
   labs(x = NULL, y = expression(bold("AIC"["c"])),
        title = expression("Soil moisture (% WHC)")) +
-  theme_bw(base_size = 18) +
-  theme(panel.grid.minor = element_blank())
-
-temp.chi <- ggplot(data = aicc.results, aes(x = day, y = aicc.temp)) +
-  geom_point() +
-  geom_point(data = subset(aicc.results, day == 4), 
-             fill = "red", size = 2, shape = 21) +
-  geom_line() +
-  scale_x_continuous(limits = c(0, 90), breaks = seq(0, 90, 30)) +
-  scale_y_continuous(limits = c(-877, -865), breaks = seq(-877, -865, 3)) +
-  labs(x = expression(bold("Days before site visit")), y = NULL,
-       title = expression("Air temperature ("*degree*"C)")) +
   theme_bw(base_size = 18) +
   theme(panel.grid.minor = element_blank())
 
@@ -266,13 +189,13 @@ vpd.chi <- ggplot(data = aicc.results, aes(x = day, y = aicc.vpd)) +
              fill = "red", size = 2, shape = 21) +
   geom_line() +
   scale_x_continuous(limits = c(0, 90), breaks = seq(0, 90, 30)) +
-  scale_y_continuous(limits = c(-880, -860), breaks = seq(-880, -860, 5)) +
+  scale_y_continuous(limits = c(-885, -860), breaks = seq(-885, -860, 5)) +
   labs(x = NULL, y = NULL,
        title = "VPD (kPa)") +
   theme_bw(base_size = 18) +
   theme(panel.grid.minor = element_blank())
 
 png(filename = "../working_drafts/figs/TXeco_figS2_aicc_results.png",
-    width = 12.5, height = 4, units = 'in', res = 600)
-ggarrange(wn.beta, temp.chi, vpd.chi, ncol = 3, align = "hv")
+    width = 8, height = 4, units = 'in', res = 600)
+ggarrange(wn.beta, vpd.chi, ncol = 3, align = "hv")
 dev.off()
