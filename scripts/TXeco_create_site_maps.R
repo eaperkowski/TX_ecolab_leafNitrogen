@@ -57,21 +57,21 @@ iridescent.reverse <- c("#000000", "#46353A", "#684957", "#805770",
 
 ## Workaround to not having PRISM 1991-2020 climate norms (download monthly
 ## and then calculate mean across years)
-#get_prism_monthlys(type = "tmean", years = 1991:2020, mon = 1:12, keepZip = FALSE)
-# get_prism_monthlys(type = "ppt", years = 1991:2020, mon = 1:12, keepZip = FALSE)
-# get_prism_monthlys(type = "tmin", years = 1991:2020, mon = 1:12, keepZip = FALSE)
-# get_prism_monthlys(type = "tmax", years = 1991:2020, mon = 1:12, keepZip = FALSE)
-# get_prism_monthlys(type = "tdmean", years = 1991:2020, mon = 1:12, keepZip = FALSE)
-# get_prism_monthlys(type = "vpdmin", years = 1991:2020, mon = 1:12, keepZip = FALSE)
-# get_prism_monthlys(type = "vpdmax", years = 1991:2020, mon = 1:12, keepZip = FALSE)
-# 
-# get_prism_normals(type = "tmean", "4km", annual = TRUE, keepZip = FALSE)
-# get_prism_normals(type = "ppt", "4km", annual = TRUE, keepZip = FALSE)
-# get_prism_normals(type = "tmin", "4km", annual = TRUE, keepZip = FALSE)
-# get_prism_normals(type = "tmax", "4km", annual = TRUE, keepZip = FALSE)
-# get_prism_normals(type = "tdmean", "4km", annual = TRUE, keepZip = FALSE)
-# get_prism_normals(type = "vpdmin", "4km", annual = TRUE, keepZip = FALSE)
-# get_prism_normals(type = "vpdmax", "4km", annual = TRUE, keepZip = FALSE)
+get_prism_monthlys(type = "tmean", years = 2006:2020, mon = 1:12, keepZip = FALSE)
+get_prism_monthlys(type = "ppt", years = 2006:2020, mon = 1:12, keepZip = FALSE)
+get_prism_monthlys(type = "tmin", years = 2006:2020, mon = 1:12, keepZip = FALSE)
+get_prism_monthlys(type = "tmax", years = 2006:2020, mon = 1:12, keepZip = FALSE)
+get_prism_monthlys(type = "tdmean", years = 2006:2020, mon = 1:12, keepZip = FALSE)
+get_prism_monthlys(type = "vpdmin", years = 2006:2020, mon = 1:12, keepZip = FALSE)
+get_prism_monthlys(type = "vpdmax", years = 2006:2020, mon = 1:12, keepZip = FALSE)
+
+get_prism_normals(type = "tmean", "4km", annual = TRUE, keepZip = FALSE)
+get_prism_normals(type = "ppt", "4km", annual = TRUE, keepZip = FALSE)
+get_prism_normals(type = "tmin", "4km", annual = TRUE, keepZip = FALSE)
+get_prism_normals(type = "tmax", "4km", annual = TRUE, keepZip = FALSE)
+get_prism_normals(type = "tdmean", "4km", annual = TRUE, keepZip = FALSE)
+get_prism_normals(type = "vpdmin", "4km", annual = TRUE, keepZip = FALSE)
+get_prism_normals(type = "vpdmax", "4km", annual = TRUE, keepZip = FALSE)
 
 ###############################################################################
 ## Create US shapefile to mask rasters to only Texas
@@ -97,7 +97,7 @@ precip.masked.df <- as.data.frame(rasterToPoints(precip.masked))
 ## precip. Then, in a step, calculate 2006-2020 mean annual precipitation 
 ## of all grid cells 
 precip.masked.df_cleaned <- precip.masked.df %>%
-  tidyr::pivot_longer(cols = PRISM_ppt_stable_4kmM3_199101_bil:PRISM_ppt_stable_4kmM3_202012_bil,
+  tidyr::pivot_longer(cols = PRISM_ppt_stable_4kmM3_200601_bil:PRISM_ppt_stable_4kmM3_202012_bil,
                       names_prefix = "PRISM_ppt_stable_4kmM3_",
                       values_to = "monthly.prcp",
                       names_to = "month") %>%
@@ -112,7 +112,7 @@ precip.masked.df_cleaned <- precip.masked.df %>%
   summarize(map = mean(annual.prcp, na.rm = TRUE))
 
 min(precip.masked.df_cleaned$map)
-
+max(precip.masked.df_cleaned$map)
 
 ## Extract monthly precipitation data from grid cell containing each site.
 ## Note that grid cell is on 4km resolution
@@ -127,7 +127,7 @@ df.sites.precip$site = ecosites$property
 ## precip. Then, in a step, calculate 2006-2020 mean annual precipitation 
 ## of all grid cells 
 df.sites.precip_cleaned <- df.sites.precip %>%
-  tidyr::pivot_longer(cols = PRISM_ppt_stable_4kmM3_199101_bil:PRISM_ppt_stable_4kmM3_202012_bil,
+  tidyr::pivot_longer(cols = PRISM_ppt_stable_4kmM3_200601_bil:PRISM_ppt_stable_4kmM3_202012_bil,
                names_prefix = "PRISM_ppt_stable_4kmM3_",
                values_to = "monthly.prcp",
                names_to = "month") %>%
@@ -151,7 +151,7 @@ temp.masked.df <- as.data.frame(rasterToPoints(temp.masked))
 ## precip. Then, in a step, calculate 2006-2020 mean annual precipitation 
 ## of all grid cells 
 temp.masked.df_cleaned <- temp.masked.df %>%
-  tidyr::pivot_longer(cols = PRISM_tmean_stable_4kmM3_199101_bil:PRISM_tmean_stable_4kmM3_202012_bil,
+  tidyr::pivot_longer(cols = PRISM_tmean_stable_4kmM3_200601_bil:PRISM_tmean_stable_4kmM3_202012_bil,
                       names_prefix = "PRISM_tmean_stable_4kmM3_",
                       values_to = "monthly.mean.temp",
                       names_to = "month") %>%
@@ -165,7 +165,9 @@ temp.masked_20062020_mat <- temp.masked.df_cleaned %>%
   group_by(x, y, year) %>%
   summarize(annual.mean.temp = mean(monthly.mean.temp, na.rm = TRUE)) %>%
   ungroup(year) %>%
-  summarize(mat = mean(annual.mean.temp, na.rm = TRUE))
+  summarize(mat = mean(annual.mean.temp, na.rm = TRUE)) %>%
+  mutate(x = round(x, digits = 4),
+         y = round(y, digits = 5))
 
 max(temp.masked_20062020_mat$mat)
 min(temp.masked_20062020_mat$mat)
@@ -183,7 +185,7 @@ df.sites.temp$site = ecosites$property
 ## precip. Then, in a step, calculate 2006-2020 mean annual precipitation 
 ## of all grid cells 
 df.sites.temp_cleaned <- df.sites.temp %>%
-  tidyr::pivot_longer(cols = PRISM_tmean_stable_4kmM3_199101_bil:PRISM_tmean_stable_4kmM3_202012_bil,
+  tidyr::pivot_longer(cols = PRISM_tmean_stable_4kmM3_200601_bil:PRISM_tmean_stable_4kmM3_202012_bil,
                       names_prefix = "PRISM_tmean_stable_4kmM3_",
                       values_to = "monthly.temp",
                       names_to = "month") %>%
@@ -217,7 +219,7 @@ vpdmean.masked.df <- as.data.frame(rasterToPoints(vpdmean.masked))
 ## of all grid cells. NOTE: dividing by 10 to convert VPD from
 ## hPa to kPa
 vpdmean.masked.df_cleaned <- vpdmean.masked.df %>%
-  tidyr::pivot_longer(cols = layer.1:layer.360,
+  tidyr::pivot_longer(cols = layer.1:layer.180,
                       values_to = "monthly.mean.vpd",
                       names_to = "month") %>%
   cbind(temp.masked.df_cleaned) %>%
@@ -244,7 +246,7 @@ df.sites.temp$site = ecosites$property
 ## precip. Then, in a step, calculate 2006-2020 mean annual precipitation 
 ## of all grid cells 
 df.sites.vpd_cleaned <- df.sites.vpd %>%
-  tidyr::pivot_longer(cols = layer.1:layer.360,
+  tidyr::pivot_longer(cols = layer.1:layer.180,
                       values_to = "monthly.mean.vpd",
                       names_to = "month") %>%
   cbind(df.sites.temp_cleaned) %>%
@@ -262,9 +264,9 @@ df.sites.vpd_cleaned <- df.sites.vpd %>%
 ## grid cells
 ###############################################################################
 df.normals <- precip.masked.df_cleaned %>%
-  full_join(temp.masked_20062020_mat) %>%
-  full_join(vpdmean.masked.df_cleaned) %>%
-  dplyr::select(latitude = y, longitude = x, map, mat, mav)
+  cbind(temp.masked_20062020_mat) %>%
+  cbind(vpdmean.masked.df_cleaned) %>%
+  dplyr::select(latitude = y...2, longitude = x...1, map, mat, mav)
 
 df.sites <- df.sites.precip_cleaned %>%
   full_join(df.sites.temp_20062020_mat) %>%
@@ -284,7 +286,7 @@ map.plot <- ggplot() +
   geom_point(data = ecosites.short, 
              aes(x = longitude, y = latitude, 
                  shape = factor(sampling.year, levels = c("2020", "2021", "2020_2021"))), 
-             size = 3) +
+             size = 2, stroke = 1) +
   borders(database = "state", region = "texas", 
           xlim = c(-107, -92), ylim = c(25, 37), colour = "black") +
   ggsn::scalebar(x.min = -107, x.max = -92, y.min = 25.5, y.max = 37,
@@ -304,7 +306,7 @@ map.plot <- ggplot() +
                        na.value = "grey50",
                        guide = "colourbar",
                        aesthetics = "fill") +
-  scale_shape_manual(values = c(21, 24, 16),
+  scale_shape_manual(values = c(3, 4, 8),
                      labels = c("2020", "2021", "2020/2021")) +
   scale_x_continuous(limits = c(-107, -92), breaks = seq(-107, -92, 3)) +
   scale_y_continuous(limits = c(25, 37), breaks = seq(25, 37, 3)) +
@@ -317,10 +319,10 @@ map.plot <- ggplot() +
         plot.title = element_text(hjust = 0.5),
         panel.grid = element_blank()) +
   guides(fill = guide_colorbar(ticks.colour = "black",
-                               ticks.linewidth = 2,
-                               frame.linewidth = 1,
-                               frame.colour = "black",
-                               hjust = 0))
+                               ticks.linewidth = 1,
+                               ticks.lineheight = 1,
+                               frame.linewidth = 0.5,
+                               frame.colour = "black"))
 
 map.plot
 
@@ -331,7 +333,7 @@ mat.plot <- ggplot() +
   geom_point(data = ecosites, 
              aes(x = longitude, y = latitude, 
                  shape = factor(sampling.year, levels = c("2020", "2021", "2020_2021"))), 
-             size = 3) +
+             size = 2, stroke = 1) +
   borders(database = "state", region = "texas", 
           xlim = c(-107, -92), ylim = c(25, 37), colour = "black") +
   # ggsn::scalebar(x.min = -107, x.max = -92, y.min = 25.5, y.max = 37,
@@ -351,7 +353,7 @@ mat.plot <- ggplot() +
                        na.value = "grey50",
                        guide = "colourbar",
                        aesthetics = "fill") +
-  scale_shape_manual(values = c(21, 24, 16),
+  scale_shape_manual(values = c(3, 4, 8),
                      labels = c("2020", "2021", "2020/2021")) +
   scale_x_continuous(limits = c(-107, -92), breaks = seq(-107, -92, 3)) +
   scale_y_continuous(limits = c(25, 37), breaks = seq(25, 37, 3)) +
@@ -366,13 +368,14 @@ mat.plot <- ggplot() +
         plot.title = element_text(hjust = 0.5),
         panel.grid = element_blank()) +
   guides(fill = guide_colorbar(ticks.colour = "black",
-                               ticks.linewidth = 2,
-                               frame.linewidth = 1,
+                               ticks.linewidth = 1,
+                               ticks.lineheight = 1,
+                               frame.linewidth = 0.5,
                                frame.colour = "black"))
 
 mat.plot
 
-png("../working_drafts/TXeco_siteMaps.png", 
+png("../working_drafts/figs/TXeco_fig1_site_map.png", 
     width = 20, height = 8, units = 'in', res = 600)
 ggarrange(map.plot, mat.plot, ncol = 2, nrow = 1, 
           legend = "right", align = "hv", labels = "AUTO",
