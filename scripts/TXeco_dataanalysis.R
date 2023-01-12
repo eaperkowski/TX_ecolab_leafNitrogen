@@ -113,7 +113,6 @@ emmeans(chi, pairwise~pft)
 ##########################################################################
 df$n.leaf[c(509)] <- NA
 
-
 # Fit model
 nmass <- lmer(log(n.leaf) ~ (chi + (soil.no3n * wn2_perc)) * pft + (1 | NCRS.code),
               data = df)
@@ -222,17 +221,17 @@ df$photo <- ifelse(df$photo == "c3", 1, 0)
 narea_psem <- psem(
   
   ## Narea model
-  narea = lme(narea ~ chi + soil.no3n + wn2_perc + marea + n.leaf,
+  narea = lme(narea ~ chi + soil.no3n + wn2_perc + marea + n.leaf + n.fixer + photo,
               random = ~ 1 | NCRS.code, 
               data = df, na.action = na.omit),
   
   ## Marea model
-  marea = lme(marea ~ chi + soil.no3n + wn2_perc,
+  marea = lme(marea ~ chi + soil.no3n + wn2_perc + n.fixer + photo,
               random = ~ 1 | NCRS.code, 
               data = df, na.action = na.omit),
   
   ## Nmass model
-  n.leaf = lme(n.leaf ~ chi + soil.no3n + wn2_perc + marea,
+  n.leaf = lme(n.leaf ~ chi + soil.no3n + wn2_perc + marea + n.fixer + photo,
                random = ~ 1 | NCRS.code, 
                data = df, na.action = na.omit),
   
@@ -335,7 +334,7 @@ summary(narea_psem_full)
 
 line.thick <- data.frame(summary(narea_psem)$coefficients,
            line.thickness = abs(summary(
-             narea_psem)$coefficients$Std.Estimate) * 14.875)
+             narea_psem)$coefficients$Std.Estimate) * 18.75)
 
 
 line.thick <- line.thick %>%
@@ -344,8 +343,10 @@ line.thick <- line.thick %>%
 
 
 ggplot(data=line.thick, aes(x = abs(Std.Estimate), 
-                            y = line.thickness)) + geom_smooth() +
-  scale_y_continuous(limits = c(0,12), breaks = seq(0, 12, 4))
+                            y = line.thickness)) + 
+  geom_smooth() +
+  geom_point() +
+  scale_y_continuous(limits = c(0,15), breaks = seq(0, 15, 5))
 
 
 
@@ -518,7 +519,7 @@ write.csv(table4, "../working_drafts/tables/TXeco_table4_leafN.csv",
 
 
 ## Table 5 (SEM results)
-table5.coefs <- summary(narea_psem_corrected)$coefficients[, c(1:8)] %>%
+table5.coefs <- summary(narea_psem)$coefficients[, c(1:8)] %>%
   as.data.frame() %>%
   mutate(Std.Error = ifelse(Std.Error == "-", NA, Std.Error),
          across(Estimate:Std.Estimate, as.numeric),
@@ -528,7 +529,7 @@ table5.coefs <- summary(narea_psem_corrected)$coefficients[, c(1:8)] %>%
   dplyr::select(resp = Response, pred = Predictor, std_est = Std.Estimate, 
                 p_val)
 
-table5 <- summary(narea_psem_corrected)$R2 %>%
+table5 <- summary(narea_psem)$R2 %>%
   dplyr::select(resp = Response, r2_marg = Marginal,
                 r2_cond = Conditional) %>%
   full_join(table5.coefs) %>%

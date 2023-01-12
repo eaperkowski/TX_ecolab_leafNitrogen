@@ -178,10 +178,13 @@ wn.beta <- ggplot(data = aicc.results, aes(x = day, y = aicc.wn)) +
   geom_line() +
   scale_x_continuous(limits = c(0, 90), breaks = seq(0, 90, 30)) +
   scale_y_continuous(limits = c(1227, 1232), breaks = seq(1227, 1232, 1)) +
-  labs(x = NULL, y = expression(bold("AIC"["c"])),
-       title = expression("Soil moisture (% WHC)")) +
+  labs(x = "Days prior to measurement", y = expression(bold("AIC"["c"])),
+       title = expression(bold("Soil moisture (% WHC)"))) +
   theme_bw(base_size = 18) +
-  theme(panel.grid.minor = element_blank())
+  theme(panel.grid.minor = element_blank(),
+        axis.title = element_text(face = "bold"),
+        plot.title = element_text(face = "bold"),
+        panel.border = element_rect(size = 1.25))
 
 vpd.chi <- ggplot(data = aicc.results, aes(x = day, y = aicc.vpd)) +
   geom_point() +
@@ -190,12 +193,15 @@ vpd.chi <- ggplot(data = aicc.results, aes(x = day, y = aicc.vpd)) +
   geom_line() +
   scale_x_continuous(limits = c(0, 90), breaks = seq(0, 90, 30)) +
   scale_y_continuous(limits = c(-885, -860), breaks = seq(-885, -860, 5)) +
-  labs(x = NULL, y = NULL,
+  labs(x = "Days prior to measurement", y = NULL,
        title = "VPD (kPa)") +
   theme_bw(base_size = 18) +
-  theme(panel.grid.minor = element_blank())
+  theme(panel.grid.minor = element_blank(),
+        axis.title = element_text(face = "bold"),
+        plot.title = element_text(face = "bold"),
+        panel.border = element_rect(size = 1.25))
 
 png(filename = "../working_drafts/figs/TXeco_figS2_aicc_results.png",
-    width = 8, height = 4, units = 'in', res = 600)
-ggarrange(wn.beta, vpd.chi, ncol = 3, align = "hv")
+    width = 12, height = 4.5, units = 'in', res = 600)
+ggarrange(wn.beta, vpd.chi, ncol = 2, align = "hv")
 dev.off()
