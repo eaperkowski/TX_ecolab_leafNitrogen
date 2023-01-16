@@ -48,7 +48,8 @@ df$chi[c(321, 325)] <- NA
 df$chi[c(71, 402)] <- NA
 df$narea[df$narea > 10] <- NA
 df$narea[509] <- NA
-df$n.leaf[c(375, 509)] <- NA
+df$n.leaf[c(509)] <- NA
+df$marea[df$marea > 1000] <- NA
 df$marea[c(20, 21)] <- NA
 
 ## Add general models
@@ -56,6 +57,10 @@ beta <- lmer(log(beta) ~ wn2_perc * soil.no3n * pft + (1 | NCRS.code), data = df
 chi <- lmer(chi ~ (vpd4+ (wn2_perc * soil.no3n)) * pft + 
               (1 | NCRS.code), data = df)
 narea <- lmer(log(narea) ~ (chi + (soil.no3n * wn2_perc)) * pft + (1 | NCRS.code),
+              data = df)
+nmass <- lmer(log(n.leaf) ~ (chi + (soil.no3n * wn2_perc)) * pft + (1 | NCRS.code),
+              data = df)
+marea <- lmer(log(marea) ~ (chi + (soil.no3n * wn2_perc)) * pft + (1 | NCRS.code),
               data = df)
 
 ##########################################################################
@@ -80,12 +85,12 @@ beta.no3n <- ggplot(data = subset(df, !is.na(pft)),
             size = 1) +
   scale_fill_manual(values = c(cbbPalette3), 
                     labels = c(expression("C"[3]~"legume"),
-                               expression("C"[4]~"non-legume"),
-                               expression("C"[3]~"non-legume"))) +
+                               expression("C"[3]~"non-legume"),
+                               expression("C"[4]~"non-legume"))) +
   scale_color_manual(values = c(cbbPalette3), 
                      labels = c(expression("C"[3]~"legume"),
-                                expression("C"[4]~"non-legume"),
-                                expression("C"[3]~"non-legume"))) +
+                                expression("C"[3]~"non-legume"),
+                                expression("C"[4]~"non-legume"))) +
   scale_linetype_manual(values = c("dashed", "solid")) +
   scale_x_continuous(limits = c(-1, 80), breaks = seq(0, 80, 20)) +
   scale_y_continuous(limits = c(-3, 6), breaks = seq(-3, 6, 3)) +
@@ -103,7 +108,7 @@ beta.no3n
 ##########################################################################
 ## Beta - soil moisture
 ##########################################################################
-test(emtrends(beta, ~pft, "wn3_perc"))
+test(emtrends(beta, ~pft, "wn2_perc"))
 
 beta.sm.pft <- data.frame(emmeans(beta, ~pft, "wn2_perc",
                                     at = list(wn2_perc = seq(0,1,0.01))))
@@ -130,6 +135,10 @@ beta.h2o <- ggplot(data = subset(df, !is.na(pft)),
                     labels = c(expression("C"[3]~"legume"),
                                expression("C"[3]~"non-legume"),
                                expression("C"[4]~"non-legume"))) +
+  scale_color_manual(values = c(cbbPalette3), 
+                     labels = c(expression("C"[3]~"legume"),
+                                expression("C"[3]~"non-legume"),
+                                expression("C"[4]~"non-legume"))) +
   scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.25),
                      labels = c(0, 25, 50, 75, 100)) +
   scale_y_continuous(limits = c(-3, 6), breaks = seq(-3, 6, 3)) +
@@ -152,7 +161,7 @@ png("../working_drafts/figs/TXeco_fig2_beta.png",
     width = 12, height = 4.5, units = 'in', res = 600)
 ggarrange(beta.no3n, beta.h2o,
           nrow = 1, ncol = 2, common.legend = TRUE, legend = "right", 
-          align = "hv", labels = "AUTO", font.label = list(size = 18))
+          align = "hv", labels = c("(a)", "(b)"), font.label = list(size = 18))
 
 dev.off()
 
@@ -176,12 +185,12 @@ chi.vpd <- ggplot(data = df, aes(x = vpd4, y = chi)) +
             size = 1) +
   scale_fill_manual(values = c(cbbPalette3), 
                     labels = c(expression("C"[3]~"legume"),
-                               expression("C"[4]~"non-legume"),
-                               expression("C"[3]~"non-legume"))) +
+                               expression("C"[3]~"non-legume"),
+                               expression("C"[4]~"non-legume"))) +
   scale_color_manual(values = c(cbbPalette3), 
                      labels = c(expression("C"[3]~"legume"),
-                                expression("C"[4]~"non-legume"),
-                                expression("C"[3]~"non-legume"))) +
+                                expression("C"[3]~"non-legume"),
+                                expression("C"[4]~"non-legume"))) +
   scale_linetype_manual(values = c("dashed", "solid")) +
   scale_x_continuous(limits = c(0.8, 1.41), breaks = seq(0.8, 1.4, 0.15)) +
   scale_y_continuous(limits = c(0.15, 1), breaks = seq(0.2, 1, 0.2)) +
@@ -215,12 +224,12 @@ chi.no3n <- ggplot(data = df, aes(x = soil.no3n, y = chi)) +
             size = 1) +
   scale_fill_manual(values = c(cbbPalette3), 
                     labels = c(expression("C"[3]~"legume"),
-                               expression("C"[4]~"non-legume"),
-                               expression("C"[3]~"non-legume"))) +
+                               expression("C"[3]~"non-legume"),
+                               expression("C"[4]~"non-legume"))) +
   scale_color_manual(values = c(cbbPalette3), 
                      labels = c(expression("C"[3]~"legume"),
-                                expression("C"[4]~"non-legume"),
-                                expression("C"[3]~"non-legume"))) +
+                                expression("C"[3]~"non-legume"),
+                                expression("C"[4]~"non-legume"))) +
   scale_linetype_manual(values = c("dashed", "solid")) +
   scale_x_continuous(limits = c(0, 80), breaks = seq(0, 80, 20)) +
   scale_y_continuous(limits = c(0.15, 1), breaks = seq(0.2, 1, 0.2)) +
@@ -254,12 +263,12 @@ chi.sm <- ggplot(data = df, aes(x = wn2_perc, y = chi)) +
             size = 1) +
   scale_fill_manual(values = c(cbbPalette3), 
                     labels = c(expression("C"[3]~"legume"),
-                               expression("C"[4]~"non-legume"),
-                               expression("C"[3]~"non-legume"))) +
+                               expression("C"[3]~"non-legume"),
+                               expression("C"[4]~"non-legume"))) +
   scale_color_manual(values = c(cbbPalette3), 
                      labels = c(expression("C"[3]~"legume"),
-                                expression("C"[4]~"non-legume"),
-                                expression("C"[3]~"non-legume"))) +
+                                expression("C"[3]~"non-legume"),
+                                expression("C"[4]~"non-legume"))) +
   scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.25),
                      labels = c(0, 25, 50, 75, 100)) +
   scale_y_continuous(limits = c(0.15, 1), breaks = seq(0.2, 1, 0.2)) +
@@ -278,10 +287,11 @@ chi.sm
 ## Write chi plot
 ##########################################################################
 png("../working_drafts/figs/TXeco_fig3_chi.png",
-    width = 12, height = 9, units = 'in', res = 600)
+    width = 12.2, height = 9.2, units = 'in', res = 600)
 ggarrange(chi.vpd, chi.sm, chi.no3n,
           nrow = 2, ncol = 2, common.legend = TRUE, legend = "right", 
-          align = "hv", labels = "AUTO", font.label = list(size = 18))
+          align = "hv", labels = c("(a)", "(b)", "(c)"), 
+          font.label = list(size = 18))
 dev.off()
 
 ##########################################################################
@@ -317,12 +327,12 @@ narea.chi <- ggplot(data = subset(df, !is.na(pft)),
             size = 0.9) +
   scale_fill_manual(values = c(cbbPalette3), 
                     labels = c(expression("C"[3]~"legume"),
-                               expression("C"[4]~"non-legume"),
-                               expression("C"[3]~"non-legume"))) +
+                               expression("C"[3]~"non-legume"),
+                               expression("C"[4]~"non-legume"))) +
   scale_color_manual(values = c(cbbPalette3), 
                      labels = c(expression("C"[3]~"legume"),
-                                expression("C"[4]~"non-legume"),
-                                expression("C"[3]~"non-legume"))) +
+                                expression("C"[3]~"non-legume"),
+                                expression("C"[4]~"non-legume"))) +
   scale_x_continuous(limits = c(0.2, 1), breaks = seq(0.2, 1, 0.2)) +
   scale_y_continuous(limits = c(-1, 3), breaks = seq(-1, 3, 1)) +
   scale_linetype_manual(values = c("dashed", "solid")) +
@@ -346,10 +356,14 @@ narea.no3n <- ggplot(data = subset(df, !is.na(pft)),
                                                           "c4_nonlegume",
                                                           "c3_nonlegume")))) +
   geom_jitter(width = 0.5, size = 3, alpha = 0.7, shape = 21) +
-  scale_fill_manual(values = cbbPalette3[1:3], 
+  scale_fill_manual(values = c(cbbPalette3), 
                     labels = c(expression("C"[3]~"legume"),
-                               expression("C"[4]~"non-legume"),
-                               expression("C"[3]~"non-legume"))) +
+                               expression("C"[3]~"non-legume"),
+                               expression("C"[4]~"non-legume"))) +
+  scale_color_manual(values = c(cbbPalette3), 
+                     labels = c(expression("C"[3]~"legume"),
+                                expression("C"[3]~"non-legume"),
+                                expression("C"[4]~"non-legume"))) +
   scale_x_continuous(limits = c(-1, 80), breaks = seq(0, 80, 20)) +
   scale_y_continuous(limits = c(-1, 3), breaks = seq(-1, 3, 1)) +
   labs(x = expression(bold("Soil N availability (ppm NO"[3]*"-N)")),
@@ -370,8 +384,12 @@ narea.sm <- ggplot(data = subset(df, !is.na(pft)),
               width = 0.025, size = 3, alpha = 0.7, shape = 21) +
   scale_fill_manual(values = c(cbbPalette3), 
                     labels = c(expression("C"[3]~"legume"),
-                               expression("C"[4]~"non-legume"),
-                               expression("C"[3]~"non-legume"))) +
+                               expression("C"[3]~"non-legume"),
+                               expression("C"[4]~"non-legume"))) +
+  scale_color_manual(values = c(cbbPalette3), 
+                     labels = c(expression("C"[3]~"legume"),
+                                expression("C"[3]~"non-legume"),
+                                expression("C"[4]~"non-legume"))) +
   scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.25)) +
   scale_y_continuous(limits = c(-1, 3), breaks = seq(-1, 3, 1)) +
   labs(x = expression(bold("Soil moisture (% WHC)")),
@@ -416,12 +434,12 @@ nmass.chi <- ggplot(data = subset(df, !is.na(pft)),
             size = 0.9) +
   scale_fill_manual(values = c(cbbPalette3), 
                     labels = c(expression("C"[3]~"legume"),
-                               expression("C"[4]~"non-legume"),
-                               expression("C"[3]~"non-legume"))) +
+                               expression("C"[3]~"non-legume"),
+                               expression("C"[4]~"non-legume"))) +
   scale_color_manual(values = c(cbbPalette3), 
                      labels = c(expression("C"[3]~"legume"),
-                                expression("C"[4]~"non-legume"),
-                                expression("C"[3]~"non-legume"))) +
+                                expression("C"[3]~"non-legume"),
+                                expression("C"[4]~"non-legume"))) +
   scale_linetype_manual(values = c("dashed", "solid")) +
   scale_x_continuous(limits = c(0.2, 1), breaks = seq(0.2, 1, 0.2)) +
   scale_y_continuous(limits = c(-1, 2), breaks = seq(-1, 2, 1)) +
@@ -456,12 +474,12 @@ nmass.no3n <- ggplot(data = subset(df, !is.na(pft)),
             size = 0.9, color = "black") +
   scale_fill_manual(values = c(cbbPalette3), 
                     labels = c(expression("C"[3]~"legume"),
-                               expression("C"[4]~"non-legume"),
-                               expression("C"[3]~"non-legume"))) +
+                               expression("C"[3]~"non-legume"),
+                               expression("C"[4]~"non-legume"))) +
   scale_color_manual(values = c(cbbPalette3), 
                      labels = c(expression("C"[3]~"legume"),
-                                expression("C"[4]~"non-legume"),
-                                expression("C"[3]~"non-legume"))) +
+                                expression("C"[3]~"non-legume"),
+                                expression("C"[4]~"non-legume"))) +
   scale_x_continuous(limits = c(-1, 80), breaks = seq(0, 80, 20)) +
   scale_y_continuous(limits = c(-1, 2), breaks = seq(-1, 2, 1)) +
   labs(x = expression(bold("Soil N availability (ppm NO"[3]*"-N)")),
@@ -493,8 +511,12 @@ nmass.sm <- ggplot(data = subset(df, !is.na(pft)),
             size = 0.9, color = "black") +
   scale_fill_manual(values = c(cbbPalette3), 
                     labels = c(expression("C"[3]~"legume"),
-                               expression("C"[4]~"non-legume"),
-                               expression("C"[3]~"non-legume"))) +
+                               expression("C"[3]~"non-legume"),
+                               expression("C"[4]~"non-legume"))) +
+  scale_color_manual(values = c(cbbPalette3), 
+                     labels = c(expression("C"[3]~"legume"),
+                                expression("C"[3]~"non-legume"),
+                                expression("C"[4]~"non-legume"))) +
   scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.25)) +
   scale_y_continuous(limits = c(-1, 2), breaks = seq(-1, 2, 1)) +
   labs(x = expression(bold("Soil moisture (% WHC)")),
@@ -539,12 +561,12 @@ marea.chi <- ggplot(data = subset(df, !is.na(pft)),
             size = 0.9) +
   scale_fill_manual(values = c(cbbPalette3), 
                     labels = c(expression("C"[3]~"legume"),
-                               expression("C"[4]~"non-legume"),
-                               expression("C"[3]~"non-legume"))) +
+                               expression("C"[3]~"non-legume"),
+                               expression("C"[4]~"non-legume"))) +
   scale_color_manual(values = c(cbbPalette3), 
                      labels = c(expression("C"[3]~"legume"),
-                                expression("C"[4]~"non-legume"),
-                                expression("C"[3]~"non-legume"))) +
+                                expression("C"[3]~"non-legume"),
+                                expression("C"[4]~"non-legume"))) +
   scale_linetype_manual(values = c("dashed", "solid")) +
   scale_x_continuous(limits = c(0.2, 1), breaks = seq(0.2, 1, 0.2)) +
   scale_y_continuous(limits = c(3, 7), breaks = seq(3, 7, 1)) +
@@ -583,12 +605,12 @@ marea.no3n <- ggplot(data = subset(df, !is.na(pft)),
             size = 0.9) +
   scale_fill_manual(values = c(cbbPalette3), 
                     labels = c(expression("C"[3]~"legume"),
-                               expression("C"[4]~"non-legume"),
-                               expression("C"[3]~"non-legume"))) +
+                               expression("C"[3]~"non-legume"),
+                               expression("C"[4]~"non-legume"))) +
   scale_color_manual(values = c(cbbPalette3), 
                      labels = c(expression("C"[3]~"legume"),
-                                expression("C"[4]~"non-legume"),
-                                expression("C"[3]~"non-legume"))) +
+                                expression("C"[3]~"non-legume"),
+                                expression("C"[4]~"non-legume"))) +
   scale_linetype_manual(values = c("dashed", "solid")) +
   scale_x_continuous(limits = c(-1, 80), breaks = seq(0, 80, 20)) +
   scale_y_continuous(limits = c(3, 7), breaks = seq(3, 7, 1)) +
@@ -625,8 +647,12 @@ marea.sm <- ggplot(data = subset(df, !is.na(pft)),
             size = 0.9) +
   scale_fill_manual(values = c(cbbPalette3), 
                     labels = c(expression("C"[3]~"legume"),
-                               expression("C"[4]~"non-legume"),
-                               expression("C"[3]~"non-legume"))) +
+                               expression("C"[3]~"non-legume"),
+                               expression("C"[4]~"non-legume"))) +
+  scale_color_manual(values = c(cbbPalette3), 
+                     labels = c(expression("C"[3]~"legume"),
+                                expression("C"[3]~"non-legume"),
+                                expression("C"[4]~"non-legume"))) +
   scale_linetype_manual(values = c("dashed", "solid")) +
   scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.25)) +
   scale_y_continuous(limits = c(3, 7), breaks = seq(3, 7, 1)) +
@@ -642,8 +668,6 @@ marea.sm <- ggplot(data = subset(df, !is.na(pft)),
 
 marea.sm
 
-
-
 ##########################################################################
 ## Create Narea plots
 ##########################################################################
@@ -653,7 +677,9 @@ ggarrange(narea.chi, nmass.chi, marea.chi,
           narea.no3n, nmass.no3n, marea.no3n,
           narea.sm, nmass.sm, marea.sm,
           ncol = 3, nrow = 3, common.legend = TRUE, legend = "right", 
-          align = "hv", labels = "AUTO", font.label = list(size = 18))
+          align = "hv", labels = c("(a)", "(b)", "(c)", "(d)", "(e)",
+                                   "(f)", "(g)", "(h)", "(i)"), 
+          font.label = list(size = 18))
 dev.off()
 
 
