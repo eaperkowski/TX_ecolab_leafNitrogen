@@ -274,7 +274,7 @@ narea_psem_reduced <- psem(
                data = df, na.action = na.omit),
   
   ## Chi model
-  chi = lme(chi ~ beta + vpd4, 
+  chi = lme(chi ~ beta + vpd4 + photo, 
             random = ~ 1 | NCRS.code,
             data = df, na.action = na.omit),
   
