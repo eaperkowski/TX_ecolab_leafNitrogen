@@ -247,11 +247,7 @@ narea_psem <- psem(
   
   ## Soil N model
   soiln = lme(soil.no3n ~ wn2_perc, random = ~ 1 | NCRS.code, 
-                            data = df, na.action = na.omit),
-  
-  ## VPD soil moisture
-  vpd4 = lme(vpd4 ~ wn2_perc, random = ~ 1 | NCRS.code, 
-           data = df, na.action = na.omit))
+                            data = df, na.action = na.omit))
 
 summary(narea_psem)
 
@@ -274,7 +270,7 @@ narea_psem_reduced <- psem(
                data = df, na.action = na.omit),
   
   ## Chi model
-  chi = lme(chi ~ beta + vpd4 + photo, 
+  chi = lme(chi ~ beta + vpd4, 
             random = ~ 1 | NCRS.code,
             data = df, na.action = na.omit),
   
@@ -285,91 +281,10 @@ narea_psem_reduced <- psem(
   
   ## Soil N model
   soiln = lme(soil.no3n ~ wn2_perc, random = ~ 1 | NCRS.code, 
-              data = df, na.action = na.omit),
-  
-  ## VPD soil moisture
-  vpd4 = lme(vpd4 ~ wn2_perc, random = ~ 1 | NCRS.code, 
-             data = df, na.action = na.omit))
+              data = df, na.action = na.omit))
 
 summary(narea_psem_reduced)
-
 plot(narea_psem_reduced)
-
-# ## Corrected PSEM with added relationships from tests of directed separation:
-# narea_psem_corrected <- psem(
-#   
-#   ## Narea model
-#   narea = lme(narea ~ chi + soil.no3n + wn2_perc + marea + n.leaf + photo,
-#               random = ~ 1 | NCRS.code, 
-#               data = df, na.action = na.omit),
-#   
-#   ## Marea model
-#   marea = lme(marea ~ chi + soil.no3n + wn2_perc + photo + n.fixer,
-#               random = ~ 1 | NCRS.code, 
-#               data = df, na.action = na.omit),
-#   
-#   ## Nmass model
-#   n.leaf = lme(n.leaf ~ chi + soil.no3n + wn2_perc + marea + photo + n.fixer,
-#                random = ~ 1 | NCRS.code, 
-#                data = df, na.action = na.omit),
-#   
-#   ## Chi model
-#   chi = lme(chi ~ beta + vpd4 + wn2_perc + soil.no3n + photo, 
-#             random = ~ 1 | NCRS.code,
-#             data = df, na.action = na.omit),
-#   
-#   ## Beta model
-#   beta = lme(beta ~ soil.no3n + wn2_perc + vpd4 + photo + n.fixer,
-#              random = ~ 1 | NCRS.code, data = df, 
-#              na.action = na.omit),
-#   
-#   ## Soil N model
-#   soiln = lme(soil.no3n ~ wn2_perc, random = ~ 1 | NCRS.code, 
-#               data = df, na.action = na.omit),
-#   
-#   ## VPD soil moisture
-#   vpd4 = lme(vpd4 ~ wn2_perc, random = ~ 1 | NCRS.code, 
-#              data = df, na.action = na.omit))
-
-
-## Corrected PSEM with added relationships from tests of directed separation:
-narea_psem_full <- psem(
-
-  ## Narea model
-  narea = lme(narea ~ beta + chi + soil.no3n + wn2_perc + marea + n.leaf + photo,
-              random = ~ 1 | NCRS.code,
-              data = df, na.action = na.omit),
-
-  ## Marea model
-  marea = lme(marea ~ chi + soil.no3n + wn2_perc + photo + n.fixer,
-              random = ~ 1 | NCRS.code,
-              data = df, na.action = na.omit),
-
-  ## Nmass model
-  n.leaf = lme(n.leaf ~ beta + chi + soil.no3n + wn2_perc + marea + photo + n.fixer,
-               random = ~ 1 | NCRS.code,
-               data = df, na.action = na.omit),
-
-  ## Chi model
-  chi = lme(chi ~ beta + vpd4 + wn2_perc + soil.no3n + photo,
-            random = ~ 1 | NCRS.code,
-            data = df, na.action = na.omit),
-
-  ## Beta model
-  beta = lme(beta ~ soil.no3n + wn2_perc + vpd4 + photo + n.fixer,
-             random = ~ 1 | NCRS.code, data = df,
-             na.action = na.omit),
-
-  ## Soil N model
-  soiln = lme(soil.no3n ~ wn2_perc, random = ~ 1 | NCRS.code,
-              data = df, na.action = na.omit),
-
-  ## VPD soil moisture
-  vpd4 = lme(vpd4 ~ wn2_perc + soil.no3n, random = ~ 1 | NCRS.code,
-             data = df, na.action = na.omit))
-summary(narea_psem_full)
-
-
 
 
 line.thick <- data.frame(summary(narea_psem_reduced)$coefficients,
@@ -578,8 +493,6 @@ table5 <- summary(narea_psem_reduced)$R2 %>%
 
 write.csv(table5, "../working_drafts/tables/TXeco_table5_SEMclean.csv", 
           row.names = FALSE)
-
-
 
 ###############################
 # Indirect SEM path coefs
