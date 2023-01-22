@@ -201,7 +201,7 @@ chi.vpd <- ggplot(data = df, aes(x = vpd4, y = chi)) +
   guides(linetype = "none") +
   theme_bw(base_size = 18) +
   theme(legend.text.align = 0,
-        panel.border = element_rect(linewidth = 1.25))
+        panel.border = element_rect(size = 1.25))
 chi.vpd
 
 ##########################################################################
@@ -240,7 +240,7 @@ chi.no3n <- ggplot(data = df, aes(x = soil.no3n, y = chi)) +
   guides(linetype = "none") +
   theme_bw(base_size = 18) +
   theme(legend.text.align = 0,
-        panel.border = element_rect(linewidth = 1.25))
+        panel.border = element_rect(size = 1.25))
 chi.no3n
 
 ##########################################################################
@@ -280,7 +280,7 @@ chi.sm <- ggplot(data = df, aes(x = wn2_perc, y = chi)) +
   guides(linetype = "none") +
   theme_bw(base_size = 18) +
   theme(legend.text.align = 0,
-        panel.border = element_rect(linewidth = 1.25))
+        panel.border = element_rect(size = 1.25))
 chi.sm
 
 ##########################################################################
