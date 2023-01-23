@@ -378,7 +378,7 @@ mat.plot
 png("../working_drafts/figs/TXeco_fig1_site_map.png", 
     width = 20, height = 8, units = 'in', res = 600)
 ggarrange(map.plot, mat.plot, ncol = 2, nrow = 1, 
-          legend = "right", align = "hv", labels = "AUTO",
+          legend = "right", align = "hv", labels = c("(a)", "(b)"),
           font.label = list(size = 25))
 dev.off()
 
