@@ -255,7 +255,7 @@ summary(narea_psem)
 narea_psem_reduced <- psem(
   
   ## Narea model
-  narea = lme(narea ~ chi + marea + n.leaf,
+  narea = lme(narea ~ marea + n.leaf,
               random = ~ 1 | NCRS.code, 
               data = df, na.action = na.omit),
   
