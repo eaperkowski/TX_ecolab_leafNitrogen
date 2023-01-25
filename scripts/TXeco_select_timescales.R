@@ -11,7 +11,7 @@ library(merTools)
 ###############################################################################
 # Load compiled data file
 ###############################################################################
-df <- read.csv("../data_sheets/TXeco_compiled_datasheet.csv",
+df <- read.csv("../data_sheets/TXeco_compiled_datasheet2.csv",
                na.strings = c("NA", "NaN")) %>%
   filter(site != "Bell_2020_05" & 
            site != "Russel_2020_01") %>%
@@ -22,7 +22,7 @@ df <- read.csv("../data_sheets/TXeco_compiled_datasheet.csv",
                              ifelse(pft == "legume", 
                                     "c3_legume", 
                                     NA))),
-         chi = ifelse(chi > 0.95 | chi < 0.20, NA, chi))
+         chi = ifelse(chi > 0.95 | chi < 0.10, NA, chi))
 
 ###############################################################################
 # Iterative models for soil moisture and beta
@@ -87,7 +87,7 @@ aicc.results.wn <- wn30.modelSelect %>%
   dplyr::select(day, aicc.wn = AICc, rmse.wn = RMSE)
 # 3-day soil moisture is best model
 
-plot(aicc.results.wn$aicc.wn)
+plot(aicc.results.wn$day, aicc.results.wn$aicc.wn)
 
 
 ###############################################################################
@@ -173,18 +173,18 @@ write.csv(aicc.results,
 ###############################################################################
 wn.beta <- ggplot(data = aicc.results, aes(x = day, y = aicc.wn)) +
   geom_point() +
-  geom_point(data = subset(aicc.results, day == 2), 
-             fill = "red", size = 3, shape = 21) +
+  geom_point(data = subset(aicc.results, day == 90), 
+             fill = "red", shape = 21) +
   geom_line() +
   scale_x_continuous(limits = c(0, 90), breaks = seq(0, 90, 30)) +
-  scale_y_continuous(limits = c(1227, 1232), breaks = seq(1227, 1232, 1)) +
+  scale_y_continuous(limits = c(1429, 1432), breaks = seq(1429, 1432, 1)) +
   labs(x = "Days prior to measurement", y = expression(bold("AIC"["c"])),
        title = expression(bold("Soil moisture (% WHC)"))) +
   theme_bw(base_size = 18) +
   theme(panel.grid.minor = element_blank(),
         axis.title = element_text(face = "bold"),
         plot.title = element_text(face = "bold"),
-        panel.border = element_rect(size = 1.25))
+        panel.border = element_rect(linewidth = 1.25))
 
 vpd.chi <- ggplot(data = aicc.results, aes(x = day, y = aicc.vpd)) +
   geom_point() +
@@ -192,7 +192,7 @@ vpd.chi <- ggplot(data = aicc.results, aes(x = day, y = aicc.vpd)) +
              fill = "red", size = 2, shape = 21) +
   geom_line() +
   scale_x_continuous(limits = c(0, 90), breaks = seq(0, 90, 30)) +
-  scale_y_continuous(limits = c(-885, -860), breaks = seq(-885, -860, 5)) +
+  scale_y_continuous(limits = c(-800, -760), breaks = seq(-800, -760, 10)) +
   labs(x = "Days prior to measurement", y = NULL,
        title = "VPD (kPa)") +
   theme_bw(base_size = 18) +

@@ -30,7 +30,7 @@ spp.info <- read.csv("../data_sheets/TXeco_species_id.csv",
 soil <- read.csv("../data_sheets/TXeco_soil_characteristics.csv")
 soilgrids <- read.csv("../data_sheets/TXeco_soilgrid_data.csv")
 
-names(soilgrids)[2:21] <- str_c("sg.", names(soilgrids)[2:21])
+names(soilgrids)[2:21] <- stringr::str_c("sg.", names(soilgrids)[2:21])
 
 ##########################################################################
 ## Import raw costech files
@@ -106,17 +106,23 @@ full.df <- leaf %>%
   summarize_if(is.numeric, mean, na.rm = TRUE) %>%
   filter(pft != "c3_tree") %>%
   dplyr::mutate(chi = ifelse(pft == "c4_graminoid", 
-                             abs(calc_chi_c4(d13C, year = sampling.year)[2]),
-                             calc_chi_c3(d13C, year = sampling.year)[2])) %>%
+                             abs(calc_chi_c4(d13C, year = sampling.year)),
+                             calc_chi_c3(d13C, year = sampling.year)),
+                chi = ifelse(chi < 0.1 | chi > 0.95, NA, chi),
+                beta = calc_beta(chi = chi, temp = tavg7, 
+                                 vpd = vpd7 * 10, z = elevation.m)) %>%
   full_join(soilgrids) %>%
-  mutate(across(wn1:wn90, list(perc =~./ whc)))
-
+  mutate(across(wn1:wn90, list(perc =~./ whc))) %>%
+  as.data.frame()
 
 ## Add chi column
-full.df$chi[full.df$chi < 0.2 | full.df$chi > 0.95] <- NA
-full.df$beta <- calc_beta(chi = full.df$chi, temp = full.df$tavg7, 
+
+full.df$beta <- calc_beta(chi = as.numeric(full.df$chi), temp = full.df$tavg7, 
                           vpd = full.df$vpd7 * 10, z = full.df$elevation.m)
-full.df$beta[full.df$beta > 400] <- NA
+full.df$beta[full.df$beta > 600] <- NA
 hist(full.df$beta)
+
+class(full.df)
+
 ## Write csv
-write.csv(full.df, "../data_sheets/TXeco_compiled_datasheet.csv", row.names = FALSE)
+write.csv(full.df, "../data_sheets/TXeco_compiled_datasheet2.csv", row.names = FALSE)
