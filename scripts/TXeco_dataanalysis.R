@@ -123,9 +123,8 @@ r.squaredGLMM(nmass)
 
 # Post hoc tests
 test(emtrends(nmass, ~pft, "chi"))
-test(emtrends(nmass, ~wn90_perc, "soil.no3n",
-              at = list(wn90_perc = seq(0,1,0.05))))
-test(emtrends(nmass, ~1, "soil.no3n"))
+test(emtrends(nmass, ~wn90_perc, "soil.no3n", at = list(wn90_perc = seq(0,1,0.05))))
+test(emtrends(nmass, ~pft, "soil.no3n"))
 test(emtrends(nmass, ~1, "wn90_perc"))
 emmeans(nmass, pairwise~pft)
 
@@ -133,6 +132,8 @@ emmeans(nmass, pairwise~pft)
 ## Marea
 ##########################################################################
 df$marea[df$marea > 1000] <- NA
+df$marea[c(20, 21)] <- NA
+df$marea[c(287,290)] <- NA
 
 # Fit model
 marea <- lmer(log(marea) ~ (chi + (soil.no3n * wn90_perc)) * pft + (1 | NCRS.code),
@@ -153,12 +154,10 @@ Anova(marea)
 r.squaredGLMM(marea)
 
 # Post-hoc comparisons
-test(emtrends(marea, ~1, "chi"))
+test(emtrends(marea, pairwise~wn90_perc|pft, "soil.no3n",
+              at = list(soil.no3n = seq(0,80, 20),
+                        wn90_perc = seq(0.2, 0.8, 0.2))))
 test(emtrends(marea, pairwise~pft, "chi"))
-
-test(emtrends(marea, ~wn90_perc, "soil.no3n",
-              at = list(wn90_perc = seq(0,1,0.05))))
-test(emtrends(marea, ~1, "wn90_perc"))
 test(emtrends(marea, pairwise~pft, "soil.no3n"))
 
 emmeans(marea, pairwise~pft)

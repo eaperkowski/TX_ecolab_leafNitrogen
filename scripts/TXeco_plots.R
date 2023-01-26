@@ -144,7 +144,6 @@ png("../working_drafts/figs/TXeco_fig2_beta.png",
 ggarrange(beta.no3n, beta.h2o,
           nrow = 1, ncol = 2, common.legend = TRUE, legend = "right", 
           align = "hv", labels = c("(a)", "(b)"), font.label = list(size = 18))
-
 dev.off()
 
 ##########################################################################
@@ -170,7 +169,7 @@ chi.vpd <- ggplot(data = df, aes(x = vpd4, y = chi)) +
   scale_x_continuous(limits = c(0.9, 1.3), breaks = seq(0.9, 1.3, 0.1)) +
   scale_y_continuous(limits = c(0.1, 1), breaks = seq(0.1, 1, 0.3)) +
   labs(x = expression(bold("Vapor pressure deficit (kPa)")),
-       y = expression(bold(chi)),
+       y = expression(bold("C"["i"]*" : C"["a"])),
        fill = expression(bold("Functional group"))) +
   guides(color = "none") +
   theme_bw(base_size = 18) +
@@ -198,7 +197,7 @@ chi.no3n <- ggplot(data = df, aes(x = soil.no3n, y = chi)) +
   scale_x_continuous(limits = c(0, 80), breaks = seq(0, 80, 20)) +
   scale_y_continuous(limits = c(0.1, 1), breaks = seq(0.1, 1, 0.3)) +
   labs(x = expression(bold("Soil N availability (ppm NO"[3]*"-N)")),
-       y = expression(bold(chi)),
+       y = expression(bold("C"["i"]*" : C"["a"])),
        fill = expression(bold("Functional group")),
        color = expression(bold("Functional group"))) +
   guides(linetype = "none") +
@@ -228,7 +227,7 @@ chi.sm <- ggplot(data = df, aes(x = wn90_perc, y = chi)) +
   scale_y_continuous(limits = c(0.1, 1), breaks = seq(0.1, 1, 0.3)) +
   scale_linetype_manual(values = c("dashed", "solid")) +
   labs(x = expression(bold("Soil moisture (% WHC)")),
-       y = expression(bold(chi)),
+       y = expression(bold("C"["i"]*" : C"["a"])),
        fill = expression(bold("Functional group")),
        color = expression(bold("Functional group"))) +
   guides(linetype = "none") +
@@ -257,14 +256,13 @@ car::Anova(narea)
 narea.chi.pft <- data.frame(emmeans(narea, ~pft, "chi",
                                      at = list(chi = seq(0.1, 1, 0.01)))) %>%
   filter(pft != "c4_nonlegume")
-
-
 narea.chi.legume <- subset(narea.chi.pft, pft == "c3_legume" & chi > 0.55 & chi < 0.95)
 narea.chi.c3non <- subset(narea.chi.pft, pft == "c3_nonlegume" & chi > 0.55 & chi < 0.95)
-
-
 narea.chi.pft.cleaned <- narea.chi.legume %>%
   full_join(narea.chi.c3non) 
+
+narea.chi.ind <- data.frame(emmeans(narea, ~1, "chi",
+                                    at = list(chi = seq(0.1, 1, 0.1))))
 
 narea.chi <- ggplot(data = subset(df, !is.na(pft)), 
                          aes(x = chi, y = log(narea))) +
@@ -276,8 +274,7 @@ narea.chi <- ggplot(data = subset(df, !is.na(pft)),
               alpha = 0.25) +
   geom_line(data = narea.chi.pft.cleaned,
             aes(x = chi, y = emmean, 
-                color = factor(pft, levels = c("c3_legume", "c3_nonlegume",
-                                               "c4_nonlegume"))),
+                color = pft),
             size = 0.9) +
   scale_fill_manual(values = c(cbbPalette3), 
                     labels = c(expression("C"[3]~"legume"),
@@ -288,8 +285,7 @@ narea.chi <- ggplot(data = subset(df, !is.na(pft)),
                                 expression("C"[3]~"non-legume"))) +
   scale_x_continuous(limits = c(0.1, 1), breaks = seq(0.1, 1, 0.3)) +
   scale_y_continuous(limits = c(-1, 3), breaks = seq(-1, 3, 1)) +
-  scale_linetype_manual(values = c("dashed", "solid")) +
-  labs(x = expression(bold(chi)),
+  labs(x = expression(bold("C"["i"]*" : C"["a"])),
        y = expression(bold(ln*" N"["area"]*" (gN m"^"-2"~")")),
        fill = expression(bold("Functional group")),
        color = expression(bold("Functional group"))) +
@@ -309,12 +305,15 @@ car::Anova(narea)
 narea.no3n.pft <- data.frame(emmeans(narea, ~pft, "soil.no3n",
                                     at = list(soil.no3n = seq(0, 80, 1)))) %>%
   filter(pft == "c3_legume")
+
+narea.no3n.ind <- data.frame(emmeans(narea, ~1, "soil.no3n",
+                                     at = list(soil.no3n = seq(0, 80, 1))))
+
   
 
 narea.no3n <- ggplot(data = subset(df, !is.na(pft)), 
-                        aes(x = soil.no3n, y = log(narea),
-                            fill = pft)) +
-  geom_jitter(width = 0.5, size = 3, alpha = 0.75, shape = 21) +
+                        aes(x = soil.no3n, y = log(narea))) +
+  geom_jitter(aes (fill = pft), width = 0.5, size = 3, alpha = 0.75, shape = 21) +
   geom_ribbon(data = narea.no3n.pft, 
               aes(x = soil.no3n, y = emmean, ymin = lower.CL, ymax = upper.CL), 
               alpha = 0.25, fill = "#DDAA33") +
@@ -379,8 +378,6 @@ nmass.chi.pft <- data.frame(emmeans(nmass, ~pft, "chi",
                                     at = list(chi = seq(0.2, 1, 0.01)))) %>%
   mutate(linetype = ifelse(pft == "c3_nonlegume","solid", "dashed"))
 
-
-
 nmass.chi <- ggplot(data = subset(df, !is.na(pft)), 
                          aes(x = chi, y = log(n.leaf))) +
   geom_point(aes(fill = pft),
@@ -391,7 +388,7 @@ nmass.chi <- ggplot(data = subset(df, !is.na(pft)),
                                expression("C"[4]~"non-legume"))) +
   scale_x_continuous(limits = c(0.2, 1), breaks = seq(0.2, 1, 0.2)) +
   scale_y_continuous(limits = c(-1, 2), breaks = seq(-1, 2, 1)) +
-  labs(x = expression(bold(chi)),
+  labs(x = expression(bold("C"["i"]*" : C"["a"])),
        y = expression(bold(ln*" N"["mass"]*" (gN g"^"-1"~")")),
        fill = expression(bold("Functional group")),
        color = expression(bold("Functional group"))) +
@@ -449,7 +446,7 @@ nmass.sm.ind <- data.frame(emmeans(nmass, ~1, "wn90_perc",
 nmass.sm <- ggplot(data = subset(df, !is.na(pft)), 
                      aes(x = wn90_perc, y = log(n.leaf))) +
   geom_jitter(aes(fill = pft),
-              width = 0.025, size = 3, alpha = 0.7, shape = 21) +
+              width = 0.01, size = 3, alpha = 0.7, shape = 21) +
   geom_ribbon(data = nmass.sm.ind,
               aes(x = wn90_perc, y = emmean, 
                   ymin = lower.CL, ymax = upper.CL), 
@@ -476,7 +473,6 @@ nmass.sm <- ggplot(data = subset(df, !is.na(pft)),
         panel.grid.minor.y = element_blank())
 nmass.sm
 
-
 ##########################################################################
 ## Marea - chi
 ##########################################################################
@@ -485,13 +481,13 @@ test(emtrends(marea, ~pft, "chi"))
 marea.chi.pft <- data.frame(emmeans(marea, ~pft, "chi",
                                     at = list(chi = seq(0.1, 1, 0.01)))) %>%
   filter(pft != "c4_nonlegume")
-
-
 marea.chi.legume <- subset(marea.chi.pft, pft == "c3_legume" & chi > 0.55 & chi < 0.95)
 marea.chi.c3non <- subset(marea.chi.pft, pft == "c3_nonlegume" & chi > 0.55 & chi < 0.95)
-
 marea.chi.pft.cleaned <- marea.chi.legume %>%
   full_join(marea.chi.c3non)
+
+marea.chi.ind <- data.frame(emmeans(marea, ~1, "chi",
+                                    at = list(chi = seq(0.1, 1, 0.01))))
 
 
 marea.chi <- ggplot(data = subset(df, !is.na(pft)), 
@@ -515,7 +511,7 @@ marea.chi <- ggplot(data = subset(df, !is.na(pft)),
   scale_linetype_manual(values = c("dashed", "solid")) +
   scale_x_continuous(limits = c(0.1, 1), breaks = seq(0.1, 1, 0.3)) +
   scale_y_continuous(limits = c(3, 7), breaks = seq(3, 7, 1)) +
-  labs(x = expression(bold(chi)),
+  labs(x = expression(bold("C"["i"]*" : C"["a"])),
        y = expression(bold(ln*" M"["area"]*" (g m"^"-2"~")")),
        fill = expression(bold("Functional group"))) +
   theme_bw(base_size = 18) +
@@ -531,21 +527,22 @@ marea.chi
 test(emtrends(marea, ~pft, "soil.no3n"))
 car::Anova(marea)
 
-marea.no3n.ind <- data.frame(emmeans(marea, ~pft, "soil.no3n",
+marea.no3n.pft <- data.frame(emmeans(marea, ~pft, "soil.no3n",
                                  at = list(soil.no3n = seq(0, 80, 1))))
+marea.no3n.ind <- data.frame(emmeans(marea, ~1, "soil.no3n",
+                                     at = list(soil.no3n = seq(0, 80, 1))))
 
 marea.no3n <- ggplot(data = subset(df, !is.na(pft)), 
                      aes(x = soil.no3n, y = log(marea))) +
   geom_jitter(aes(fill = pft),
               width = 0.5, size = 3, alpha = 0.7, shape = 21) +
-  geom_ribbon(data = marea.no3n.ind,
+  geom_ribbon(data = marea.no3n.pft,
               aes(x = soil.no3n, y = emmean, 
                   ymin = lower.CL, ymax = upper.CL, fill = pft), 
               alpha = 0.25) +
-  geom_line(data = marea.no3n.ind,
+  geom_line(data = marea.no3n.pft,
             aes(x = soil.no3n, y = emmean, 
-                color = factor(pft, levels = c("c3_legume", "c3_nonlegume",
-                                               "c4_nonlegume"))),
+                color = pft),
             size = 0.9) +
   scale_fill_manual(values = c(cbbPalette3), 
                     labels = c(expression("C"[3]~"legume"),
@@ -613,5 +610,4 @@ ggarrange(narea.chi, nmass.chi, marea.chi,
                                    "(f)", "(g)", "(h)", "(i)"), 
           font.label = list(size = 18))
 dev.off()
-
 
