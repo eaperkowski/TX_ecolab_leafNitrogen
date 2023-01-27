@@ -46,6 +46,10 @@ df$vpd4 <- df$vpd4 / 10
 
 length(df$pft[df$pft == "c4_nonlegume" & !is.na(df$chi)])
 
+## How many annuals within c3 legume/c3 nonlegume?
+length(df$pft[df$pft == "c3_nonlegume" & df$duration == "annual"])
+length(df$pft[df$pft == "c3_legume" & df$duration == "annual"])
+
 ##########################################################################
 ## Beta
 ##########################################################################
