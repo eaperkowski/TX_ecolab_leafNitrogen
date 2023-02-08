@@ -357,8 +357,6 @@ mat.plot <- ggplot() +
                      labels = c("2020", "2021", "2020/2021")) +
   scale_x_continuous(limits = c(-107, -92), breaks = seq(-107, -92, 3)) +
   scale_y_continuous(limits = c(25, 37), breaks = seq(25, 37, 3)) +
-  #scale_fill_continuous(type = "viridis",
-  #                      limits = c(10, 25), breaks = seq(10, 25, 5)) +
   labs(x = expression(bold("Longitude ("*degree*")")), 
        y = expression(bold("Latitude ("*degree*")")),
        fill = expression(bold("MAT ("*degree*"C)")),
@@ -375,7 +373,8 @@ mat.plot <- ggplot() +
 
 mat.plot
 
-png("../working_drafts/figs/TXeco_fig1_site_map.png", 
+png(#"/Users/eaperkowski/git/compile_dissertation/ch4_TXeco/figs/TXeco_fig1_site_map.png",
+    "../working_drafts/figs/TXeco_fig1_site_map.png", 
     width = 20, height = 8, units = 'in', res = 600)
 ggarrange(map.plot, mat.plot, ncol = 2, nrow = 1, 
           legend = "right", align = "hv", labels = c("(a)", "(b)"),
