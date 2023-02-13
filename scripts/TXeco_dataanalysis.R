@@ -20,9 +20,10 @@ df <- read.csv("../data_sheets/TXeco_compiled_datasheet2.csv",
                na.strings = c("NA", "NaN")) %>%
   filter(site != "Bell_2020_05" & 
            site != "Russel_2020_01") %>%
+  filter(pft != "c3_shrub") %>%
   mutate(pft = ifelse(pft == "c4_graminoid", 
                       "c4_nonlegume",
-                      ifelse(pft == "c3_graminoid" | pft == "c3_forb" | pft == "c3_shrub",
+                      ifelse(pft == "c3_graminoid" | pft == "c3_forb",
                              "c3_nonlegume", 
                              ifelse(pft == "legume", 
                                     "c3_legume", 
@@ -31,8 +32,6 @@ df <- read.csv("../data_sheets/TXeco_compiled_datasheet2.csv",
          marea = ifelse(marea > 1000, NA, marea))
 
 ## Add colorblind friendly palette
-cbbPalette <- c("#0077BB", "#33BBEE", "#009988", "#EE7733", "#CC3311")
-cbbPalette2 <- c("#CC3311", "#EE7733", "#009988", "#33BBEE", "#0077BB")
 cbbPalette3 <- c("#DDAA33", "#BB5566", "#004488")
 
 ## Figure out sample sizes within each pft class
@@ -46,9 +45,17 @@ df$vpd4 <- df$vpd4 / 10
 
 length(df$pft[df$pft == "c4_nonlegume" & !is.na(df$chi)])
 
+length(unique(df$NCRS.code))
+
+
 ## How many annuals within c3 legume/c3 nonlegume?
 length(df$pft[df$pft == "c3_nonlegume" & df$duration == "annual"])
 length(df$pft[df$pft == "c3_legume" & df$duration == "annual"])
+
+length(df$pft[df$pft == "c3_nonlegume"])
+length(df$pft[df$pft == "c3_nonlegume" | df$pft == "c3_legume"])
+
+length(df$pft[df$pft == "c4_nonlegume"]) / 504
 
 ##########################################################################
 ## Beta
@@ -73,7 +80,6 @@ r.squaredGLMM(beta)
 test(emtrends(beta, pairwise~pft, "soil.no3n"))
 
 # Individual effects
-test(emtrends(beta, ~1, "wn90_perc"))
 test(emtrends(beta, ~1, "soil.no3n"))
 emmeans(beta, pairwise~pft)
 
@@ -103,9 +109,37 @@ test(emtrends(chi, pairwise~pft, "soil.no3n"))
 emmeans(chi, pairwise~pft)
 
 ##########################################################################
+## Narea
+##########################################################################
+df$narea[df$narea > 10] <- NA
+
+# Fit model
+narea <- lmer(log(narea) ~ (chi + (soil.no3n * wn90_perc)) * pft + (1 | NCRS.code),
+              data = df)
+
+# Check model assumptions
+plot(narea)
+qqnorm(residuals(narea))
+qqline(residuals(narea))
+hist(residuals(narea))
+densityPlot(residuals(narea))
+shapiro.test(residuals(narea))
+outlierTest(narea)
+
+# Model output
+round(summary(narea)$coefficients, digits = 3)
+Anova(narea)
+r.squaredGLMM(narea)
+
+## Post hoc comparisons
+test(emtrends(narea, pairwise~pft, "chi"))
+test(emtrends(narea, ~pft, "soil.no3n"))
+emmeans(narea, pairwise~pft)
+
+##########################################################################
 ## Nmass
 ##########################################################################
-df$n.leaf[c(509)] <- NA
+df$n.leaf[493] <- NA
 
 # Fit model
 nmass <- lmer(log(n.leaf) ~ (chi + (soil.no3n * wn90_perc)) * pft + (1 | NCRS.code),
@@ -126,10 +160,9 @@ Anova(nmass)
 r.squaredGLMM(nmass)
 
 # Post hoc tests
-test(emtrends(nmass, ~pft, "chi"))
-test(emtrends(nmass, ~wn90_perc, "soil.no3n", at = list(wn90_perc = seq(0,1,0.05))))
-test(emtrends(nmass, ~pft, "soil.no3n"))
+test(emtrends(nmass, pairwise~pft, "chi"))
 test(emtrends(nmass, ~1, "wn90_perc"))
+test(emtrends(nmass, ~1, "soil.no3n"))
 emmeans(nmass, pairwise~pft)
 
 ##########################################################################
@@ -137,7 +170,6 @@ emmeans(nmass, pairwise~pft)
 ##########################################################################
 df$marea[df$marea > 1000] <- NA
 df$marea[c(20, 21)] <- NA
-df$marea[c(287,290)] <- NA
 
 # Fit model
 marea <- lmer(log(marea) ~ (chi + (soil.no3n * wn90_perc)) * pft + (1 | NCRS.code),
@@ -165,39 +197,6 @@ test(emtrends(marea, pairwise~pft, "chi"))
 test(emtrends(marea, pairwise~pft, "soil.no3n"))
 
 emmeans(marea, pairwise~pft)
-
-##########################################################################
-## Narea
-##########################################################################
-df$narea[df$narea > 10] <- NA
-
-# Fit model
-narea <- lmer(log(narea) ~ (chi + (soil.no3n * wn90_perc)) * pft + (1 | NCRS.code),
-                   data = df)
-
-# Check model assumptions
-plot(narea)
-qqnorm(residuals(narea))
-qqline(residuals(narea))
-hist(residuals(narea))
-densityPlot(residuals(narea))
-shapiro.test(residuals(narea))
-outlierTest(narea)
-
-# Model output
-round(summary(narea)$coefficients, digits = 3)
-Anova(narea)
-r.squaredGLMM(narea)
-
-## Post hoc comparisons
-test(emtrends(narea, pairwise~pft, "chi"))
-test(emtrends(narea, ~pft, "soil.no3n"))
-
-test(emtrends(narea, 
-              ~wn90_perc, "soil.no3n", 
-              at = list(wn90_perc = seq(0, 1, 0.1))))
-
-emmeans(narea, pairwise~pft)
 
 ##########################################################################
 ## Structural equation model
@@ -308,7 +307,7 @@ chi.coefs <- data.frame(summary(chi)$coefficient) %>%
   filter(treatment == "(Intercept)" | treatment == "vpd4" |
            treatment == "wn90_perc" | 
            treatment == "soil.no3n" | 
-           treatment == "wn3_perc:soil.no3n") %>%
+           treatment == "wn90_perc:soil.no3n") %>%
   mutate(coef.nobeta = ifelse(coef.nobeta <0.001 & coef.nobeta >= 0, 
                               "<0.001", coef.nobeta)) %>%
   print(., row.names = FALSE)

@@ -15,9 +15,10 @@ df <- read.csv("../data_sheets/TXeco_compiled_datasheet2.csv",
                na.strings = c("NA", "NaN")) %>%
   filter(site != "Bell_2020_05" & 
            site != "Russel_2020_01") %>%
+  filter(pft != "c3_shrub") %>%
   mutate(pft = ifelse(pft == "c4_graminoid", 
                       "c4_nonlegume",
-                      ifelse(pft == "c3_graminoid" | pft == "c3_forb" | pft == "c3_shrub",
+                      ifelse(pft == "c3_graminoid" | pft == "c3_forb",
                              "c3_nonlegume", 
                              ifelse(pft == "legume", 
                                     "c3_legume", 
@@ -177,7 +178,7 @@ wn.beta <- ggplot(data = aicc.results, aes(x = day, y = aicc.wn)) +
              fill = "red", shape = 21) +
   geom_line() +
   scale_x_continuous(limits = c(0, 90), breaks = seq(0, 90, 30)) +
-  scale_y_continuous(limits = c(1429, 1432), breaks = seq(1429, 1432, 1)) +
+  scale_y_continuous(limits = c(1387, 1391), breaks = seq(1387, 1391, 1)) +
   labs(x = "Days prior to measurement", y = expression(bold("AIC"["c"])),
        title = expression(bold("Soil moisture (% WHC)"))) +
   theme_bw(base_size = 18) +
@@ -192,7 +193,7 @@ vpd.chi <- ggplot(data = aicc.results, aes(x = day, y = aicc.vpd)) +
              fill = "red", size = 2, shape = 21) +
   geom_line() +
   scale_x_continuous(limits = c(0, 90), breaks = seq(0, 90, 30)) +
-  scale_y_continuous(limits = c(-800, -760), breaks = seq(-800, -760, 10)) +
+  scale_y_continuous(limits = c(-760, -735), breaks = seq(-760, -735, 5)) +
   labs(x = "Days prior to measurement", y = NULL,
        title = "VPD (kPa)") +
   theme_bw(base_size = 18) +
