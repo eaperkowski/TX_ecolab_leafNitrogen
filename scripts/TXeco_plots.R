@@ -74,9 +74,9 @@ beta.no3n <- ggplot(data = subset(df, !is.na(pft)),
   geom_line(data = beta.no3n.pft, aes(x = soil.no3n, y = emmean), 
             size = 1, color = "black") +
   scale_fill_manual(values = c(cbbPalette3), 
-                    labels = c(expression("C"[3]~"legume"),
-                               expression("C"[3]~"non-legume"),
-                               expression("C"[4]~"non-legume"))) +
+                    labels = c(expression("C"[3]*" N-fixer"),
+                               expression("C"[3]*" non-fixer"),
+                               expression("C"[4]*" non-fixer"))) +
   scale_linetype_manual(values = c("dashed", "solid")) +
   scale_x_continuous(limits = c(-1, 80), breaks = seq(0, 80, 20)) +
   scale_y_continuous(limits = c(-3, 6), breaks = seq(-3, 6, 3)) +
@@ -117,13 +117,13 @@ beta.h2o <- ggplot(data = subset(df, !is.na(pft)),
   #           aes(x = wn2_perc, y = emmean, linetype = linetype, color = pft),
   #           size = 1) +
   scale_fill_manual(values = c(cbbPalette3), 
-                    labels = c(expression("C"[3]~"legume"),
-                               expression("C"[3]~"non-legume"),
-                               expression("C"[4]~"non-legume"))) +
+                    labels = c(expression("C"[3]*" N-fixer"),
+                               expression("C"[3]*" non-fixer"),
+                               expression("C"[4]*" non-fixer"))) +
   scale_color_manual(values = c(cbbPalette3), 
-                     labels = c(expression("C"[3]~"legume"),
-                                expression("C"[3]~"non-legume"),
-                                expression("C"[4]~"non-legume"))) +
+                     labels = c(expression("C"[3]*" N-fixer"),
+                                expression("C"[3]*" non-fixer"),
+                                expression("C"[4]*" non-fixer"))) +
   scale_x_continuous(limits = c(0.2, 0.8), breaks = seq(0.2, 0.8, 0.2),
                      labels = c(20, 40, 60, 80)) +
   scale_y_continuous(limits = c(-3, 6), breaks = seq(-3, 6, 3)) +
@@ -166,9 +166,9 @@ chi.vpd <- ggplot(data = df, aes(x = vpd4, y = chi)) +
   geom_line(data = chi.vpd.pft, aes(x = vpd4, y = emmean), 
             size = 1, color = "black") +
   scale_fill_manual(values = c(cbbPalette3), 
-                    labels = c(expression("C"[3]~"legume"),
-                               expression("C"[3]~"non-legume"),
-                               expression("C"[4]~"non-legume"))) +
+                    labels = c(expression("C"[3]*" N-fixer"),
+                               expression("C"[3]*" non-fixer"),
+                               expression("C"[4]*" non-fixer"))) +
   scale_x_continuous(limits = c(0.9, 1.3), breaks = seq(0.9, 1.3, 0.1)) +
   scale_y_continuous(limits = c(0.1, 1), breaks = seq(0.1, 1, 0.3)) +
   labs(x = expression(bold("Vapor pressure deficit (kPa)")),
@@ -193,9 +193,9 @@ chi.no3n <- ggplot(data = df, aes(x = soil.no3n, y = chi)) +
   geom_jitter(aes(fill = pft),
               width = 0.5, size = 3, alpha = 0.75, shape = 21) +
   scale_fill_manual(values = c(cbbPalette3), 
-                    labels = c(expression("C"[3]~"legume"),
-                               expression("C"[3]~"non-legume"),
-                               expression("C"[4]~"non-legume"))) +
+                    labels = c(expression("C"[3]*" N-fixer"),
+                               expression("C"[3]*" non-fixer"),
+                               expression("C"[4]*" non-fixer"))) +
   scale_linetype_manual(values = c("dashed", "solid")) +
   scale_x_continuous(limits = c(0, 80), breaks = seq(0, 80, 20)) +
   scale_y_continuous(limits = c(0.1, 1), breaks = seq(0.1, 1, 0.3)) +
@@ -222,9 +222,9 @@ chi.sm <- ggplot(data = df, aes(x = wn90_perc, y = chi)) +
   geom_jitter(aes(fill = pft),
               width = 0.01, size = 3, alpha = 0.75, shape = 21) +
   scale_fill_manual(values = c(cbbPalette3), 
-                    labels = c(expression("C"[3]~"legume"),
-                               expression("C"[3]~"non-legume"),
-                               expression("C"[4]~"non-legume"))) +
+                    labels = c(expression("C"[3]*" N-fixer"),
+                               expression("C"[3]*" non-fixer"),
+                               expression("C"[4]*" non-fixer"))) +
   scale_x_continuous(limits = c(0.15, 0.85), breaks = seq(0.2, 0.8, 0.2),
                      labels = c(20, 40, 60, 80)) +
   scale_y_continuous(limits = c(0.1, 1), breaks = seq(0.1, 1, 0.3)) +
@@ -280,12 +280,12 @@ narea.chi <- ggplot(data = subset(df, !is.na(pft)),
                 color = pft),
             size = 0.9) +
   scale_fill_manual(values = c(cbbPalette3), 
-                    labels = c(expression("C"[3]~"legume"),
-                               expression("C"[3]~"non-legume"),
-                               expression("C"[4]~"non-legume"))) +
+                    labels = c(expression("C"[3]*" N-fixer"),
+                               expression("C"[3]*" non-fixer"),
+                               expression("C"[4]*" non-fixer"))) +
   scale_color_manual(values = c(cbbPalette3), 
-                     labels = c(expression("C"[3]~"legume"),
-                                expression("C"[3]~"non-legume"))) +
+                     labels = c(expression("C"[3]*" N-fixer"),
+                                expression("C"[3]*" non-fixer"))) +
   scale_x_continuous(limits = c(0.1, 1), breaks = seq(0.1, 1, 0.3)) +
   scale_y_continuous(limits = c(-1, 3), breaks = seq(-1, 3, 1)) +
   labs(x = expression(bold("C"["i"]*" : C"["a"])),
@@ -324,9 +324,9 @@ narea.no3n <- ggplot(data = subset(df, !is.na(pft)),
             aes(x = soil.no3n, y = emmean),
             size = 0.9, color = "#DDAA33") +
   scale_fill_manual(values = c(cbbPalette3), 
-                    labels = c(expression("C"[3]~"legume"),
-                               expression("C"[3]~"non-legume"),
-                               expression("C"[4]~"non-legume"))) +
+                    labels = c(expression("C"[3]*" N-fixer"),
+                               expression("C"[3]*" non-fixer"),
+                               expression("C"[4]*" non-fixer"))) +
   scale_x_continuous(limits = c(-1, 80), breaks = seq(0, 80, 20)) +
   scale_y_continuous(limits = c(-1, 3), breaks = seq(-1, 3, 1)) +
   labs(x = expression(bold("Soil N availability (ppm NO"[3]*"-N)")),
@@ -358,9 +358,9 @@ narea.sm <- ggplot(data = subset(df, !is.na(pft)),
             aes(x = wn90_perc, y = emmean),
             size = 0.9, color = "black") +
   scale_fill_manual(values = c(cbbPalette3), 
-                    labels = c(expression("C"[3]~"legume"),
-                               expression("C"[3]~"non-legume"),
-                               expression("C"[4]~"non-legume"))) +
+                    labels = c(expression("C"[3]*" N-fixer"),
+                               expression("C"[3]*" non-fixer"),
+                               expression("C"[4]*" non-fixer"))) +
   scale_x_continuous(limits = c(0.2, 0.8), breaks = seq(0.2, 0.8, 0.2)) +
   scale_y_continuous(limits = c(-1, 3), breaks = seq(-1, 3, 1)) +
   labs(x = expression(bold("Soil moisture (% WHC)")),
@@ -386,9 +386,9 @@ nmass.chi <- ggplot(data = subset(df, !is.na(pft)),
   geom_point(aes(fill = pft),
              size = 3, alpha = 0.75, shape = 21) +
   scale_fill_manual(values = c(cbbPalette3), 
-                    labels = c(expression("C"[3]~"legume"),
-                               expression("C"[3]~"non-legume"),
-                               expression("C"[4]~"non-legume"))) +
+                    labels = c(expression("C"[3]*" N-fixer"),
+                               expression("C"[3]*" non-fixer"),
+                               expression("C"[4]*" non-fixer"))) +
   scale_x_continuous(limits = c(0.2, 1), breaks = seq(0.2, 1, 0.2)) +
   scale_y_continuous(limits = c(-1, 2), breaks = seq(-1, 2, 1)) +
   labs(x = expression(bold("C"["i"]*" : C"["a"])),
@@ -421,13 +421,13 @@ nmass.no3n <- ggplot(data = subset(df, !is.na(pft)),
             aes(x = soil.no3n, y = emmean),
             size = 0.9, color = "black") +
   scale_fill_manual(values = c(cbbPalette3), 
-                    labels = c(expression("C"[3]~"legume"),
-                               expression("C"[3]~"non-legume"),
-                               expression("C"[4]~"non-legume"))) +
+                    labels = c(expression("C"[3]*" N-fixer"),
+                               expression("C"[3]*" non-fixer"),
+                               expression("C"[4]*" non-fixer"))) +
   scale_color_manual(values = c(cbbPalette3), 
-                     labels = c(expression("C"[3]~"legume"),
-                                expression("C"[3]~"non-legume"),
-                                expression("C"[4]~"non-legume"))) +
+                     labels = c(expression("C"[3]*" N-fixer"),
+                                expression("C"[3]*" non-fixer"),
+                                expression("C"[4]*" non-fixer"))) +
   scale_x_continuous(limits = c(-1, 80), breaks = seq(0, 80, 20)) +
   scale_y_continuous(limits = c(-1, 2), breaks = seq(-1, 2, 1)) +
   labs(x = expression(bold("Soil N availability (ppm NO"[3]*"-N)")),
@@ -458,13 +458,13 @@ nmass.sm <- ggplot(data = subset(df, !is.na(pft)),
             aes(x = wn90_perc, y = emmean),
             size = 0.9, color = "black") +
   scale_fill_manual(values = c(cbbPalette3), 
-                    labels = c(expression("C"[3]~"legume"),
-                               expression("C"[3]~"non-legume"),
-                               expression("C"[4]~"non-legume"))) +
+                    labels = c(expression("C"[3]*" N-fixer"),
+                               expression("C"[3]*" non-fixer"),
+                               expression("C"[4]*" non-fixer"))) +
   scale_color_manual(values = c(cbbPalette3), 
-                     labels = c(expression("C"[3]~"legume"),
-                                expression("C"[3]~"non-legume"),
-                                expression("C"[4]~"non-legume"))) +
+                     labels = c(expression("C"[3]*" N-fixer"),
+                                expression("C"[3]*" non-fixer"),
+                                expression("C"[4]*" non-fixer"))) +
   scale_x_continuous(limits = c(0.2, 0.8), breaks = seq(0.2, 0.8, 0.2)) +
   scale_y_continuous(limits = c(-1, 2), breaks = seq(-1, 2, 1)) +
   labs(x = expression(bold("Soil moisture (% WHC)")),
@@ -505,12 +505,12 @@ marea.chi <- ggplot(data = subset(df, !is.na(pft)),
             aes(x = chi, y = emmean, color = pft),
             size = 0.9) +
   scale_fill_manual(values = c(cbbPalette3), 
-                    labels = c(expression("C"[3]~"legume"),
-                               expression("C"[3]~"non-legume"),
-                               expression("C"[4]~"non-legume"))) +
+                    labels = c(expression("C"[3]*" N-fixer"),
+                               expression("C"[3]*" non-fixer"),
+                               expression("C"[4]*" non-fixer"))) +
   scale_color_manual(values = c(cbbPalette3), 
-                     labels = c(expression("C"[3]~"legume"),
-                                expression("C"[3]~"non-legume"))) +
+                     labels = c(expression("C"[3]*" N-fixer"),
+                                expression("C"[3]*" non-fixer"))) +
   scale_linetype_manual(values = c("dashed", "solid")) +
   scale_x_continuous(limits = c(0.1, 1), breaks = seq(0.1, 1, 0.3)) +
   scale_y_continuous(limits = c(3, 7), breaks = seq(3, 7, 1)) +
@@ -548,13 +548,13 @@ marea.no3n <- ggplot(data = subset(df, !is.na(pft)),
                 color = pft),
             size = 0.9) +
   scale_fill_manual(values = c(cbbPalette3), 
-                    labels = c(expression("C"[3]~"legume"),
-                               expression("C"[3]~"non-legume"),
-                               expression("C"[4]~"non-legume"))) +
+                    labels = c(expression("C"[3]*" N-fixer"),
+                               expression("C"[3]*" non-fixer"),
+                               expression("C"[4]*" non-fixer"))) +
   scale_color_manual(values = c(cbbPalette3), 
-                     labels = c(expression("C"[3]~"legume"),
-                                expression("C"[3]~"non-legume"),
-                                expression("C"[4]~"non-legume"))) +
+                     labels = c(expression("C"[3]*" N-fixer"),
+                                expression("C"[3]*" non-fixer"),
+                                expression("C"[4]*" non-fixer"))) +
   scale_linetype_manual(values = c("dashed", "solid")) +
   scale_x_continuous(limits = c(-1, 80), breaks = seq(0, 80, 20)) +
   scale_y_continuous(limits = c(3, 7), breaks = seq(3, 7, 1)) +
@@ -583,9 +583,9 @@ marea.sm <- ggplot(data = subset(df, !is.na(pft)),
   geom_jitter(aes(fill = pft),
               width = 0.01, size = 3, alpha = 0.7, shape = 21) +
   scale_fill_manual(values = c(cbbPalette3), 
-                    labels = c(expression("C"[3]~"legume"),
-                               expression("C"[3]~"non-legume"),
-                               expression("C"[4]~"non-legume"))) +
+                    labels = c(expression("C"[3]*" N-fixer"),
+                               expression("C"[3]*" non-fixer"),
+                               expression("C"[4]*" non-fixer"))) +
   scale_x_continuous(limits = c(0.2, 0.8), breaks = seq(0.2, 0.8, 0.2)) +
   scale_y_continuous(limits = c(3, 7), breaks = seq(3, 7, 1)) +
   labs(x = expression(bold("Soil moisture (% WHC)")),
