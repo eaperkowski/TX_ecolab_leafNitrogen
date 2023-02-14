@@ -10,6 +10,8 @@ library(ggpubr)
 # Turn off digit rounding in emmean args
 emm_options(opt.digits = FALSE)
 
+source("../../r_functions/propN_funcs.R")
+
 # Load compiled datasheet
 df <- read.csv("../data_sheets/TXeco_compiled_datasheet2.csv",
                na.strings = c("NA", "NaN")) %>%
@@ -24,7 +26,8 @@ df <- read.csv("../data_sheets/TXeco_compiled_datasheet2.csv",
                                     "c3_legume", 
                                     NA))),
          chi = ifelse(chi > 0.95 | chi < 0.10, NA, chi),
-         marea = ifelse(marea > 1000, NA, marea))
+         marea = ifelse(marea > 1000, NA, marea),
+         p.structure = p_structure(lma = marea, narea = narea))
 
 ## Add colorblind friendly palette
 cbbPalette3 <- c("#DDAA33", "#004488", "#BB5566")
@@ -79,7 +82,7 @@ beta.no3n <- ggplot(data = subset(df, !is.na(pft)),
                                expression("C"[4]*" non-fixer"))) +
   scale_linetype_manual(values = c("dashed", "solid")) +
   scale_x_continuous(limits = c(-1, 80), breaks = seq(0, 80, 20)) +
-  scale_y_continuous(limits = c(-3, 6), breaks = seq(-3, 6, 3)) +
+  scale_y_continuous(limits = c(-4, 6), breaks = seq(-4, 6, 2)) +
   labs(x = expression(bold("Soil N availability (ppm NO"[3]*"-N)")),
        y = expression(bold(ln~beta)),
        fill = "Functional group") +
@@ -126,7 +129,7 @@ beta.h2o <- ggplot(data = subset(df, !is.na(pft)),
                                 expression("C"[4]*" non-fixer"))) +
   scale_x_continuous(limits = c(0.2, 0.8), breaks = seq(0.2, 0.8, 0.2),
                      labels = c(20, 40, 60, 80)) +
-  scale_y_continuous(limits = c(-3, 6), breaks = seq(-3, 6, 3)) +
+  scale_y_continuous(limits = c(-4, 6), breaks = seq(-4, 6, 2)) +
   labs(x = expression(bold("Soil moisture (% WHC)")),
        y = expression(bold(ln~beta)),
        fill = "Functional group",
@@ -315,7 +318,7 @@ narea.no3n.ind <- data.frame(emmeans(narea, ~1, "soil.no3n",
   
 
 narea.no3n <- ggplot(data = subset(df, !is.na(pft)), 
-                        aes(x = soil.no3n, y = log(narea))) +
+                     aes(x = soil.no3n, y = log(narea))_ +
   geom_jitter(aes (fill = pft), width = 0.5, size = 3, alpha = 0.75, shape = 21) +
   geom_ribbon(data = narea.no3n.pft, 
               aes(x = soil.no3n, y = emmean, ymin = lower.CL, ymax = upper.CL), 
@@ -348,7 +351,7 @@ narea.sm.pft <- data.frame(emmeans(narea, ~1, "wn90_perc",
                                      at = list(wn90_perc = seq(0.2, 0.8, 0.01))))
 
 narea.sm <- ggplot(data = subset(df, !is.na(pft)), 
-                   aes(x = wn90_perc, y = log(narea))) +
+                   aes(x = wn90_perc, y = narea)) +
   geom_jitter(aes(fill = pft),
               width = 0.01, size = 3, alpha = 0.75, shape = 21) +
   geom_ribbon(data = narea.sm.pft, 
@@ -601,6 +604,39 @@ marea.sm <- ggplot(data = subset(df, !is.na(pft)),
 marea.sm
 
 ##########################################################################
+## fraction of leaf N allocated to structure
+##########################################################################
+test(emtrends(p.str, ~pft, "chi"))
+car::Anova(marea)
+
+marea.soiln.ind <- data.frame(emmeans(marea, ~1, "chi",
+                                   at = list(soil.no3n = seq(0, 80, 1))))
+
+marea.sm <- ggplot(data = subset(df, !is.na(pft)), 
+                   aes(x = soil.no3n, y = log(p.structure))) +
+  geom_jitter(aes(fill = pft),
+              width = 0.01, size = 3, alpha = 0.7, shape = 21) +
+  scale_fill_manual(values = c(cbbPalette3), 
+                    labels = c(expression("C"[3]*" N-fixer"),
+                               expression("C"[3]*" non-fixer"),
+                               expression("C"[4]*" non-fixer"))) +
+  scale_x_continuous(limits = c(0.2, 0.8), breaks = seq(0.2, 0.8, 0.2)) +
+  scale_y_continuous(limits = c(3, 7), breaks = seq(3, 7, 1)) +
+  labs(x = expression(bold("Soil moisture (% WHC)")),
+       y = expression(bold(ln*" M"["area"]*" (g m"^"-2"~")")),
+       fill = expression(bold("Functional group")),
+       color = expression(bold("Functional group"))) +
+  theme_bw(base_size = 18) +
+  theme(legend.text.align = 0,
+        panel.border = element_rect(size = 1.25),
+        panel.grid.minor.y = element_blank()) +
+  guides(linetype = "none")
+
+marea.sm
+
+
+
+##########################################################################
 ## Create Narea plots
 ##########################################################################
 png("../working_drafts/figs/TXeco_fig4_narea.png",
@@ -620,7 +656,7 @@ beta.var <- ggplot(data = df, aes(x = log(beta))) +
   scale_fill_manual(values = c("#004488", "#BB5566"),
                     labels = c(expression("C"[3]),
                                expression("C"[4]))) +
-  scale_x_continuous(limits = c(-6, 6), breaks = seq(-6, 6, 3)) +
+  scale_x_continuous(limits = c(-4, 6), breaks = seq(-4, 6, 2)) +
   scale_y_continuous(limits = c(0, 0.6), breaks = seq(0, 0.6, 0.2)) +
   labs(x = expression(bold(ln~beta)),
        y = "Density",

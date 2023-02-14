@@ -47,7 +47,6 @@ length(df$pft[df$pft == "c4_nonlegume" & !is.na(df$chi)])
 
 length(unique(df$NCRS.code))
 
-
 ## How many annuals within c3 legume/c3 nonlegume?
 length(df$pft[df$pft == "c3_nonlegume" & df$duration == "annual"])
 length(df$pft[df$pft == "c3_legume" & df$duration == "annual"])
@@ -114,7 +113,7 @@ emmeans(chi, pairwise~pft)
 df$narea[df$narea > 10] <- NA
 
 # Fit model
-narea <- lmer(log(narea) ~ (chi + (soil.no3n * wn90_perc)) * pft + (1 | NCRS.code),
+narea <- lmer(narea ~ (chi + (soil.no3n * wn90_perc)) * pft + (1 | NCRS.code),
               data = df)
 
 # Check model assumptions
@@ -208,17 +207,17 @@ df$photo <- ifelse(df$photo == "c3", 1, 0)
 narea_psem_reduced <- psem(
   
   ## Narea model
-  narea = lme(narea ~ marea + n.leaf,
+  narea = lme(narea ~ marea + n.leaf + soil.no3n,
               random = ~ 1 | NCRS.code, 
               data = df, na.action = na.omit),
   
   ## Marea model
-  marea = lme(marea ~ chi,
+  marea = lme(marea ~ chi + soil.no3n,
               random = ~ 1 | NCRS.code, 
               data = df, na.action = na.omit),
   
   ## Nmass model
-  n.leaf = lme(n.leaf ~ chi + marea,
+  n.leaf = lme(n.leaf ~ chi + marea + soil.no3n,
                random = ~ 1 | NCRS.code, 
                data = df, na.action = na.omit),
   
