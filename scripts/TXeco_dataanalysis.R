@@ -207,7 +207,7 @@ df$photo <- ifelse(df$photo == "c3", 1, 0)
 narea_psem_reduced <- psem(
   
   ## Narea model
-  narea = lme(narea ~ marea + n.leaf + soil.no3n,
+  narea = lme(narea ~ marea + n.leaf,
               random = ~ 1 | NCRS.code, 
               data = df, na.action = na.omit),
   
@@ -217,7 +217,7 @@ narea_psem_reduced <- psem(
               data = df, na.action = na.omit),
   
   ## Nmass model
-  n.leaf = lme(n.leaf ~ chi + marea + soil.no3n,
+  n.leaf = lme(n.leaf ~ chi + soil.no3n + marea + n.fixer,
                random = ~ 1 | NCRS.code, 
                data = df, na.action = na.omit),
   
