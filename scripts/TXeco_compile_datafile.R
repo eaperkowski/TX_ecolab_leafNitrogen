@@ -106,7 +106,7 @@ full.df <- leaf %>%
   summarize_if(is.numeric, mean, na.rm = TRUE) %>%
   filter(pft != "c3_tree") %>%
   dplyr::mutate(chi = ifelse(pft == "c4_graminoid", 
-                             abs(calc_chi_c4(d13C, year = sampling.year)),
+                             calc_chi_c4(d13C, year = sampling.year),
                              calc_chi_c3(d13C, year = sampling.year)),
                 chi = ifelse(chi < 0.1 | chi > 0.95, NA, chi),
                 beta = calc_beta(chi = chi, temp = tavg7, 
@@ -115,14 +115,16 @@ full.df <- leaf %>%
   mutate(across(wn1:wn90, list(perc =~./ whc))) %>%
   as.data.frame()
 
+length(full.df$pft[full.df$pft == "c4_graminoid" & !is.na(full.df$chi)])
+
 ## Add chi column
 
 full.df$beta <- calc_beta(chi = as.numeric(full.df$chi), temp = full.df$tavg7, 
                           vpd = full.df$vpd7 * 10, z = full.df$elevation.m)
 full.df$beta[full.df$beta > 600] <- NA
-hist(full.df$beta)
+hist(full.df$beta[full.df$pft == "c4_graminoid"])
 
 class(full.df)
 
 ## Write csv
-write.csv(full.df, "../data_sheets/TXeco_compiled_datasheet2.csv", row.names = FALSE)
+write.csv(full.df, "../data_sheets/TXeco_compiled_datasheet3.csv", row.names = FALSE)

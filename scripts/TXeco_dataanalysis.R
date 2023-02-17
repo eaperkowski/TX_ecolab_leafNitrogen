@@ -16,7 +16,7 @@ library(nlme)
 emm_options(opt.digits = FALSE)
 
 # Load compiled datasheet
-df <- read.csv("../data_sheets/TXeco_compiled_datasheet2.csv",
+df <- read.csv("../data_sheets/TXeco_compiled_datasheet3.csv",
                na.strings = c("NA", "NaN")) %>%
   filter(site != "Bell_2020_05" & 
            site != "Russel_2020_01") %>%
