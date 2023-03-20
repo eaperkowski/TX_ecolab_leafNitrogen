@@ -11,7 +11,7 @@ library(merTools)
 ###############################################################################
 # Load compiled data file
 ###############################################################################
-df <- read.csv("../data_sheets/TXeco_compiled_datasheet2.csv",
+df <- read.csv("../data_sheets/TXeco_compiled_datasheet.csv",
                na.strings = c("NA", "NaN")) %>%
   filter(site != "Bell_2020_05" & 
            site != "Russel_2020_01") %>%
@@ -155,6 +155,8 @@ aicc.results.vpd <- vpd30.modelSelect %>%
   dplyr::select(day, aicc.vpd = AICc, rmse.vpd = RMSE)
 ## 4-day VPD is best model
 
+plot(aicc.results.vpd$day, aicc.results.vpd$aicc.vpd)
+
 ###############################################################################
 # Merge model selection results
 ###############################################################################
@@ -174,11 +176,11 @@ write.csv(aicc.results,
 ###############################################################################
 wn.beta <- ggplot(data = aicc.results, aes(x = day, y = aicc.wn)) +
   geom_point() +
-  geom_point(data = subset(aicc.results, day == 90), 
+  geom_point(data = subset(aicc.results, day == 3), 
              fill = "red", shape = 21) +
   geom_line() +
   scale_x_continuous(limits = c(0, 90), breaks = seq(0, 90, 30)) +
-  scale_y_continuous(limits = c(1387, 1391), breaks = seq(1387, 1391, 1)) +
+  scale_y_continuous(limits = c(1870, 1880), breaks = seq(1870, 1880, 2)) +
   labs(x = "Days prior to measurement", y = expression(bold("AIC"["c"])),
        title = expression(bold("Soil moisture (% WHC)"))) +
   theme_bw(base_size = 18) +
@@ -193,7 +195,7 @@ vpd.chi <- ggplot(data = aicc.results, aes(x = day, y = aicc.vpd)) +
              fill = "red", size = 2, shape = 21) +
   geom_line() +
   scale_x_continuous(limits = c(0, 90), breaks = seq(0, 90, 30)) +
-  scale_y_continuous(limits = c(-760, -735), breaks = seq(-760, -735, 5)) +
+  scale_y_continuous(limits = c(-870, -840), breaks = seq(-870, -840, 10)) +
   labs(x = "Days prior to measurement", y = NULL,
        title = "VPD (kPa)") +
   theme_bw(base_size = 18) +
