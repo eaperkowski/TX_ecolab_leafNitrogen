@@ -240,8 +240,12 @@ narea_psem_reduced <- psem(
              na.action = na.omit),
   
   ## Soil N model
-  soiln = lme(soil.no3n ~ wn3_perc + sg.perc.clay, random = ~ 1 | NCRS.code, 
-              data = df, na.action = na.omit))
+  soiln = lme(soil.no3n ~ wn3_perc, random = ~ 1 | NCRS.code, 
+              data = df, na.action = na.omit),
+  
+  ## Soil moisture
+  soil.moisture = lme(wn3_perc ~ sg.perc.clay, random = ~ 1 | NCRS.code, 
+                      data = df, na.action = na.omit))
 
 summary(narea_psem_reduced)
 plot(narea_psem_reduced)
@@ -345,8 +349,8 @@ narea.coefs <- data.frame(summary(narea)$coefficient) %>%
   dplyr::select(treatment, coef.narea) %>%
   filter(treatment == "(Intercept)" | 
            treatment == "chi" | treatment == "soil.no3n" | 
-           treatment == "wn90_perc" | 
-           treatment == "soil.no3n:wn90_perc") %>%
+           treatment == "wn3_perc" | 
+           treatment == "soil.no3n:wn3_perc") %>%
   mutate(coef.narea = ifelse(coef.narea <0.001 & coef.narea >= 0,
                        "<0.001", coef.narea)) %>%
   print(., row.names = FALSE)
@@ -359,9 +363,9 @@ narea.table <- data.frame(Anova(narea)) %>%
   full_join(narea.coefs) %>%
   mutate(treatment = factor(
     treatment, levels = c("(Intercept)", "chi", "soil.no3n",
-                          "wn90_perc", "pft", "soil.no3n:wn90_perc",
+                          "wn3_perc", "pft", "soil.no3n:wn3_perc",
                           "chi:pft", "soil.no3n:pft",
-                          "wn90_perc:pft", "soil.no3n:wn90_perc:pft"))) %>%
+                          "wn3_perc:pft", "soil.no3n:wn3_perc:pft"))) %>%
   dplyr::select(treatment, df = Df, coef.narea, Chisq.narea, P_value.narea) %>%
   arrange(treatment) %>%
   replace(is.na(.), "-")
@@ -372,8 +376,8 @@ nmass.coefs <- data.frame(summary(nmass)$coefficient) %>%
   dplyr::select(treatment, coef.nmass) %>%
   filter(treatment == "(Intercept)" | treatment == "chi" | 
            treatment == "soil.no3n" | 
-           treatment == "wn90_perc" | 
-           treatment == "soil.no3n:wn90_perc") %>%
+           treatment == "wn3_perc" | 
+           treatment == "soil.no3n:wn3_perc") %>%
   mutate(coef.nmass = ifelse(coef.nmass <0.001 & coef.nmass >= 0,
                        "<0.001", coef.nmass)) %>%
   print(., row.names = FALSE)
@@ -386,9 +390,9 @@ nmass.table <- data.frame(Anova(nmass)) %>%
   full_join(nmass.coefs) %>%
   mutate(treatment = factor(
     treatment, levels = c("(Intercept)", "chi", "soil.no3n",
-                          "wn90_perc", "pft", "soil.no3n:wn90_perc",
+                          "wn3_perc", "pft", "soil.no3n:wn3_perc",
                           "chi:pft", "soil.no3n:pft",
-                          "wn90_perc:pft", "soil.no3n:wn90_perc:pft"))) %>%
+                          "wn3_perc:pft", "soil.no3n:wn3_perc:pft"))) %>%
   dplyr::select(treatment, df = Df, coef.nmass, Chisq.nmass, P_value.nmass) %>%
   arrange(treatment) %>%
   replace(is.na(.), "-")
@@ -399,8 +403,8 @@ marea.coefs <- data.frame(summary(marea)$coefficient) %>%
   dplyr::select(treatment, coef.marea) %>%
   filter(treatment == "(Intercept)" | 
            treatment == "chi" | treatment == "soil.no3n" | 
-           treatment == "wn90_perc" | 
-           treatment == "soil.no3n:wn90_perc") %>%
+           treatment == "wn3_perc" | 
+           treatment == "soil.no3n:wn3_perc") %>%
   mutate(coef.marea = ifelse(coef.marea <0.001 & coef.marea >= 0,
                              "<0.001", coef.marea)) %>%
   print(., row.names = FALSE)
@@ -413,9 +417,9 @@ marea.table <- data.frame(Anova(marea)) %>%
   full_join(marea.coefs) %>%
   mutate(treatment = factor(
     treatment, levels = c("(Intercept)", "chi", "soil.no3n",
-                          "wn90_perc", "pft", "soil.no3n:wn90_perc",
+                          "wn3_perc", "pft", "soil.no3n:wn3_perc",
                           "chi:pft", "soil.no3n:pft",
-                          "wn90_perc:pft", "soil.no3n:wn90_perc:pft"))) %>%
+                          "wn3_perc:pft", "soil.no3n:wn3_perc:pft"))) %>%
   dplyr::select(treatment, df = Df, coef.marea, Chisq.marea, P_value.marea) %>%
   arrange(treatment) %>%
   replace(is.na(.), "-")
