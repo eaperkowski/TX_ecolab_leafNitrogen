@@ -20,7 +20,8 @@ R.utils::sourceDirectory("../../r_functions/splash_dev/R/", modifiedOnly = FALSE
 ###############################################################################
 sites <- read.csv("../data_sheets/TXeco_sitecoords.csv") %>%
   dplyr::select(-site) %>%
-  dplyr::select(site = property, everything())
+  dplyr::select(site = property, everything()) %>%
+  dplyr::filter(site != "Bell_2020_05" & site != "Russel_2020_01")
 
 ###############################################################################
 ## Run SPLASH model with 1991 data
@@ -3220,11 +3221,10 @@ daily.clim <- sites.daily.1991 %>%
 ###############################################################################
 # 2020 initial site visits
 initial.2020eco <- daily.clim %>%
-  dplyr::filter(site == "Bell_2020_05" | site == "Bexar_2019_13" | 
-                  site == "Blanco_2019_16" | site == "Brazos_2020_18" | 
-                  site == "Comal_2020_21" | site == "Edwards_2019_17" |
-                  site == "Fayette_2019_04" | site == "Harris_2020_03" | 
-                  site == "Menard_2020_01" | site == "Russel_2020_01" | 
+  dplyr::filter(site == "Bexar_2019_13" | site == "Blanco_2019_16" | 
+                  site == "Brazos_2020_18" | site == "Comal_2020_21" | 
+                  site == "Edwards_2019_17" | site == "Fayette_2019_04" | 
+                  site == "Harris_2020_03" | site == "Menard_2020_01" | 
                   site == "Sansaba_2020_01" | site == "Uvalde_2020_02" |
                   site == "Williamson_2019_09" | site == "Williamson_2019_10") %>%
   dplyr::filter(sampling.year == 2020) %>%

@@ -14,7 +14,8 @@ library(suncalc)
 
 # Load Ecolab site coords
 site.coords <- read.csv("../data_sheets/TXeco_sitecoords.csv") %>%
-  dplyr::select(site = property, property = site, latitude:elevation.m)
+  dplyr::select(site = property, property = site, latitude:elevation.m) %>%
+  dplyr::filter(site != "Bell_2020_05" & site != "Russel_2020_01")
 
 ecosites <- site.coords %>%
   dplyr::select(site, latitude, longitude) %>%
@@ -23,7 +24,8 @@ ecosites <- site.coords %>%
 eco.coords <- dplyr::select(ecosites, x = longitude, y = latitude) # select only lat/long data, code as xy
 
 # Load SoilGrids datafile
-soilgrids <- read.csv("../data_sheets/TXeco_soilgrid_data.csv")
+soil.texture <- read.csv("../data_sheets/TXeco_soiltexture_data.csv",
+                      na.strings = "<NA>")
 
 # Load calc_soil_water custom fxn
 source("../../r_functions/calc_soil_water.R")
@@ -35,7 +37,7 @@ source("../../r_functions/calc_soil_water.R")
 ###############################################################################
 
 # Set PRISM directory (put folder where prism data will be stored here)
-# prism_set_dl_dir("../climate_data/prism/prism_daily/")
+# prism_set_dl_dir("../climate_data/prism_daily/")
 # 
 # ###############################################################################
 # ## Stack raster files, select grid cells by site
@@ -47,7 +49,7 @@ source("../../r_functions/calc_soil_water.R")
 # ################
 # # Precipitation
 # ################
-# pd.daily.prcp <- pd_stack(prism_archive_subset("ppt", "daily", 
+# pd.daily.prcp <- pd_stack(prism_archive_subset("ppt", "daily",
 #                                                minDate = "1991-01-01",
 #                                                maxDate = "2021-07-31"))
 # sites.daily.prcp <- as.data.frame(terra::extract(pd.daily.prcp,
@@ -65,11 +67,11 @@ source("../../r_functions/calc_soil_water.R")
 # # Rename columns to have climate data indicator as prefix with month/year
 # # as suffix
 # names(sites.daily.prcp) <- c("site", "latitude", "longitude",
-#                              str_c("prcp_", 
+#                              str_c("prcp_",
 #                                    str_extract(names(sites.daily.prcp[4:11172]),
 #                                                "[0-9]{8}")))
 # 
-# # Pivot to long data format
+# #Pivot to long data format
 # sites.daily.prcp <- sites.daily.prcp %>%
 #   tidyr::pivot_longer(cols = prcp_19910101:prcp_20210730,
 #                       names_to = "date", values_to = "daily.prcp") %>%
@@ -253,7 +255,7 @@ source("../../r_functions/calc_soil_water.R")
 ## of sunlight hours
 ###############################################################################
 daily.clim <- read.csv("../climate_data/TXeco_PRISM_daily.csv") %>%
-  mutate(date = lubridate::ymd(date))
+  mutate(date = lubridate::mdy(date))
 
 ## Visualize dataset
 head(daily.clim)
@@ -285,23 +287,29 @@ daily.clim$sun.hours[daily.clim$site == "Harris_2020_03"]
 ###############################################################################
 ## Calculate water holding capacity of each site
 ###############################################################################
-whc.data <- soilgrids %>%
-  dplyr::mutate(calc_soil_water(id = site, fsand = perc.sand/100,
-                         fclay = perc.clay/100,
-                         fom = om/1000,
-                         fgravel = perc.gravel/100,
-                         zbed = bedrock),
+head(soil.texture)
+
+whc.data <- soil.texture %>%
+  dplyr::mutate(calc_soil_water(id = site, 
+                                fsand = as.numeric(perc.sand)/100,
+                                fclay = as.numeric(perc.clay)/100,
+                                fom = as.numeric(om_sg)/1000,
+                                fgravel = as.numeric(perc.gravel_sg)/100,
+                                zbed = as.numeric(bedrock_sg)),
          wfc = wfc*1000, 
          pwp = pwp*1000,
          whc = whc*1000) %>%
-  dplyr::select(-id, -lat, -long)
+  dplyr::select(-id)
+
+whc.data
 
 write.csv(whc.data, "../data_sheets/TXeco_soilgrid_data.csv", row.names = FALSE)
 
 ## Join water holding capacity data with compiled daily climate dataframe
 daily.clim <- daily.clim %>%
   full_join(whc.data, by = "site") %>%
-  distinct(site, date, .keep_all = TRUE)
+  distinct(site, date, .keep_all = TRUE) %>%
+  filter(site != "Bell_2020_05" & site != "Russel_2020_01")
 
 ###############################################################################
 ## Write daily climate .csv

@@ -10,11 +10,10 @@ library(lubridate)
 ###############################################################################
 # 2020 initial site visits
 initial.2020eco <- read.csv("../climate_data/TXeco_PRISM_daily.csv") %>%
-  dplyr::filter(site == "Bell_2020_05" | site == "Bexar_2019_13" | 
-                  site == "Blanco_2019_16" | site == "Brazos_2020_18" | 
-                  site == "Comal_2020_21" | site == "Edwards_2019_17" |
-                  site == "Fayette_2019_04" | site == "Harris_2020_03" | 
-                  site == "Menard_2020_01" | site == "Russel_2020_01" | 
+  dplyr::filter(site == "Bexar_2019_13" | site == "Blanco_2019_16" | 
+                  site == "Brazos_2020_18" | site == "Comal_2020_21" | 
+                  site == "Edwards_2019_17" | site == "Fayette_2019_04" | 
+                  site == "Harris_2020_03" | site == "Menard_2020_01" |
                   site == "Sansaba_2020_01" | site == "Uvalde_2020_02" |
                   site == "Williamson_2019_09" | site == "Williamson_2019_10") %>%
   mutate(date = ymd(date)) %>%
@@ -58,7 +57,8 @@ primary.2021eco <- read.csv("../climate_data/TXeco_PRISM_daily.csv") %>%
 ## by 90 days leading up to site visit
 ###############################################################################
 initial.2020eco <- read.csv("../data_sheets/TXeco_sitecoords.csv") %>%
-  dplyr::filter(sampling.year == 2020) %>%
+  dplyr::filter(sampling.year == 2020 & 
+                  property != "Bell_2020_05" & property != "Russel_2020_01") %>%
   dplyr::select(site = property, sampling.date = initial.2020) %>%
   mutate(sampling.date = ymd(sampling.date),
          sampling.year = 2020,
@@ -126,7 +126,7 @@ norm.15yr <- concat.clim %>%
 ###############################################################################
 d365 <- concat.clim %>%
   group_by(site, sampling.year, visit.type) %>%
-  filter(date > sampling.date - 365 & date < sampling.date) %>%
+  filter(date > sampling.date - 365 & date <= sampling.date) %>%
   summarize(tavg365 = mean(daily.tmean, na.rm = TRUE),
             prcp365 = sum(daily.prcp, na.rm = TRUE),
             vpd365 = mean(daily.vpdmean, na.rm = TRUE),
@@ -134,7 +134,7 @@ d365 <- concat.clim %>%
   na.omit()
 
 d90 <- concat.clim %>%
-  filter(date > sampling.date - 90 & date < sampling.date) %>%
+  filter(date > sampling.date - 90 & date <= sampling.date) %>%
   group_by(site, sampling.year, visit.type) %>%
   summarize(tavg90 = mean(daily.tmean, na.rm = TRUE),
             prcp90 = sum(daily.prcp, na.rm = TRUE),
@@ -142,103 +142,104 @@ d90 <- concat.clim %>%
             sf90 = mean(sf)) %>%
   na.omit()
 
-d60 <- concat.clim %>% filter(date > sampling.date - 60 & date < sampling.date) %>%
+d60 <- concat.clim %>% filter(date > sampling.date - 60 & date <= sampling.date) %>%
   group_by(site, sampling.year, visit.type) %>%
   summarize(tavg60 = mean(daily.tmean, na.rm = TRUE),
             prcp60 = sum(daily.prcp, na.rm = TRUE),
             vpd60 = mean(daily.vpdmean, na.rm = TRUE),
             sf60 = mean(sf))
 
-d30 <- concat.clim %>% filter(date > sampling.date - 30 & date < sampling.date) %>%
+d30 <- concat.clim %>% filter(date > sampling.date - 30 & date <= sampling.date) %>%
   group_by(site, sampling.year, visit.type) %>%
   summarize(tavg30 = mean(daily.tmean, na.rm = TRUE),
             prcp30 = sum(daily.prcp, na.rm = TRUE),
             vpd30 = mean(daily.vpdmean, na.rm = TRUE),
             sf30 = mean(sf))
 
-d20 <- concat.clim %>% filter(date > sampling.date - 20 & date < sampling.date) %>%
+d20 <- concat.clim %>% filter(date > sampling.date - 20 & date <= sampling.date) %>%
   group_by(site, sampling.year, visit.type) %>%
   summarize(tavg20 = mean(daily.tmean, na.rm = TRUE),
             prcp20 = sum(daily.prcp, na.rm = TRUE),
             vpd20 = mean(daily.vpdmean, na.rm = TRUE),
             sf20 = mean(sf))
 
-d15 <- concat.clim %>% filter(date > sampling.date - 15 & date < sampling.date) %>%
+d15 <- concat.clim %>% filter(date > sampling.date - 15 & date <= sampling.date) %>%
   group_by(site, sampling.year, visit.type) %>%
   summarize(tavg15 = mean(daily.tmean, na.rm = TRUE),
             prcp15 = sum(daily.prcp, na.rm = TRUE),
             vpd15 = mean(daily.vpdmean, na.rm = TRUE),
             sf15 = mean(sf))
 
-d10 <- concat.clim %>% filter(date > sampling.date - 10 & date < sampling.date) %>%
+d10 <- concat.clim %>% filter(date > sampling.date - 10 & date <= sampling.date) %>%
   group_by(site, sampling.year, visit.type) %>%
   summarize(tavg10 = mean(daily.tmean, na.rm = TRUE),
             prcp10 = sum(daily.prcp, na.rm = TRUE),
             vpd10 = mean(daily.vpdmean, na.rm = TRUE),
             sf10 = mean(sf))
 
-d9 <- concat.clim %>% filter(date > sampling.date - 9 & date < sampling.date) %>%
+d9 <- concat.clim %>% filter(date > sampling.date - 9 & date <= sampling.date) %>%
   group_by(site, sampling.year, visit.type) %>%
-  summarize(tavg9 = mean(daily.tmean, na.rm = TRUE),
-            prcp9 = sum(daily.prcp, na.rm = TRUE),
-            vpd9 = mean(daily.vpdmean, na.rm = TRUE),
-            sf9 = mean(sf))
+  summarize(tavg09 = mean(daily.tmean, na.rm = TRUE),
+            prcp09 = sum(daily.prcp, na.rm = TRUE),
+            vpd09 = mean(daily.vpdmean, na.rm = TRUE),
+            sf09 = mean(sf))
 
-d8 <- concat.clim %>% filter(date > sampling.date - 8 & date < sampling.date) %>%
+d8 <- concat.clim %>% filter(date > sampling.date - 8 & date <= sampling.date) %>%
   group_by(site, sampling.year, visit.type) %>%
-  summarize(tavg8 = mean(daily.tmean, na.rm = TRUE),
-            prcp8 = sum(daily.prcp, na.rm = TRUE),
-            vpd8 = mean(daily.vpdmean, na.rm = TRUE),
-            sf8 = mean(sf))
+  summarize(tavg08 = mean(daily.tmean, na.rm = TRUE),
+            prcp08 = sum(daily.prcp, na.rm = TRUE),
+            vpd08 = mean(daily.vpdmean, na.rm = TRUE),
+            sf08 = mean(sf))
 
-d7 <- concat.clim %>% filter(date > sampling.date - 7 & date < sampling.date) %>%
+d7 <- concat.clim %>% filter(date > sampling.date - 7 & date <= sampling.date) %>%
   group_by(site, sampling.year, visit.type) %>%
-  summarize(tavg7 = mean(daily.tmean, na.rm = TRUE),
-            prcp7 = sum(daily.prcp, na.rm = TRUE),
-            vpd7 = mean(daily.vpdmean, na.rm = TRUE),
-            sf7 = mean(sf))
+  summarize(tavg07 = mean(daily.tmean, na.rm = TRUE),
+            prcp07 = sum(daily.prcp, na.rm = TRUE),
+            vpd07 = mean(daily.vpdmean, na.rm = TRUE),
+            sf07 = mean(sf))
 
-d6 <- concat.clim %>% filter(date > sampling.date - 6 & date < sampling.date) %>%
+d6 <- concat.clim %>% filter(date > sampling.date - 6 & date <= sampling.date) %>%
   group_by(site, sampling.year, visit.type) %>%
-  summarize(tavg6 = mean(daily.tmean, na.rm = TRUE),
-            prcp6 = sum(daily.prcp, na.rm = TRUE),
-            vpd6 = mean(daily.vpdmean, na.rm = TRUE),
-            sf6 = mean(sf))
+  summarize(tavg06 = mean(daily.tmean, na.rm = TRUE),
+            prcp06 = sum(daily.prcp, na.rm = TRUE),
+            vpd06 = mean(daily.vpdmean, na.rm = TRUE),
+            sf06 = mean(sf))
 
-d5 <- concat.clim %>% filter(date > sampling.date - 5 & date < sampling.date) %>%
+d5 <- concat.clim %>% filter(date > sampling.date - 5 & date <= sampling.date) %>%
   group_by(site, sampling.year, visit.type) %>%
-  summarize(tavg5 = mean(daily.tmean, na.rm = TRUE),
-            prcp5 = sum(daily.prcp, na.rm = TRUE),
-            vpd5 = mean(daily.vpdmean, na.rm = TRUE),
-            sf5 = mean(sf))
+  summarize(tavg05 = mean(daily.tmean, na.rm = TRUE),
+            prcp05 = sum(daily.prcp, na.rm = TRUE),
+            vpd05 = mean(daily.vpdmean, na.rm = TRUE),
+            sf05 = mean(sf))
 
-d4 <- concat.clim %>% filter(date < sampling.date - 4 & date < sampling.date) %>%
+d4 <- concat.clim %>% filter(date > sampling.date - 4 & date <= sampling.date) %>%
   group_by(site, sampling.year, visit.type) %>%
-  summarize(tavg4 = mean(daily.tmean, na.rm = TRUE),
-            prcp4 = sum(daily.prcp, na.rm = TRUE),
-            vpd4 = mean(daily.vpdmean, na.rm = TRUE),
-            sf4 = mean(sf))
+  summarize(tavg04 = mean(daily.tmean, na.rm = TRUE),
+            prcp04 = sum(daily.prcp, na.rm = TRUE),
+            vpd04 = mean(daily.vpdmean, na.rm = TRUE),
+            sf04 = mean(sf))
 
-d3 <- concat.clim %>% filter(date > sampling.date - 3 & date < sampling.date) %>%
+d3 <- concat.clim %>% filter(date > sampling.date - 3 & date <= sampling.date) %>%
   group_by(site, sampling.year, visit.type) %>%
-  summarize(tavg3 = mean(daily.tmean, na.rm = TRUE),
-            prcp3 = sum(daily.prcp, na.rm = TRUE),
-            vpd3 = mean(daily.vpdmean, na.rm = TRUE),
-            sf3 = mean(sf))
+  summarize(tavg03 = mean(daily.tmean, na.rm = TRUE),
+            prcp03 = sum(daily.prcp, na.rm = TRUE),
+            vpd03 = mean(daily.vpdmean, na.rm = TRUE),
+            sf03 = mean(sf))
 
-d2 <- concat.clim %>% filter(date > sampling.date - 2 & date < sampling.date) %>%
+d2 <- concat.clim %>% filter(date > sampling.date - 2 & date <= sampling.date) %>%
   group_by(site, sampling.year, visit.type) %>%
-  summarize(tavg2 = mean(daily.tmean, na.rm = TRUE),
-            prcp2 = sum(daily.prcp, na.rm = TRUE),
-            vpd2 = mean(daily.vpdmean, na.rm = TRUE),
-            sf2 = mean(sf))
+  summarize(tavg02 = mean(daily.tmean, na.rm = TRUE),
+            prcp02 = sum(daily.prcp, na.rm = TRUE),
+            vpd02 = mean(daily.vpdmean, na.rm = TRUE),
+            sf02 = mean(sf))
 
 d1 <- concat.clim %>% filter(date > sampling.date - 1 & date <= sampling.date) %>%
+  filter(date > sampling.date - 1) %>%
   group_by(site, sampling.year, visit.type) %>%
-  summarize(tavg1 = daily.tmean,
-            prcp1 = daily.prcp,
-            vpd1 = daily.vpdmean,
-            sf1 = sf)
+  summarize(tavg01 = daily.tmean,
+            prcp01 = daily.prcp,
+            vpd01 = daily.vpdmean,
+            sf01 = sf)
 
 ## Merge all iterative climate means with normals data frame
 ## Also merge aridity index values for single climate data file
@@ -246,7 +247,8 @@ d <- norm.15yr %>% full_join(d365) %>% full_join(d90) %>% full_join(d60) %>%
   full_join(d30) %>% full_join(d20) %>% full_join(d15) %>% full_join(d10) %>%
   full_join(d9) %>% full_join(d8) %>% full_join(d7) %>% 
   full_join(d6) %>% full_join(d5) %>% full_join(d4) %>% full_join(d3) %>% 
-  full_join(d2) %>% full_join(d1) 
+  full_join(d2) %>% full_join(d1) %>%
+  relocate(sort(names(.)))
 
 ## Read in climate aridity index values
 splash.df <- read.csv("../climate_data/TXeco_siteAridity_SPLASH.csv")
