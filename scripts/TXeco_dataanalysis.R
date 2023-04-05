@@ -140,7 +140,7 @@ r.squaredGLMM(narea)
 
 ## Post hoc comparisons
 test(emtrends(narea, pairwise~pft, "chi"))
-test(emtrends(narea, ~wn3_perc, "soil.no3n", at = list(wn3_perc = seq(0.1,1,0.1))))
+test(emtrends(narea, ~wn3_perc, "soil.no3n", at = list(wn3_perc = seq(0,1,0.05))))
 emmeans(narea, pairwise~pft)
 
 ##########################################################################
@@ -169,6 +169,9 @@ r.squaredGLMM(nmass)
 
 # Post hoc tests
 test(emtrends(nmass, pairwise~pft, "chi"))
+test(emtrends(nmass, ~wn3_perc, "soil.no3n", at = list(wn3_perc = seq(0,1,0.05))))
+
+
 test(emtrends(nmass, ~1, "wn3_perc"))
 test(emtrends(nmass, ~1, "soil.no3n"))
 emmeans(nmass, pairwise~pft)
@@ -199,7 +202,7 @@ r.squaredGLMM(marea)
 
 # Post-hoc comparisons
 test(emtrends(marea, ~wn3_perc, "soil.no3n",
-              at = list(wn3_perc = seq(0.2, 0.8, 0.2))))
+              at = list(wn3_perc = seq(0.1, 0.9, 0.05))))
 test(emtrends(marea, pairwise~pft, "chi"))
 test(emtrends(marea, pairwise~pft, "soil.no3n"))
 
@@ -458,12 +461,12 @@ write.csv(table5, "../working_drafts/tables/TXeco_table5_SEMclean.csv",
 ## Mean and standard deviation of beta
 min(subset(df, pft != "c4_nonlegume")$beta, na.rm = TRUE)
 max(subset(df, pft != "c4_nonlegume")$beta, na.rm = TRUE)
-median(subset(df, pft != "c4_nonlegume")$beta, na.rm = TRUE)
 mean(subset(df, pft != "c4_nonlegume")$beta, na.rm = TRUE)
+median(subset(df, pft != "c4_nonlegume")$beta, na.rm = TRUE)
 sd(subset(df, pft != "c4_nonlegume")$beta, na.rm = TRUE)
 
 min(subset(df, pft == "c4_nonlegume")$beta, na.rm = TRUE)
 max(subset(df, pft == "c4_nonlegume")$beta, na.rm = TRUE)
-median(subset(df, pft == "c4_nonlegume")$beta, na.rm = TRUE)
 mean(subset(df, pft == "c4_nonlegume")$beta, na.rm = TRUE)
+median(subset(df, pft == "c4_nonlegume")$beta, na.rm = TRUE)
 sd(subset(df, pft == "c4_nonlegume")$beta, na.rm = TRUE)
