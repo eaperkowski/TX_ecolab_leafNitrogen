@@ -11,8 +11,8 @@ library(merTools)
 ###############################################################################
 # Load compiled data file
 ###############################################################################
-df <- read.csv("../data_sheets/TXeco_compiled_datasheet.csv",
-               na.strings = c("NA", "NaN")) %>%
+df <- df <- read.csv("../data_sheets/TXeco_compiled_datasheet.csv",
+                     na.strings = c("NA", "NaN")) %>%
   filter(site != "Bell_2020_05" & 
            site != "Russel_2020_01") %>%
   filter(pft != "c3_shrub") %>%
@@ -20,10 +20,13 @@ df <- read.csv("../data_sheets/TXeco_compiled_datasheet.csv",
                       "c4_nonlegume",
                       ifelse(pft == "c3_graminoid" | pft == "c3_forb",
                              "c3_nonlegume", 
-                             ifelse(pft == "legume", 
+                             ifelse(pft == "c3_legume", 
                                     "c3_legume", 
                                     NA))),
-         chi = ifelse(chi > 0.95 | chi < 0.10, NA, chi))
+         beta = ifelse(beta > 2000, NA, beta),
+         beta = ifelse(pft == "c4_nonlegume" & beta > 400, NA, beta),
+         beta = ifelse(pft == "c3_legume" & beta > 1000, NA, beta),
+         marea = ifelse(marea > 1000, NA, marea))
 
 ###############################################################################
 # Iterative models for soil moisture and beta
@@ -34,15 +37,15 @@ wn30 <- lmer(log(beta) ~ wn30_perc + (1 | NCRS.code), data = df)
 wn20 <- lmer(log(beta) ~ wn20_perc + (1 | NCRS.code), data = df)
 wn15 <- lmer(log(beta) ~ wn15_perc + (1 | NCRS.code), data = df)
 wn10 <- lmer(log(beta) ~ wn10_perc + (1 | NCRS.code), data = df)
-wn9 <- lmer(log(beta) ~ wn9_perc + (1 | NCRS.code), data = df)
-wn8 <- lmer(log(beta) ~ wn8_perc + (1 | NCRS.code), data = df)
-wn7 <- lmer(log(beta) ~ wn7_perc + (1 | NCRS.code), data = df)
-wn6 <- lmer(log(beta) ~ wn6_perc + (1 | NCRS.code), data = df)
-wn5 <- lmer(log(beta) ~ wn5_perc + (1 | NCRS.code), data = df)
-wn4 <- lmer(log(beta) ~ wn4_perc + (1 | NCRS.code), data = df)
-wn3 <- lmer(log(beta) ~ wn3_perc + (1 | NCRS.code), data = df)
-wn2 <- lmer(log(beta) ~ wn2_perc + (1 | NCRS.code), data = df)
-wn1 <- lmer(log(beta) ~ wn1_perc + (1 | NCRS.code), data = df)
+wn9 <- lmer(log(beta) ~ wn09_perc + (1 | NCRS.code), data = df)
+wn8 <- lmer(log(beta) ~ wn08_perc + (1 | NCRS.code), data = df)
+wn7 <- lmer(log(beta) ~ wn07_perc + (1 | NCRS.code), data = df)
+wn6 <- lmer(log(beta) ~ wn06_perc + (1 | NCRS.code), data = df)
+wn5 <- lmer(log(beta) ~ wn05_perc + (1 | NCRS.code), data = df)
+wn4 <- lmer(log(beta) ~ wn04_perc + (1 | NCRS.code), data = df)
+wn3 <- lmer(log(beta) ~ wn03_perc + (1 | NCRS.code), data = df)
+wn2 <- lmer(log(beta) ~ wn02_perc + (1 | NCRS.code), data = df)
+wn1 <- lmer(log(beta) ~ wn01_perc + (1 | NCRS.code), data = df)
 
 # Model selection across timescales
 wn90.modelSelect <- data.frame(day = 90, var = "wn", AICc = AICc(wn90), 
@@ -100,15 +103,15 @@ vpd30 <- lmer(chi ~ vpd30 + (1 | NCRS.code), data = df)
 vpd20 <- lmer(chi ~ vpd20 + (1 | NCRS.code), data = df)
 vpd15 <- lmer(chi ~ vpd15 + (1 | NCRS.code), data = df)
 vpd10 <- lmer(chi ~ vpd10 + (1 | NCRS.code), data = df)
-vpd9 <- lmer(chi ~ vpd9 + (1 | NCRS.code), data = df)
-vpd8 <- lmer(chi ~ vpd8 + (1 | NCRS.code), data = df)
-vpd7 <- lmer(chi ~ vpd7 + (1 | NCRS.code), data = df)
-vpd6 <- lmer(chi ~ vpd6 + (1 | NCRS.code), data = df)
-vpd5 <- lmer(chi ~ vpd5 + (1 | NCRS.code), data = df)
-vpd4 <- lmer(chi ~ vpd4 + (1 | NCRS.code), data = df)
-vpd3 <- lmer(chi ~ vpd3 + (1 | NCRS.code), data = df)
-vpd2 <- lmer(chi ~ vpd2 + (1 | NCRS.code), data = df)
-vpd1 <- lmer(chi ~ vpd1 + (1 | NCRS.code), data = df)
+vpd9 <- lmer(chi ~ vpd09 + (1 | NCRS.code), data = df)
+vpd8 <- lmer(chi ~ vpd08 + (1 | NCRS.code), data = df)
+vpd7 <- lmer(chi ~ vpd07 + (1 | NCRS.code), data = df)
+vpd6 <- lmer(chi ~ vpd06 + (1 | NCRS.code), data = df)
+vpd5 <- lmer(chi ~ vpd05 + (1 | NCRS.code), data = df)
+vpd4 <- lmer(chi ~ vpd04 + (1 | NCRS.code), data = df)
+vpd3 <- lmer(chi ~ vpd03 + (1 | NCRS.code), data = df)
+vpd2 <- lmer(chi ~ vpd02 + (1 | NCRS.code), data = df)
+vpd1 <- lmer(chi ~ vpd01 + (1 | NCRS.code), data = df)
 
 # Model selection across timescales
 vpd90.modelSelect <- data.frame(day = 90, var = "vpd", AICc = AICc(vpd90), 
@@ -153,7 +156,7 @@ aicc.results.vpd <- vpd30.modelSelect %>%
   mutate(concat.select = AICc + RMSE) %>%
   arrange(day) %>%
   dplyr::select(day, aicc.vpd = AICc, rmse.vpd = RMSE)
-## 4-day VPD is best model
+## 90-day VPD is best model
 
 plot(aicc.results.vpd$day, aicc.results.vpd$aicc.vpd)
 
@@ -180,7 +183,7 @@ wn.beta <- ggplot(data = aicc.results, aes(x = day, y = aicc.wn)) +
              fill = "red", shape = 21) +
   geom_line() +
   scale_x_continuous(limits = c(0, 90), breaks = seq(0, 90, 30)) +
-  scale_y_continuous(limits = c(1870, 1880), breaks = seq(1870, 1880, 2)) +
+  scale_y_continuous(limits = c(1656.5, 1662), breaks = seq(1657, 1662, 1)) +
   labs(x = "Days prior to measurement", y = expression(bold("AIC"["c"])),
        title = expression(bold("Soil moisture (% WHC)"))) +
   theme_bw(base_size = 18) +
@@ -191,11 +194,11 @@ wn.beta <- ggplot(data = aicc.results, aes(x = day, y = aicc.wn)) +
 
 vpd.chi <- ggplot(data = aicc.results, aes(x = day, y = aicc.vpd)) +
   geom_point() +
-  geom_point(data = subset(aicc.results, day == 4), 
+  geom_point(data = subset(aicc.results, day == 90), 
              fill = "red", size = 2, shape = 21) +
   geom_line() +
   scale_x_continuous(limits = c(0, 90), breaks = seq(0, 90, 30)) +
-  scale_y_continuous(limits = c(-870, -840), breaks = seq(-870, -840, 10)) +
+  scale_y_continuous(limits = c(-885, -860), breaks = seq(-885, -860, 5)) +
   labs(x = "Days prior to measurement", y = NULL,
        title = "VPD (kPa)") +
   theme_bw(base_size = 18) +

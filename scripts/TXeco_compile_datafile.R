@@ -123,14 +123,15 @@ full.df <- leaf %>%
   dplyr::mutate(chi = ifelse(pft == "c4_graminoid", 
                              calc_chi_c4(d13C),
                              calc_chi_c3(d13C)),
-                chi = ifelse(chi < 0.1 | chi > 0.95, NA, chi),
+                chi = ifelse(chi < 0.05 | chi > 0.95, NA, chi),
                 beta = calc_beta(chi = chi, temp = tavg07, 
-                                 vpd = vpd07 * 10, z = elevation.m)$beta) %>%
+                                 vpd = vpd07 * 100, z = elevation.m)$beta) %>%
   dplyr::select(-(sf90:sf01), -(ai.30:ai.15yr))
 
 length(full.df$pft[full.df$pft == "c4_graminoid" & !is.na(full.df$chi)])
 hist(full.df$beta[full.df$pft == "c4_graminoid"])
 hist(full.df$beta[full.df$pft == "c3_forb"])
+hist(log(full.df$beta))
 
 ## Write csv
 write.csv(full.df, "../data_sheets/TXeco_compiled_datasheet.csv", row.names = FALSE)

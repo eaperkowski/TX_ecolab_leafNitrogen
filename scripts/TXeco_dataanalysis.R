@@ -25,12 +25,13 @@ df <- read.csv("../data_sheets/TXeco_compiled_datasheet.csv",
                       "c4_nonlegume",
                       ifelse(pft == "c3_graminoid" | pft == "c3_forb",
                              "c3_nonlegume", 
-                             ifelse(pft == "legume", 
+                             ifelse(pft == "c3_legume", 
                                     "c3_legume", 
                                     NA))),
-         chi = ifelse(chi > 0.95 | chi < 0.10, NA, chi),
-         marea = ifelse(marea > 1000, NA, marea),
-         beta = ifelse(pft == "c4_nonlegume" & beta > 100, NA, beta))
+         beta = ifelse(beta > 2000, NA, beta),
+         beta = ifelse(pft == "c4_nonlegume" & beta > 400, NA, beta),
+         beta = ifelse(pft == "c3_legume" & beta > 1000, NA, beta),
+         marea = ifelse(marea > 1000, NA, marea))
 
 ## Add colorblind friendly palette
 cbbPalette3 <- c("#DDAA33", "#BB5566", "#004488")
@@ -40,9 +41,6 @@ length(df$pft[df$pft == "c3_legume"])
 length(df$pft[df$pft == "c3_nonlegume"])
 length(df$pft[df$pft == "c4_nonlegume"])
 df$pft <- factor(df$pft, levels = c("c3_legume", "c4_nonlegume", "c3_nonlegume"))
-
-## Convert VPD from hPa (PRISM units) to kPa (standard)
-df$vpd4 <- df$vpd4 / 10
 
 length(df$pft[df$pft == "c4_nonlegume" & !is.na(df$chi)])
 length(unique(df$NCRS.code))
@@ -54,6 +52,9 @@ length(df$pft[df$pft == "c3_legume" & df$duration == "annual"])
 length(df$pft[df$pft == "c3_nonlegume"])
 length(df$pft[df$pft == "c3_nonlegume" | df$pft == "c3_legume"])
 length(df$pft[df$pft == "c4_nonlegume"]) / 504
+
+hist(df$beta)
+hist(df$beta[df$pft == "c4_nonlegume"])
 
 ##########################################################################
 ## Beta
