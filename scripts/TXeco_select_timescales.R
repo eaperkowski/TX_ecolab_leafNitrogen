@@ -31,21 +31,21 @@ df <- df <- read.csv("../data_sheets/TXeco_compiled_datasheet.csv",
 ###############################################################################
 # Iterative models for soil moisture and beta
 ###############################################################################
-wn90 <- lmer(log(beta) ~ wn90_perc + (1 | NCRS.code), data = df)
-wn60 <- lmer(log(beta) ~ wn60_perc + (1 | NCRS.code), data = df)
-wn30 <- lmer(log(beta) ~ wn30_perc + (1 | NCRS.code), data = df)
-wn20 <- lmer(log(beta) ~ wn20_perc + (1 | NCRS.code), data = df)
-wn15 <- lmer(log(beta) ~ wn15_perc + (1 | NCRS.code), data = df)
-wn10 <- lmer(log(beta) ~ wn10_perc + (1 | NCRS.code), data = df)
-wn9 <- lmer(log(beta) ~ wn09_perc + (1 | NCRS.code), data = df)
-wn8 <- lmer(log(beta) ~ wn08_perc + (1 | NCRS.code), data = df)
-wn7 <- lmer(log(beta) ~ wn07_perc + (1 | NCRS.code), data = df)
-wn6 <- lmer(log(beta) ~ wn06_perc + (1 | NCRS.code), data = df)
-wn5 <- lmer(log(beta) ~ wn05_perc + (1 | NCRS.code), data = df)
-wn4 <- lmer(log(beta) ~ wn04_perc + (1 | NCRS.code), data = df)
-wn3 <- lmer(log(beta) ~ wn03_perc + (1 | NCRS.code), data = df)
-wn2 <- lmer(log(beta) ~ wn02_perc + (1 | NCRS.code), data = df)
-wn1 <- lmer(log(beta) ~ wn01_perc + (1 | NCRS.code), data = df)
+wn90 <- lmer(sqrt(beta) ~ wn90_perc + (1 | NCRS.code), data = df)
+wn60 <- lmer(sqrt(beta) ~ wn60_perc + (1 | NCRS.code), data = df)
+wn30 <- lmer(sqrt(beta) ~ wn30_perc + (1 | NCRS.code), data = df)
+wn20 <- lmer(sqrt(beta) ~ wn20_perc + (1 | NCRS.code), data = df)
+wn15 <- lmer(sqrt(beta) ~ wn15_perc + (1 | NCRS.code), data = df)
+wn10 <- lmer(sqrt(beta) ~ wn10_perc + (1 | NCRS.code), data = df)
+wn9 <- lmer(sqrt(beta) ~ wn09_perc + (1 | NCRS.code), data = df)
+wn8 <- lmer(sqrt(beta) ~ wn08_perc + (1 | NCRS.code), data = df)
+wn7 <- lmer(sqrt(beta) ~ wn07_perc + (1 | NCRS.code), data = df)
+wn6 <- lmer(sqrt(beta) ~ wn06_perc + (1 | NCRS.code), data = df)
+wn5 <- lmer(sqrt(beta) ~ wn05_perc + (1 | NCRS.code), data = df)
+wn4 <- lmer(sqrt(beta) ~ wn04_perc + (1 | NCRS.code), data = df)
+wn3 <- lmer(sqrt(beta) ~ wn03_perc + (1 | NCRS.code), data = df)
+wn2 <- lmer(sqrt(beta) ~ wn02_perc + (1 | NCRS.code), data = df)
+wn1 <- lmer(sqrt(beta) ~ wn01_perc + (1 | NCRS.code), data = df)
 
 # Model selection across timescales
 wn90.modelSelect <- data.frame(day = 90, var = "wn", AICc = AICc(wn90), 
@@ -179,11 +179,11 @@ write.csv(aicc.results,
 ###############################################################################
 wn.beta <- ggplot(data = aicc.results, aes(x = day, y = aicc.wn)) +
   geom_point() +
-  geom_point(data = subset(aicc.results, day == 3), 
+  geom_point(data = subset(aicc.results, day == 90), 
              fill = "red", shape = 21) +
   geom_line() +
   scale_x_continuous(limits = c(0, 90), breaks = seq(0, 90, 30)) +
-  scale_y_continuous(limits = c(1656.5, 1662), breaks = seq(1657, 1662, 1)) +
+  scale_y_continuous(limits = c(2984, 2994), breaks = seq(2984, 2994, 2)) +
   labs(x = "Days prior to measurement", y = expression(bold("AIC"["c"])),
        title = expression(bold("Soil moisture (% WHC)"))) +
   theme_bw(base_size = 18) +
