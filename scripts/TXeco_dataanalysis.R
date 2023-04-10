@@ -267,7 +267,7 @@ narea_psem_preopt <- psem(
 
 summary(narea_psem_preopt)
 
-## Optimized Narea PSEM model (before optimization)
+## Optimized Narea PSEM model
 narea_psem_opt <- psem(
   
   ## Narea model
@@ -276,23 +276,23 @@ narea_psem_opt <- psem(
               data = df.psem, na.action = na.omit),
   
   ## Marea model
-  marea = lme(marea.trans ~ chi + soil.no3n + photo,
+  marea = lme(marea.trans ~ chi + soil.no3n + vpd90 + photo,
               random = ~ 1 | NCRS.code, 
               data = df.psem, na.action = na.omit),
   
   ## Nmass model
-  nmass = lme(nmass.trans ~ chi + soil.no3n + wn90_perc + perc.clay + 
-                marea.trans + photo + n.fixer + vpd90,
+  nmass = lme(nmass.trans ~ chi + beta.trans + marea.trans + soil.no3n + 
+                wn90_perc + perc.clay + vpd90 + photo + n.fixer,
               random = ~ 1 | NCRS.code, 
               data = df.psem, na.action = na.omit),
   
   ## Chi model
-  chi = lme(chi ~ beta.trans + vpd90 + wn90_perc + photo, 
+  chi = lme(chi ~ beta.trans + wn90_perc + vpd90 + photo, 
             random = ~ 1 | NCRS.code,
             data = df.psem, na.action = na.omit),
   
   ## Beta model
-  beta = lme(beta.trans ~ soil.no3n + wn90_perc + perc.clay + photo + n.fixer + vpd90,
+  beta = lme(beta.trans ~ soil.no3n + wn90_perc + perc.clay + vpd90 + photo + n.fixer,
              random = ~ 1 | NCRS.code, data = df.psem, 
              na.action = na.omit),
   
@@ -303,20 +303,16 @@ narea_psem_opt <- psem(
   ## Soil moisture
   soil.moisture = lme(wn90_perc ~ perc.clay + vpd90, random = ~ 1 | NCRS.code, 
                       data = df.psem, na.action = na.omit))
-
 summary(narea_psem_opt)
-
 plot(narea_psem_opt)
 
 line.thick <- data.frame(summary(narea_psem_opt)$coefficients,
            line.thickness = abs(summary(
              narea_psem_opt)$coefficients$Std.Estimate) * 16.67)
 
-
 line.thick <- line.thick %>%
   mutate(line.thickness = round(line.thickness, digits = 2)) %>%
   dplyr::select(-Var.9)
-
 
 ggplot(data=line.thick, aes(x = abs(Std.Estimate), 
                             y = line.thickness)) + 
