@@ -141,13 +141,15 @@ shapiro.test(residuals(narea))
 outlierTest(narea)
 
 # Model output
-round(summary(narea)$coefficients, digits = 3)
+summary(narea)
 Anova(narea)
 r.squaredGLMM(narea)
 
 ## Post hoc comparisons
 test(emtrends(narea, pairwise~pft, "chi"))
-test(emtrends(narea, ~wn03_perc, "soil.no3n", at = list(wn03_perc = seq(0,1,0.05))))
+test(emtrends(narea, ~1, "soil.no3n"))
+test(emtrends(narea, ~1, "wn90_perc"))
+
 emmeans(narea, pairwise~pft)
 
 ##########################################################################
@@ -169,16 +171,14 @@ shapiro.test(residuals(nmass))
 outlierTest(nmass)
 
 # Model output
-format(summary(nmass)$coefficients, scientific = TRUE, digits = 3)
+summary(nmass)
 Anova(nmass)
 r.squaredGLMM(nmass)
 
 # Post hoc tests
 test(emtrends(nmass, pairwise~pft, "chi"))
-test(emtrends(nmass, ~wn03_perc, "soil.no3n", at = list(wn03_perc = seq(0,1,0.05))))
-
-
-test(emtrends(nmass, ~1, "wn03_perc"))
+test(emtrends(nmass, ~wn90_perc, "soil.no3n", at = list(wn90_perc = seq(0.15,0.75,0.05))))
+test(emtrends(nmass, ~1, "wn90_perc"))
 test(emtrends(nmass, ~1, "soil.no3n"))
 emmeans(nmass, pairwise~pft)
 
@@ -207,8 +207,11 @@ Anova(marea)
 r.squaredGLMM(marea)
 
 # Post-hoc comparisons
-test(emtrends(marea, ~wn03_perc, "soil.no3n",
-              at = list(wn03_perc = seq(0.1, 0.9, 0.05))))
+test(emtrends(marea, pairwise~pft, "chi"))
+
+
+test(emtrends(marea, ~wn90_perc*pft, "soil.no3n",
+              at = list(wn90_perc = seq(0.15, 0.75, 0.01))))
 test(emtrends(marea, pairwise~pft, "chi"))
 test(emtrends(marea, pairwise~pft, "soil.no3n"))
 
@@ -240,7 +243,7 @@ narea_psem_preopt <- psem(
               data = df.psem, na.action = na.omit),
   
   ## Nmass model
-  nmass = lme(nmass.trans ~ chi + soil.no3n + marea.trans,
+  nmass = lme(nmass.trans ~ chi + soil.no3n + marea.trans + n.fixer,
                random = ~ 1 | NCRS.code, 
                data = df.psem, na.action = na.omit),
   
