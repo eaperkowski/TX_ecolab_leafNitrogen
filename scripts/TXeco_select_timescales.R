@@ -11,10 +11,8 @@ library(merTools)
 ###############################################################################
 # Load compiled data file
 ###############################################################################
-df <- df <- read.csv("../data_sheets/TXeco_compiled_datasheet.csv",
-                     na.strings = c("NA", "NaN")) %>%
-  filter(site != "Bell_2020_05" & 
-           site != "Russel_2020_01") %>%
+df <- read.csv("../../TXeco/TXeco_data.csv",
+               na.strings = c("NA", "NaN")) %>%
   filter(pft != "c3_shrub") %>%
   mutate(pft = ifelse(pft == "c4_graminoid", 
                       "c4_nonlegume",
@@ -89,7 +87,7 @@ aicc.results.wn <- wn30.modelSelect %>%
   full_join(wn2.modelSelect) %>% full_join(wn1.modelSelect) %>%
   arrange(day) %>%
   dplyr::select(day, aicc.wn = AICc, rmse.wn = RMSE)
-# 3-day soil moisture is best model
+# 90-day soil moisture is best model
 
 plot(aicc.results.wn$day, aicc.results.wn$aicc.wn)
 
@@ -183,7 +181,7 @@ wn.beta <- ggplot(data = aicc.results, aes(x = day, y = aicc.wn)) +
              fill = "red", shape = 21) +
   geom_line() +
   scale_x_continuous(limits = c(0, 90), breaks = seq(0, 90, 30)) +
-  scale_y_continuous(limits = c(2984, 2994), breaks = seq(2984, 2994, 2)) +
+  scale_y_continuous(limits = c(2984, 2993), breaks = seq(2984, 2993, 3)) +
   labs(x = "Days prior to measurement", y = expression(bold("AIC"["c"])),
        title = expression(bold("Soil moisture (% WHC)"))) +
   theme_bw(base_size = 18) +
@@ -198,7 +196,7 @@ vpd.chi <- ggplot(data = aicc.results, aes(x = day, y = aicc.vpd)) +
              fill = "red", size = 2, shape = 21) +
   geom_line() +
   scale_x_continuous(limits = c(0, 90), breaks = seq(0, 90, 30)) +
-  scale_y_continuous(limits = c(-885, -860), breaks = seq(-885, -860, 5)) +
+  scale_y_continuous(limits = c(-884, -860), breaks = seq(-884, -860, 8)) +
   labs(x = "Days prior to measurement", y = NULL,
        title = "VPD (kPa)") +
   theme_bw(base_size = 18) +

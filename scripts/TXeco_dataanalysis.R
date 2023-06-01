@@ -16,10 +16,8 @@ library(nlme)
 emm_options(opt.digits = FALSE)
 
 # Load compiled datasheet
-df <- read.csv("../data_sheets/TXeco_compiled_datasheet.csv",
+df <- read.csv("../../TXeco/TXeco_data.csv",
                na.strings = c("NA", "NaN")) %>%
-  filter(site != "Bell_2020_05" & 
-           site != "Russel_2020_01") %>%
   filter(pft != "c3_shrub") %>%
   mutate(pft = ifelse(pft == "c4_graminoid", 
                       "c4_nonlegume",
@@ -237,15 +235,15 @@ narea_psem_preopt <- psem(
               random = ~ 1 | NCRS.code, 
               data = df.psem, na.action = na.omit),
   
+  ## Nmass model
+  nmass = lme(nmass.trans ~ chi + soil.no3n + marea.trans + n.fixer,
+              random = ~ 1 | NCRS.code, 
+              data = df.psem, na.action = na.omit),
+  
   ## Marea model
   marea = lme(marea.trans ~ chi + soil.no3n,
               random = ~ 1 | NCRS.code, 
               data = df.psem, na.action = na.omit),
-  
-  ## Nmass model
-  nmass = lme(nmass.trans ~ chi + soil.no3n + marea.trans + n.fixer,
-               random = ~ 1 | NCRS.code, 
-               data = df.psem, na.action = na.omit),
   
   ## Chi model
   chi = lme(chi ~ beta.trans + vpd90, 
@@ -275,14 +273,14 @@ narea_psem_opt <- psem(
               random = ~ 1 | NCRS.code, 
               data = df.psem, na.action = na.omit),
   
-  ## Marea model
-  marea = lme(marea.trans ~ chi + soil.no3n + vpd90 + photo,
+  ## Nmass model
+  nmass = lme(nmass.trans ~ chi + beta.trans + soil.no3n + wn90_perc + 
+                perc.clay + marea.trans + vpd90 + n.fixer + photo,
               random = ~ 1 | NCRS.code, 
               data = df.psem, na.action = na.omit),
   
-  ## Nmass model
-  nmass = lme(nmass.trans ~ chi + beta.trans + marea.trans + soil.no3n + 
-                wn90_perc + perc.clay + vpd90 + photo + n.fixer,
+  ## Marea model
+  marea = lme(marea.trans ~ chi + soil.no3n + photo,
               random = ~ 1 | NCRS.code, 
               data = df.psem, na.action = na.omit),
   
