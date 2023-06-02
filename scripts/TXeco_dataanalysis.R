@@ -310,7 +310,8 @@ line.thick <- data.frame(summary(narea_psem_opt)$coefficients,
 
 line.thick <- line.thick %>%
   mutate(line.thickness = round(line.thickness, digits = 2)) %>%
-  dplyr::select(-Var.9)
+  dplyr::select(-Var.9) %>%
+  filter(P.Value < 0.05)
 
 ggplot(data=line.thick, aes(x = abs(Std.Estimate), 
                             y = line.thickness)) + 
@@ -499,6 +500,8 @@ table5 <- summary(narea_psem_opt)$R2 %>%
   dplyr::select(resp = Response, r2_marg = Marginal,
                 r2_cond = Conditional) %>%
   full_join(table5.coefs) %>%
+  group_by(resp) %>%
+  arrange(-abs(std_est), .by_group = TRUE) %>%
   dplyr::select(resp, pred, r2_marg, r2_cond, std_est:p_val)
 
 
