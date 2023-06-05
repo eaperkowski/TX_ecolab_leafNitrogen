@@ -1,3 +1,4 @@
 *.DS_Store
 *.Rhistory
 /climate_data/prism_daily
+/climate_data/prism/
