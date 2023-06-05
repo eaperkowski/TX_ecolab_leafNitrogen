@@ -277,13 +277,17 @@ df.sites <- df.sites.precip_cleaned %>%
 
 write.csv(df.sites, "../data_sheets/TXeco_climate_normals.csv", row.names = FALSE)
 
+
 ###############################################################################
 ## MAP and MAT plots (general across TX, not site specific)
 ###############################################################################
+
+
+
 map.plot <- ggplot() +
   geom_raster(data = df.normals, 
               aes(x = longitude, y = latitude, fill = map)) +
-  geom_point(data = ecosites.short, 
+  geom_point(data = subset(ecosites.short, site != "Fayette_2019_04"), 
              aes(x = longitude, y = latitude, 
                  shape = factor(sampling.year, levels = c("2020", "2021", "2020_2021"))), 
              size = 2, stroke = 1) +
@@ -330,7 +334,7 @@ map.plot
 mat.plot <- ggplot() +
   geom_raster(data = df.normals, 
               aes(x = longitude, y = latitude, fill = mat)) +
-  geom_point(data = ecosites, 
+  geom_point(data = subset(ecosites.short, site != "Fayette_2019_04"), 
              aes(x = longitude, y = latitude, 
                  shape = factor(sampling.year, levels = c("2020", "2021", "2020_2021"))), 
              size = 2, stroke = 1) +
@@ -373,8 +377,7 @@ mat.plot <- ggplot() +
 
 mat.plot
 
-png(#"/Users/eaperkowski/git/compile_dissertation/ch4_TXeco/figs/TXeco_fig1_site_map.png",
-    "../working_drafts/figs/TXeco_fig1_site_map.png", 
+png("../working_drafts/figs/TXeco_fig1_site_map.png", 
     width = 20, height = 8, units = 'in', res = 600)
 ggarrange(map.plot, mat.plot, ncol = 2, nrow = 1, 
           legend = "right", align = "hv", labels = c("(a)", "(b)"),

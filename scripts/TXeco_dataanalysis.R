@@ -19,6 +19,7 @@ emm_options(opt.digits = FALSE)
 df <- read.csv("../../TXeco/TXeco_data.csv",
                na.strings = c("NA", "NaN")) %>%
   filter(pft != "c3_shrub") %>%
+  filter(site != "Fayette_2019_04") %>%
   mutate(pft = ifelse(pft == "c4_graminoid", 
                       "c4_nonlegume",
                       ifelse(pft == "c3_graminoid" | pft == "c3_forb",
@@ -57,7 +58,7 @@ hist(df$beta[df$pft == "c4_nonlegume"])
 ##########################################################################
 ## Beta
 ##########################################################################
-df$beta[c(392, 411)] <- NA
+df$beta[c(387, 406)] <- NA
 
 beta <- lmer(sqrt(beta) ~ wn90_perc * soil.no3n * pft + (1 | NCRS.code), 
              data = df)
@@ -87,10 +88,10 @@ emmeans(beta, pairwise~pft)
 ##########################################################################
 ## Chi
 ##########################################################################
-df$chi[c(131, 371, 499)] <- NA
-df$chi[c(401, 492)] <- NA
-df$chi[c(175, 440, 443, 485)] <- NA
-df$chi[c(221, 434)] <- NA
+df$chi[c(131, 366, 494)] <- NA
+df$chi[c(396, 487)] <- NA
+df$chi[c(175, 435, 438, 480)] <- NA
+df$chi[c(221, 429)] <- NA
 
 chi <- lmer(chi ~ (vpd90 + (wn90_perc * soil.no3n)) * pft + 
               (1 | NCRS.code), data = df)
@@ -123,7 +124,7 @@ emmeans(chi, pairwise~pft)
 ## Narea
 ##########################################################################
 df$narea[df$narea > 10] <- NA
-df$narea[c(274)] <- NA
+df$narea[c(269)] <- NA
 
 # Fit model
 narea <- lmer(log(narea) ~ (chi + (soil.no3n * wn90_perc)) * pft + (1 | NCRS.code),
@@ -153,7 +154,7 @@ emmeans(narea, pairwise~pft)
 ##########################################################################
 ## Nmass
 ##########################################################################
-df$n.leaf[493] <- NA
+df$n.leaf[488] <- NA
 
 # Fit model
 nmass <- lmer(log(n.leaf) ~ (chi + (soil.no3n * wn90_perc)) * pft + (1 | NCRS.code),
@@ -184,7 +185,7 @@ emmeans(nmass, pairwise~pft)
 ## Marea
 ##########################################################################
 df$marea[df$marea > 1000] <- NA
-df$marea[c(20, 21, 274, 308)] <- NA
+df$marea[c(20, 21, 269, 303)] <- NA
 
 # Fit model
 marea <- lmer(log(marea) ~ (chi + (soil.no3n * wn90_perc)) * pft + (1 | NCRS.code),
@@ -274,8 +275,8 @@ narea_psem_opt <- psem(
               data = df.psem, na.action = na.omit),
   
   ## Nmass model
-  nmass = lme(nmass.trans ~ chi + beta.trans + soil.no3n + wn90_perc + 
-                perc.clay + marea.trans + vpd90 + n.fixer + photo,
+  nmass = lme(nmass.trans ~ chi + soil.no3n + marea.trans + n.fixer +
+                photo + perc.clay + beta.trans,
               random = ~ 1 | NCRS.code, 
               data = df.psem, na.action = na.omit),
   
@@ -285,12 +286,12 @@ narea_psem_opt <- psem(
               data = df.psem, na.action = na.omit),
   
   ## Chi model
-  chi = lme(chi ~ beta.trans + wn90_perc + vpd90 + photo, 
+  chi = lme(chi ~ beta.trans + vpd90 + photo + wn90_perc, 
             random = ~ 1 | NCRS.code,
             data = df.psem, na.action = na.omit),
   
   ## Beta model
-  beta = lme(beta.trans ~ soil.no3n + wn90_perc + perc.clay + vpd90 + photo + n.fixer,
+  beta = lme(beta.trans ~ soil.no3n + wn90_perc + photo + n.fixer + vpd90,
              random = ~ 1 | NCRS.code, data = df.psem, 
              na.action = na.omit),
   
@@ -301,6 +302,7 @@ narea_psem_opt <- psem(
   ## Soil moisture
   soil.moisture = lme(wn90_perc ~ perc.clay + vpd90, random = ~ 1 | NCRS.code, 
                       data = df.psem, na.action = na.omit))
+
 summary(narea_psem_opt)
 plot(narea_psem_opt)
 
