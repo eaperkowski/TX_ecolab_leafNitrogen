@@ -176,7 +176,7 @@ r.squaredGLMM(nmass)
 
 # Post hoc tests
 test(emtrends(nmass, pairwise~pft, "chi"))
-test(emtrends(nmass, ~wn90_perc, "soil.no3n", at = list(wn90_perc = seq(0.15,0.75,0.05))))
+test(emtrends(nmass, ~wn90_perc, "soil.no3n", at = list(wn90_perc = seq(0.15,0.75,0.01))))
 test(emtrends(nmass, ~1, "wn90_perc"))
 test(emtrends(nmass, ~1, "soil.no3n"))
 emmeans(nmass, pairwise~pft)
@@ -276,7 +276,7 @@ narea_psem_opt <- psem(
   
   ## Nmass model
   nmass = lme(nmass.trans ~ chi + soil.no3n + marea.trans + n.fixer +
-                photo + perc.clay + beta.trans,
+                photo + perc.clay + beta.trans + wn90_perc + vpd90,
               random = ~ 1 | NCRS.code, 
               data = df.psem, na.action = na.omit),
   
@@ -291,7 +291,8 @@ narea_psem_opt <- psem(
             data = df.psem, na.action = na.omit),
   
   ## Beta model
-  beta = lme(beta.trans ~ soil.no3n + wn90_perc + photo + n.fixer + vpd90,
+  beta = lme(beta.trans ~ soil.no3n + wn90_perc + photo + n.fixer + vpd90 +
+               perc.clay,
              random = ~ 1 | NCRS.code, data = df.psem, 
              na.action = na.omit),
   
