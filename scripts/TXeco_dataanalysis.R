@@ -47,7 +47,6 @@ length(unique(df$NCRS.code))
 ## How many annuals within c3 legume/c3 nonlegume?
 length(df$pft[df$pft == "c3_nonlegume" & df$duration == "annual"])
 length(df$pft[df$pft == "c3_legume" & df$duration == "annual"])
-
 length(df$pft[df$pft == "c3_nonlegume"])
 length(df$pft[df$pft == "c3_nonlegume" | df$pft == "c3_legume"])
 length(df$pft[df$pft == "c4_nonlegume"]) / 504
@@ -207,8 +206,6 @@ r.squaredGLMM(marea)
 
 # Post-hoc comparisons
 test(emtrends(marea, pairwise~pft, "chi"))
-
-
 test(emtrends(marea, ~wn90_perc*pft, "soil.no3n",
               at = list(wn90_perc = seq(0.15, 0.75, 0.01))))
 test(emtrends(marea, pairwise~pft, "chi"))

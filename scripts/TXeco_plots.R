@@ -155,8 +155,7 @@ Anova(chi)
 test(emtrends(chi, ~pft, "vpd90"))
 
 chi.vpd.ind <- data.frame(
-  emmeans(chi, ~pft, "vpd90", at = list(vpd90 = seq(0.9, 1.4, 0.01)))) %>%
-  filter(pft != "c4_nonlegume")
+  emmeans(chi, ~1, "vpd90", at = list(vpd90 = seq(0.9, 1.4, 0.01))))
 
 chi.vpd <- ggplot(data = df, aes(x = vpd90, y = chi)) +
   geom_jitter(aes(fill = pft),
