@@ -76,8 +76,8 @@ Anova(beta)
 r.squaredGLMM(beta)
 
 # Post-hoc comparisons
-test(emtrends(beta, pairwise~pft, "wn90_perc"))
-test(emtrends(beta, pairwise~pft, "soil.no3n"))
+test(emtrends(beta, ~pft, "wn90_perc"))
+test(emtrends(beta,~pft, "soil.no3n"))
 
 # Individual effects
 test(emtrends(beta, ~1, "soil.no3n"))
