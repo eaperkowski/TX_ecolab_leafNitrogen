@@ -12,7 +12,7 @@ library(car)
 emm_options(opt.digits = FALSE)
 
 # Load compiled datasheet
-df <- read.csv("../../TXeco/TXeco_data.csv",
+df <- read.csv("../../TXeco/data/TXeco_data.csv",
                na.strings = c("NA", "NaN")) %>%
   filter(pft != "c3_shrub") %>%
   filter(site != "Fayette_2019_04") %>%
@@ -67,13 +67,12 @@ Anova(beta)
 test(emtrends(beta, ~pft, "soil.no3n"))
 
 beta.no3n.ind <- data.frame(emmeans(beta, ~1, "soil.no3n",
-                                    at = list(soil.no3n = seq(0,80,1))))
+                                    at = list(soil.no3n = seq(0, 80, 1))))
 
 ## Plot
 beta.no3n <- ggplot(data = subset(df, !is.na(pft)), 
                     aes(x = soil.no3n, y = sqrt(beta))) +
-  geom_jitter(aes(fill = pft),
-              width = 0.5, size = 3, alpha = 0.75, shape = 21) +
+  geom_point(aes(fill = pft), size = 3, alpha = 0.75, shape = 21) +
   geom_ribbon(data = beta.no3n.ind, 
               aes(x = soil.no3n, y = emmean, ymin = lower.CL, 
                   ymax = upper.CL), fill = "black", alpha = 0.25) +
@@ -86,7 +85,7 @@ beta.no3n <- ggplot(data = subset(df, !is.na(pft)),
   scale_linetype_manual(values = c("dashed", "solid")) +
   scale_x_continuous(limits = c(-1, 80), breaks = seq(0, 80, 20)) +
   scale_y_continuous(limits = c(0, 45), breaks = seq(0, 45, 15)) +
-  labs(x = expression(bold("Soil N availability (ppm NO"[3]*"-N)")),
+  labs(x = expression(bold("N availability (ppm NO"[3]*"-N)")),
        y = expression(bold(sqrt(beta))),
        fill = "Functional group") +
   theme_bw(base_size = 18) +
@@ -110,8 +109,7 @@ beta.sm.pft <- data.frame(emmeans(beta, ~pft, "wn90_perc",
 # Plot
 beta.h2o <- ggplot(data = subset(df, !is.na(pft)), 
                    aes(x = wn90_perc, y = sqrt(beta))) +
-  geom_jitter(aes(fill = pft),
-              width = 0.01, size = 3, alpha = 0.75, shape = 21) +
+  geom_point(aes(fill = pft), size = 3, alpha = 0.75, shape = 21) +
   geom_ribbon(data = beta.sm.pft,
               aes(x = wn90_perc, y = emmean, ymin = lower.CL,
                   ymax = upper.CL),
@@ -141,7 +139,7 @@ beta.h2o
 ## Write beta plot
 ##########################################################################
 # Write plot
-jpeg("../working_drafts/figs/TXeco_fig2_beta.jpg",
+jpeg("../working_drafts/figs/TXeco_fig3_beta.jpg",
     width = 12, height = 4.5, units = 'in', res = 600)
 ggarrange(beta.no3n, beta.h2o,
           nrow = 1, ncol = 2, common.legend = TRUE, legend = "right", 
@@ -155,11 +153,11 @@ Anova(chi)
 test(emtrends(chi, ~pft, "vpd90"))
 
 chi.vpd.ind <- data.frame(
-  emmeans(chi, ~1, "vpd90", at = list(vpd90 = seq(0.9, 1.4, 0.01))))
+  emmeans(chi, ~pft, "vpd90", at = list(vpd90 = seq(0.9, 1.4, 0.01)))) %>%
+  filter(pft != "c4_nonlegume")
 
 chi.vpd <- ggplot(data = df, aes(x = vpd90, y = chi)) +
-  geom_jitter(aes(fill = pft),
-              width = 0.01, size = 3, alpha = 0.75, shape = 21) +
+  geom_point(aes(fill = pft), size = 3, alpha = 0.75, shape = 21) +
   geom_ribbon(data = chi.vpd.ind, 
               aes(x = vpd90, y = emmean, ymin = lower.CL, 
                   ymax = upper.CL, fill = pft), alpha = 0.25) +
@@ -195,8 +193,7 @@ chi.no3n.pft <- data.frame(emmeans(chi, ~pft, "soil.no3n",
   filter(pft == "c4_nonlegume")
 
 chi.no3n <- ggplot(data = df, aes(x = soil.no3n, y = chi)) +
-  geom_jitter(aes(fill = pft),
-              width = 0.5, size = 3, alpha = 0.75, shape = 21) +
+  geom_point(aes(fill = pft), size = 3, alpha = 0.75, shape = 21) +
   geom_ribbon(data = chi.no3n.pft, 
               aes(x = soil.no3n, y = emmean, ymin = lower.CL, 
                   ymax = upper.CL, fill = pft), alpha = 0.25) +
@@ -210,7 +207,7 @@ chi.no3n <- ggplot(data = df, aes(x = soil.no3n, y = chi)) +
                     labels = expression("C"[4]*" non-fixer")) +
   scale_x_continuous(limits = c(-1, 80), breaks = seq(0, 80, 20)) +
   scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.25)) +
-  labs(x = expression(bold("Soil N availability (ppm NO"[3]*"-N)")),
+  labs(x = expression(bold("N availability (ppm NO"[3]*"-N)")),
        y = expression(bold("C"["i"]*" : C"["a"])),
        fill = expression(bold("Functional group")),
        color = expression(bold("Functional group"))) +
@@ -231,8 +228,7 @@ chi.sm.pft <- data.frame(
   filter(pft == "c4_nonlegume")
 
 chi.sm <- ggplot(data = df, aes(x = wn90_perc, y = chi)) +
-  geom_jitter(aes(fill = pft),
-              width = 0.0075, size = 3, alpha = 0.75, shape = 21) +
+  geom_point(aes(fill = pft), size = 3, alpha = 0.75, shape = 21) +
   geom_ribbon(data = chi.sm.pft, 
               aes(x = wn90_perc, y = emmean, ymin = lower.CL, 
                   ymax = upper.CL, fill = pft), alpha = 0.25) +
@@ -252,7 +248,7 @@ chi.sm <- ggplot(data = df, aes(x = wn90_perc, y = chi)) +
        y = expression(bold("C"["i"]*" : C"["a"])),
        fill = expression(bold("Functional group")),
        color = expression(bold("Functional group"))) +
-  guides(linetype = "none") +
+  guides(linetype = "none", color = "none") +
   theme_bw(base_size = 18) +
   theme(legend.text.align = 0,
         panel.border = element_rect(size = 1.25))
@@ -261,7 +257,7 @@ chi.sm
 ##########################################################################
 ## Write chi plot
 ##########################################################################
-jpeg("../working_drafts/figs/TXeco_fig3_chi.jpg",
+jpeg("../working_drafts/figs/TXeco_fig4_chi.jpg",
     width = 12, height = 9, units = 'in', res = 600)
 ggarrange(chi.vpd, chi.sm, chi.no3n,
           nrow = 2, ncol = 2, common.legend = TRUE, legend = "right", 
@@ -283,10 +279,9 @@ narea.chi.c3non <- subset(narea.chi.pft, pft == "c3_nonlegume" & chi > 0.60 & ch
 narea.chi.pft.cleaned <- narea.chi.legume %>%
   full_join(narea.chi.c3non)
 
-narea.chi <- ggplot(data = subset(df, !is.na(pft)), 
-                         aes(x = chi, y = log(narea))) +
-  geom_point(aes(fill = pft),
-             size = 3, alpha = 0.75, shape = 21) +
+narea.chi <- ggplot(data = subset(df, !is.na(pft)),
+                    aes(x = chi, y = log(narea))) +
+  geom_point(aes(fill = pft), size = 3, alpha = 0.75, shape = 21) +
   geom_ribbon(data = narea.chi.pft.cleaned, 
               aes(x = chi, y = emmean, ymin = lower.CL, ymax = upper.CL,
                   fill = pft), 
@@ -304,7 +299,7 @@ narea.chi <- ggplot(data = subset(df, !is.na(pft)),
   scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.25)) +
   scale_y_continuous(limits = c(-1, 3), breaks = seq(-1, 3, 1)) +
   labs(x = expression(bold("C"["i"]*" : C"["a"])),
-       y = expression(bold(ln*" N"["area"]*" (gN m"^"-2"~")")),
+       y = expression(bold(ln*" N"["area"]*" (gN m"^"-2"*")")),
        fill = expression(bold("Functional group")),
        color = expression(bold("Functional group"))) +
   theme_bw(base_size = 18) +
@@ -325,7 +320,7 @@ narea.no3n.ind <- data.frame(emmeans(narea, ~1, "soil.no3n",
 
 narea.no3n <- ggplot(data = subset(df, !is.na(pft)), 
                      aes(x = soil.no3n, y = log(narea))) +
-  geom_jitter(aes (fill = pft), width = 0.5, size = 3, alpha = 0.75, shape = 21) +
+  geom_point(aes (fill = pft), size = 3, alpha = 0.75, shape = 21) +
   geom_ribbon(data = narea.no3n.ind, 
               aes(x = soil.no3n, y = emmean, ymin = lower.CL, ymax = upper.CL), 
               alpha = 0.25, fill = "black") +
@@ -338,8 +333,8 @@ narea.no3n <- ggplot(data = subset(df, !is.na(pft)),
                                expression("C"[4]*" non-fixer"))) +
   scale_x_continuous(limits = c(-1, 80), breaks = seq(0, 80, 20)) +
   scale_y_continuous(limits = c(-1, 3), breaks = seq(-1, 3, 1)) +
-  labs(x = expression(bold("Soil N availability (ppm NO"[3]*"-N)")),
-       y = expression(bold(ln*" N"["area"]*" (gN m"^"-2"~")")),
+  labs(x = expression(bold("N availability (ppm NO"[3]*"-N)")),
+       y = expression(bold(ln*" N"["area"]*" (gN m"^"-2"*")")),
        fill = expression(bold("Functional group"))) +
   theme_bw(base_size = 18) +
   theme(legend.text.align = 0,
@@ -357,8 +352,7 @@ narea.sm.ind <- data.frame(emmeans(narea, ~1, "wn90_perc",
 
 narea.sm <- ggplot(data = subset(df, !is.na(pft)), 
                    aes(x = wn90_perc, y = log(narea))) +
-  geom_jitter(aes(fill = pft),
-              width = 0.0075, size = 3, alpha = 0.75, shape = 21) +
+  geom_point(aes(fill = pft), size = 3, alpha = 0.75, shape = 21) +
   geom_ribbon(data = narea.sm.ind, 
               aes(x = wn90_perc, y = emmean, ymin = lower.CL, ymax = upper.CL), 
               alpha = 0.25, fill = "black") +
@@ -373,7 +367,7 @@ narea.sm <- ggplot(data = subset(df, !is.na(pft)),
                      labels = seq(15, 75, 15)) +
   scale_y_continuous(limits = c(-1, 3), breaks = seq(-1, 3, 1)) +
   labs(x = expression(bold("Soil moisture (% WHC)")),
-       y = expression(bold(ln*" N"["area"]*" (gN m"^"-2"~")")),
+       y = expression(bold(ln*" N"["area"]*" (gN m"^"-2"*")")),
        fill = expression(bold("Functional group"))) +
   theme_bw(base_size = 18) +
   theme(legend.text.align = 0,
@@ -405,7 +399,7 @@ nmass.chi <- ggplot(data = subset(df, !is.na(pft)),
   scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.25)) +
   scale_y_continuous(limits = c(-1, 2), breaks = seq(-1, 2, 1)) +
   labs(x = expression(bold("C"["i"]*" : C"["a"])),
-       y = expression(bold(ln*" N"["mass"]*" (gN g"^"-1"~")")),
+       y = expression(bold(ln*" N"["mass"]*" (gN g"^"-1"*")")),
        fill = expression(bold("Functional group")),
        color = expression(bold("Functional group"))) +
   theme_bw(base_size = 18) +
@@ -426,8 +420,7 @@ nmass.no3n.ind <- data.frame(emmeans(nmass, ~1, "soil.no3n",
 
 nmass.no3n <- ggplot(data = subset(df, !is.na(pft)), 
                          aes(x = soil.no3n, y = log(n.leaf))) +
-  geom_jitter(aes(fill = pft),
-              width = 0.5, size = 3, alpha = 0.75, shape = 21) +
+  geom_point(aes(fill = pft), size = 3, alpha = 0.75, shape = 21) +
   geom_ribbon(data = nmass.no3n.ind,
               aes(x = soil.no3n, y = emmean, 
                   ymin = lower.CL, ymax = upper.CL), 
@@ -441,8 +434,8 @@ nmass.no3n <- ggplot(data = subset(df, !is.na(pft)),
                                expression("C"[4]*" non-fixer"))) +
   scale_x_continuous(limits = c(-1, 80), breaks = seq(0, 80, 20)) +
   scale_y_continuous(limits = c(-1, 2), breaks = seq(-1, 2, 1)) +
-  labs(x = expression(bold("Soil N availability (ppm NO"[3]*"-N)")),
-       y = expression(bold(ln*" N"["mass"]*" (gN g"^"-1"~")")),
+  labs(x = expression(bold("N availability (ppm NO"[3]*"-N)")),
+       y = expression(bold(ln*" N"["mass"]*" (gN g"^"-1"*")")),
        fill = expression(bold("Functional group"))) +
   theme_bw(base_size = 18) +
   theme(legend.text.align = 0,
@@ -460,8 +453,7 @@ nmass.sm.ind <- data.frame(emmeans(nmass, ~1, "wn90_perc",
 
 nmass.sm <- ggplot(data = subset(df, !is.na(pft)), 
                      aes(x = wn90_perc, y = log(n.leaf))) +
-  geom_jitter(aes(fill = pft),
-              width = 0.01, size = 3, alpha = 0.75, shape = 21) +
+  geom_point(aes(fill = pft), size = 3, alpha = 0.75, shape = 21) +
   geom_ribbon(data = nmass.sm.ind,
               aes(x = wn90_perc, y = emmean, 
                   ymin = lower.CL, ymax = upper.CL), 
@@ -481,7 +473,7 @@ nmass.sm <- ggplot(data = subset(df, !is.na(pft)),
                      labels = seq(15, 75, 15)) +
   scale_y_continuous(limits = c(-1, 2), breaks = seq(-1, 2, 1)) +
   labs(x = expression(bold("Soil moisture (% WHC)")),
-       y = expression(bold(ln*" N"["mass"]*" (gN g"^"-1"~")")),
+       y = expression(bold(ln*" N"["mass"]*" (gN g"^"-1"*")")),
        fill = expression(bold("Functional group"))) +
   theme_bw(base_size = 18) +
   theme(legend.text.align = 0,
@@ -505,8 +497,7 @@ marea.chi.pft.cleaned <- marea.chi.legume %>%
 
 marea.chi <- ggplot(data = subset(df, !is.na(pft)), 
                          aes(x = chi, y = log(marea))) +
-  geom_point(aes(fill = pft),
-             size = 3, alpha = 0.75, shape = 21) +
+  geom_point(aes(fill = pft), size = 3, alpha = 0.75, shape = 21) +
   geom_ribbon(data = marea.chi.pft.cleaned,
               aes(x = chi, y = emmean, 
                   ymin = lower.CL, ymax = upper.CL, fill = pft), 
@@ -525,7 +516,7 @@ marea.chi <- ggplot(data = subset(df, !is.na(pft)),
   scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.25)) +
   scale_y_continuous(limits = c(3, 7), breaks = seq(3, 7, 1)) +
   labs(x = expression(bold("C"["i"]*" : C"["a"])),
-       y = expression(bold(ln*" M"["area"]*" (g m"^"-2"~")")),
+       y = expression(bold(ln*" M"["area"]*" (g m"^"-2"*")")),
        fill = expression(bold("Functional group"))) +
   theme_bw(base_size = 18) +
   theme(legend.text.align = 0,
@@ -546,8 +537,7 @@ marea.no3n.pft <- data.frame(emmeans(marea, ~pft, "soil.no3n",
 
 marea.no3n <- ggplot(data = subset(df, !is.na(pft)), 
                      aes(x = soil.no3n, y = log(marea))) +
-  geom_jitter(aes(fill = pft),
-              width = 0.5, size = 3, alpha = 0.75, shape = 21) +
+  geom_point(aes(fill = pft), size = 3, alpha = 0.75, shape = 21) +
   geom_ribbon(data = marea.no3n.pft,
               aes(x = soil.no3n, y = emmean, ymin = lower.CL, 
                   ymax = upper.CL, fill = pft), alpha = 0.25) +
@@ -563,8 +553,8 @@ marea.no3n <- ggplot(data = subset(df, !is.na(pft)),
                                 expression("C"[4]*" non-fixer"))) +
   scale_x_continuous(limits = c(-1, 80), breaks = seq(0, 80, 20)) +
   scale_y_continuous(limits = c(3, 6), breaks = seq(3, 6, 1)) +
-  labs(x = expression(bold("Soil N availability (ppm NO"[3]*"-N)")),
-       y = expression(bold(ln*" M"["area"]*" (g m"^"-2"~")")),
+  labs(x = expression(bold("N availability (ppm NO"[3]*"-N)")),
+       y = expression(bold(ln*" M"["area"]*" (g m"^"-2"*")")),
        fill = expression(bold("Functional group"))) +
   theme_bw(base_size = 18) +
   theme(legend.text.align = 0,
@@ -584,8 +574,7 @@ marea.sm.ind <- data.frame(
 
 marea.sm <- ggplot(data = subset(df, !is.na(pft)), 
                      aes(x = wn90_perc, y = log(marea))) +
-  geom_jitter(aes(fill = pft),
-              width = 0.0075, size = 3, alpha = 0.75, shape = 21) +
+  geom_point(aes(fill = pft), size = 3, alpha = 0.75, shape = 21) +
   scale_fill_manual(values = c(cbbPalette3), 
                     labels = c(expression("C"[3]*" N-fixer"),
                                expression("C"[3]*" non-fixer"),
@@ -593,7 +582,7 @@ marea.sm <- ggplot(data = subset(df, !is.na(pft)),
   scale_x_continuous(limits = c(0.125, 0.775), breaks = seq(0.15, 0.75, 0.15)) +
   scale_y_continuous(limits = c(3, 6), breaks = seq(3, 6, 1)) +
   labs(x = expression(bold("Soil moisture (% WHC)")),
-       y = expression(bold(ln*" M"["area"]*" (g m"^"-2"~")")),
+       y = expression(bold(ln*" M"["area"]*" (g m"^"-2"*")")),
        fill = expression(bold("Functional group")),
        color = expression(bold("Functional group"))) +
   theme_bw(base_size = 18) +
@@ -606,14 +595,13 @@ marea.sm
 ##########################################################################
 ## Create Narea plots
 ##########################################################################
-jpeg("../working_drafts/figs/TXeco_fig4_narea.jpg",
+jpeg("../working_drafts/figs/TXeco_fig5_narea.jpg",
     height = 12, width = 16, units = 'in', res = 600)
-ggarrange(narea.chi, nmass.chi, marea.chi,
-          narea.no3n, nmass.no3n, marea.no3n,
-          narea.sm, nmass.sm, marea.sm,
-          ncol = 3, nrow = 3, common.legend = TRUE, legend = "right", 
-          align = "hv", labels = c("(a)", "(b)", "(c)", "(d)", "(e)",
-                                   "(f)", "(g)", "(h)", "(i)"), 
+ggarrange(narea.chi, narea.no3n, narea.sm, nmass.chi, nmass.no3n, nmass.sm,
+          marea.chi, marea.no3n, marea.sm, ncol = 3, nrow = 3, 
+          common.legend = TRUE, legend = "right", align = "hv", 
+          labels = c("(a)", "(b)", "(c)", "(d)", "(e)", 
+                     "(f)", "(g)", "(h)", "(i)"), 
           font.label = list(size = 18))
 dev.off()
 
@@ -631,6 +619,7 @@ beta.var <- ggplot(data = df, aes(x = sqrt(beta))) +
        y = "Density",
        fill = "Photo. pathway") +
   theme_bw(base_size = 18)
+beta.var
 
 png("../working_drafts/figs/TXeco_figS2_betaVar.png",
     height = 4.5, width = 8, units = 'in', res = 600)
