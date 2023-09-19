@@ -60,6 +60,8 @@ nmass <- lmer(log(n.leaf) ~ (chi + (soil.no3n * wn90_perc)) * pft +
 marea <- lmer(log(marea) ~ (chi + (soil.no3n * wn90_perc)) * pft + 
                 (1 | NCRS.code), data = df)
 
+library(effects)
+
 ##########################################################################
 ## Beta - soil N
 ##########################################################################
@@ -96,7 +98,7 @@ beta.no3n <- ggplot(data = subset(df, !is.na(pft)),
 beta.no3n
 
 ##########################################################################
-## Beta - soil moisture
+## Beta - soil moisture parsed by PFT
 ##########################################################################
 Anova(beta)
 test(emtrends(beta, ~pft, "wn90_perc"))
@@ -104,7 +106,8 @@ test(emtrends(beta, ~pft, "wn90_perc"))
 beta.sm.pft <- data.frame(emmeans(beta, ~pft, "wn90_perc",
                                   at = list(wn90_perc = seq(0,1,0.01)))) %>%
   filter(pft == "c3_nonlegume")
-
+vif(beta)
+Effect("wn90_perc", mod = beta, partial.residuals = TRUE)
 
 # Plot
 beta.h2o <- ggplot(data = subset(df, !is.na(pft)), 
@@ -136,12 +139,52 @@ beta.h2o <- ggplot(data = subset(df, !is.na(pft)),
 beta.h2o
 
 ##########################################################################
+## Beta - soil moisture parsed by PFT
+##########################################################################
+beta.sm.ind <- data.frame(emmeans(beta, ~1, "wn90_perc",
+                                  at = list(wn90_perc = seq(0,1,0.01))))
+
+# Plot
+beta.h2o.ind.plot <- ggplot(data = subset(df, !is.na(pft)), 
+                   aes(x = wn90_perc, y = sqrt(beta))) +
+  geom_point(aes(fill = pft), size = 3, alpha = 0.75, shape = 21) +
+  geom_ribbon(data = beta.sm.ind,
+              aes(x = wn90_perc, y = emmean, ymin = lower.CL,
+                  ymax = upper.CL), alpha = 0.25) +
+  geom_line(data = beta.sm.ind,
+            aes(x = wn90_perc, y = emmean), linewidth = 2) +
+  scale_fill_manual(values = c(cbbPalette3), 
+                    labels = c(expression("C"[3]*" N-fixer"),
+                               expression("C"[3]*" non-fixer"),
+                               expression("C"[4]*" non-fixer"))) +
+  scale_x_continuous(limits = c(0.125, 0.775), breaks = seq(0.15, 0.75, 0.15),
+                     labels = seq(15, 75, 15)) +
+  scale_y_continuous(limits = c(0, 45), breaks = seq(0, 45, 15)) +
+  labs(x = expression(bold("Soil moisture (% WHC)")),
+       y = expression(bold(sqrt(beta))),
+       fill = "Functional group") +
+  guides(linetype = "none") +
+  theme_bw(base_size = 18) +
+  theme(legend.text.align = 0,
+        panel.border = element_rect(linewidth = 1.25),
+        legend.title = element_text(face = "bold"))
+beta.h2o
+
+##########################################################################
 ## Write beta plot
 ##########################################################################
 # Write plot
-jpeg("../working_drafts/figs/TXeco_fig3_beta.jpg",
+jpeg("../../TX_ecolab_leafNitrogen/working_drafts/figs/TXeco_fig3_beta.jpg",
     width = 12, height = 4.5, units = 'in', res = 600)
 ggarrange(beta.no3n, beta.h2o,
+          nrow = 1, ncol = 2, common.legend = TRUE, legend = "right", 
+          align = "hv", labels = c("(a)", "(b)"), font.label = list(size = 18))
+dev.off()
+
+# Write plot for mid-term review
+jpeg("../../TX_ecolab_leafNitrogen/working_drafts/figs/TXeco_fig3_beta_midterm.jpg",
+     width = 12, height = 4.5, units = 'in', res = 600)
+ggarrange(beta.no3n, beta.h2o.ind.plot,
           nrow = 1, ncol = 2, common.legend = TRUE, legend = "right", 
           align = "hv", labels = c("(a)", "(b)"), font.label = list(size = 18))
 dev.off()
