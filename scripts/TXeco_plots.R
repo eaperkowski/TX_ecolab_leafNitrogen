@@ -37,7 +37,7 @@ length(df$pft[df$pft == "c3_nonlegume"])
 length(df$pft[df$pft == "c4_nonlegume"])
 
 ## Remove outliers from statistical models
-df$beta[c(387, 406)] <- NA
+df$beta[c(64, 217, 387, 406)] <- NA
 df$chi[c(131, 366, 494)] <- NA
 df$chi[c(396, 487)] <- NA
 df$chi[c(175, 435, 438, 480)] <- NA
@@ -59,8 +59,6 @@ nmass <- lmer(log(n.leaf) ~ (chi + (soil.no3n * wn90_perc)) * pft +
                 (1 | NCRS.code), data = df)
 marea <- lmer(log(marea) ~ (chi + (soil.no3n * wn90_perc)) * pft + 
                 (1 | NCRS.code), data = df)
-
-library(effects)
 
 ##########################################################################
 ## Beta - soil N
@@ -106,8 +104,6 @@ test(emtrends(beta, ~pft, "wn90_perc"))
 beta.sm.pft <- data.frame(emmeans(beta, ~pft, "wn90_perc",
                                   at = list(wn90_perc = seq(0,1,0.01)))) %>%
   filter(pft == "c3_nonlegume")
-vif(beta)
-Effect("wn90_perc", mod = beta, partial.residuals = TRUE)
 
 # Plot
 beta.h2o <- ggplot(data = subset(df, !is.na(pft)), 
