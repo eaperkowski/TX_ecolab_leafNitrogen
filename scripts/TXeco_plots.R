@@ -72,7 +72,7 @@ beta.no3n.ind <- data.frame(emmeans(beta, ~1, "soil.no3n",
 ## Plot
 beta.no3n <- ggplot(data = subset(df, !is.na(pft)), 
                     aes(x = soil.no3n, y = sqrt(beta))) +
-  geom_point(aes(fill = pft), size = 3, alpha = 0.75, shape = 21) +
+  geom_point(aes(fill = pft), size = 3, alpha = 0.5, shape = 21) +
   geom_ribbon(data = beta.no3n.ind, 
               aes(x = soil.no3n, y = emmean, ymin = lower.CL, 
                   ymax = upper.CL), fill = "black", alpha = 0.25) +
@@ -108,7 +108,7 @@ beta.sm.pft <- data.frame(emmeans(beta, ~pft, "wn90_perc",
 # Plot
 beta.h2o <- ggplot(data = subset(df, !is.na(pft)), 
                    aes(x = wn90_perc, y = sqrt(beta))) +
-  geom_point(aes(fill = pft), size = 3, alpha = 0.75, shape = 21) +
+  geom_point(aes(fill = pft), size = 3, alpha = 0.5, shape = 21) +
   geom_ribbon(data = beta.sm.pft,
               aes(x = wn90_perc, y = emmean, ymin = lower.CL,
                   ymax = upper.CL),
@@ -196,7 +196,7 @@ chi.vpd.ind <- data.frame(
   filter(pft != "c4_nonlegume")
 
 chi.vpd <- ggplot(data = df, aes(x = vpd90, y = chi)) +
-  geom_point(aes(fill = pft), size = 3, alpha = 0.75, shape = 21) +
+  geom_point(aes(fill = pft), size = 3, alpha = 0.5, shape = 21) +
   geom_ribbon(data = chi.vpd.ind, 
               aes(x = vpd90, y = emmean, ymin = lower.CL, 
                   ymax = upper.CL, fill = pft), alpha = 0.25) +
@@ -232,7 +232,7 @@ chi.no3n.pft <- data.frame(emmeans(chi, ~pft, "soil.no3n",
   filter(pft == "c4_nonlegume")
 
 chi.no3n <- ggplot(data = df, aes(x = soil.no3n, y = chi)) +
-  geom_point(aes(fill = pft), size = 3, alpha = 0.75, shape = 21) +
+  geom_point(aes(fill = pft), size = 3, alpha = 0.5, shape = 21) +
   geom_ribbon(data = chi.no3n.pft, 
               aes(x = soil.no3n, y = emmean, ymin = lower.CL, 
                   ymax = upper.CL, fill = pft), alpha = 0.25) +
@@ -267,7 +267,7 @@ chi.sm.pft <- data.frame(
   filter(pft == "c4_nonlegume")
 
 chi.sm <- ggplot(data = df, aes(x = wn90_perc, y = chi)) +
-  geom_point(aes(fill = pft), size = 3, alpha = 0.75, shape = 21) +
+  geom_point(aes(fill = pft), size = 3, alpha = 0.5, shape = 21) +
   geom_ribbon(data = chi.sm.pft, 
               aes(x = wn90_perc, y = emmean, ymin = lower.CL, 
                   ymax = upper.CL, fill = pft), alpha = 0.25) +
@@ -296,7 +296,7 @@ chi.sm
 ##########################################################################
 ## Write chi plot
 ##########################################################################
-jpeg("../working_drafts/figs/TXeco_fig4_chi.jpg",
+jpeg("../../TX_ecolab_leafNitrogen/working_drafts/figs/TXeco_fig4_chi.jpg",
     width = 12, height = 9, units = 'in', res = 600)
 ggarrange(chi.vpd, chi.sm, chi.no3n,
           nrow = 2, ncol = 2, common.legend = TRUE, legend = "right", 
@@ -320,7 +320,7 @@ narea.chi.pft.cleaned <- narea.chi.legume %>%
 
 narea.chi <- ggplot(data = subset(df, !is.na(pft)),
                     aes(x = chi, y = log(narea))) +
-  geom_point(aes(fill = pft), size = 3, alpha = 0.75, shape = 21) +
+  geom_point(aes(fill = pft), size = 3, alpha = 0.5, shape = 21) +
   geom_ribbon(data = narea.chi.pft.cleaned, 
               aes(x = chi, y = emmean, ymin = lower.CL, ymax = upper.CL,
                   fill = pft), 
@@ -359,7 +359,7 @@ narea.no3n.ind <- data.frame(emmeans(narea, ~1, "soil.no3n",
 
 narea.no3n <- ggplot(data = subset(df, !is.na(pft)), 
                      aes(x = soil.no3n, y = log(narea))) +
-  geom_point(aes (fill = pft), size = 3, alpha = 0.75, shape = 21) +
+  geom_point(aes (fill = pft), size = 3, alpha = 0.5, shape = 21) +
   geom_ribbon(data = narea.no3n.ind, 
               aes(x = soil.no3n, y = emmean, ymin = lower.CL, ymax = upper.CL), 
               alpha = 0.25, fill = "black") +
@@ -391,7 +391,7 @@ narea.sm.ind <- data.frame(emmeans(narea, ~1, "wn90_perc",
 
 narea.sm <- ggplot(data = subset(df, !is.na(pft)), 
                    aes(x = wn90_perc, y = log(narea))) +
-  geom_point(aes(fill = pft), size = 3, alpha = 0.75, shape = 21) +
+  geom_point(aes(fill = pft), size = 3, alpha = 0.5, shape = 21) +
   geom_ribbon(data = narea.sm.ind, 
               aes(x = wn90_perc, y = emmean, ymin = lower.CL, ymax = upper.CL), 
               alpha = 0.25, fill = "black") +
@@ -426,7 +426,7 @@ nmass.chi.ind <- data.frame(
 
 nmass.chi <- ggplot(data = subset(df, !is.na(pft)), 
                          aes(x = chi, y = log(n.leaf))) +
-  geom_point(aes(fill = pft), size = 3, alpha = 0.75, shape = 21) +
+  geom_point(aes(fill = pft), size = 3, alpha = 0.5, shape = 21) +
   scale_fill_manual(values = c(cbbPalette3), 
                     labels = c(expression("C"[3]*" N-fixer"),
                                expression("C"[3]*" non-fixer"),
@@ -459,7 +459,7 @@ nmass.no3n.ind <- data.frame(emmeans(nmass, ~1, "soil.no3n",
 
 nmass.no3n <- ggplot(data = subset(df, !is.na(pft)), 
                          aes(x = soil.no3n, y = log(n.leaf))) +
-  geom_point(aes(fill = pft), size = 3, alpha = 0.75, shape = 21) +
+  geom_point(aes(fill = pft), size = 3, alpha = 0.5, shape = 21) +
   geom_ribbon(data = nmass.no3n.ind,
               aes(x = soil.no3n, y = emmean, 
                   ymin = lower.CL, ymax = upper.CL), 
@@ -492,7 +492,7 @@ nmass.sm.ind <- data.frame(emmeans(nmass, ~1, "wn90_perc",
 
 nmass.sm <- ggplot(data = subset(df, !is.na(pft)), 
                      aes(x = wn90_perc, y = log(n.leaf))) +
-  geom_point(aes(fill = pft), size = 3, alpha = 0.75, shape = 21) +
+  geom_point(aes(fill = pft), size = 3, alpha = 0.5, shape = 21) +
   geom_ribbon(data = nmass.sm.ind,
               aes(x = wn90_perc, y = emmean, 
                   ymin = lower.CL, ymax = upper.CL), 
@@ -536,7 +536,7 @@ marea.chi.pft.cleaned <- marea.chi.legume %>%
 
 marea.chi <- ggplot(data = subset(df, !is.na(pft)), 
                          aes(x = chi, y = log(marea))) +
-  geom_point(aes(fill = pft), size = 3, alpha = 0.75, shape = 21) +
+  geom_point(aes(fill = pft), size = 3, alpha = 0.5, shape = 21) +
   geom_ribbon(data = marea.chi.pft.cleaned,
               aes(x = chi, y = emmean, 
                   ymin = lower.CL, ymax = upper.CL, fill = pft), 
@@ -576,7 +576,7 @@ marea.no3n.pft <- data.frame(emmeans(marea, ~pft, "soil.no3n",
 
 marea.no3n <- ggplot(data = subset(df, !is.na(pft)), 
                      aes(x = soil.no3n, y = log(marea))) +
-  geom_point(aes(fill = pft), size = 3, alpha = 0.75, shape = 21) +
+  geom_point(aes(fill = pft), size = 3, alpha = 0.5, shape = 21) +
   geom_ribbon(data = marea.no3n.pft,
               aes(x = soil.no3n, y = emmean, ymin = lower.CL, 
                   ymax = upper.CL, fill = pft), alpha = 0.25) +
@@ -613,7 +613,7 @@ marea.sm.ind <- data.frame(
 
 marea.sm <- ggplot(data = subset(df, !is.na(pft)), 
                      aes(x = wn90_perc, y = log(marea))) +
-  geom_point(aes(fill = pft), size = 3, alpha = 0.75, shape = 21) +
+  geom_point(aes(fill = pft), size = 3, alpha = 0.5, shape = 21) +
   scale_fill_manual(values = c(cbbPalette3), 
                     labels = c(expression("C"[3]*" N-fixer"),
                                expression("C"[3]*" non-fixer"),
@@ -634,7 +634,7 @@ marea.sm
 ##########################################################################
 ## Create Narea plots
 ##########################################################################
-jpeg("../working_drafts/figs/TXeco_fig5_narea.jpg",
+jpeg("../../TX_ecolab_leafNitrogen/working_drafts/figs/TXeco_fig5_narea.jpg",
     height = 12, width = 16, units = 'in', res = 600)
 ggarrange(narea.chi, narea.no3n, narea.sm, nmass.chi, nmass.no3n, nmass.sm,
           marea.chi, marea.no3n, marea.sm, ncol = 3, nrow = 3, 
@@ -664,7 +664,3 @@ png("../working_drafts/figs/TXeco_figS2_betaVar.png",
     height = 4.5, width = 8, units = 'in', res = 600)
 beta.var
 dev.off()
-
-
-
-
