@@ -11,20 +11,25 @@ library(merTools)
 ###############################################################################
 # Load compiled data file
 ###############################################################################
-df <- read.csv("../../TXeco/TXeco_data.csv",
+# Load compiled datasheet
+df <- read.csv("../../TXeco/data/TXeco_data.csv",
                na.strings = c("NA", "NaN")) %>%
-  filter(pft != "c3_shrub" & site != "Fayette_2019_04") %>%
+  filter(site != "Fayette_2019_04") %>%
   mutate(pft = ifelse(pft == "c4_graminoid", 
                       "c4_nonlegume",
                       ifelse(pft == "c3_graminoid" | pft == "c3_forb",
                              "c3_nonlegume", 
                              ifelse(pft == "c3_legume", 
                                     "c3_legume", 
-                                    NA))),
+                                    ifelse(pft == "c3_shrub",
+                                           "c3_nonlegume",
+                                           NA)))),
          beta = ifelse(beta > 2000, NA, beta),
          beta = ifelse(pft == "c4_nonlegume" & beta > 400, NA, beta),
          beta = ifelse(pft == "c3_legume" & beta > 1000, NA, beta),
-         marea = ifelse(marea > 1000, NA, marea))
+         marea = ifelse(marea > 1000, NA, marea),
+         pft = factor(pft, 
+                      levels = c("c3_legume", "c4_nonlegume", "c3_nonlegume")))
 
 ###############################################################################
 # Iterative models for soil moisture and beta
@@ -181,7 +186,7 @@ wn.beta <- ggplot(data = aicc.results, aes(x = day, y = aicc.wn)) +
              fill = "red", shape = 21) +
   geom_line() +
   scale_x_continuous(limits = c(0, 90), breaks = seq(0, 90, 30)) +
-  scale_y_continuous(limits = c(2958, 2967), breaks = seq(2958, 2967, 3)) +
+  scale_y_continuous(limits = c(3058, 3068), breaks = seq(3058, 3068, 2)) +
   labs(x = "Days prior to measurement", y = expression(bold("AIC"["c"])),
        title = expression(bold("Soil moisture (% WHC)"))) +
   theme_bw(base_size = 18) +
@@ -196,7 +201,7 @@ vpd.chi <- ggplot(data = aicc.results, aes(x = day, y = aicc.vpd)) +
              fill = "red", size = 2, shape = 21) +
   geom_line() +
   scale_x_continuous(limits = c(0, 90), breaks = seq(0, 90, 30)) +
-  scale_y_continuous(limits = c(-875, -855), breaks = seq(-875, -855, 5)) +
+  scale_y_continuous(limits = c(-909, -888), breaks = seq(-909, -888, 7)) +
   labs(x = "Days prior to measurement", y = NULL,
        title = "VPD (kPa)") +
   theme_bw(base_size = 18) +
@@ -205,7 +210,8 @@ vpd.chi <- ggplot(data = aicc.results, aes(x = day, y = aicc.vpd)) +
         plot.title = element_text(face = "bold"),
         panel.border = element_rect(size = 1.25))
 
-png(filename = "../working_drafts/figs/TXeco_figS2_aicc_results.png",
-    width = 12, height = 4.5, units = 'in', res = 600)
+png(filename = "../working_drafts/figs/TXeco_figS1_aicc_results.png",
+    width = 10, height = 4.5, units = 'in', res = 600)
 ggarrange(wn.beta, vpd.chi, ncol = 2, align = "hv")
 dev.off()
+

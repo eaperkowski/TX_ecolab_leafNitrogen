@@ -14,7 +14,6 @@ emm_options(opt.digits = FALSE)
 # Load compiled datasheet
 df <- read.csv("../../TXeco/data/TXeco_data.csv",
                na.strings = c("NA", "NaN")) %>%
-  filter(pft != "c3_shrub") %>%
   filter(site != "Fayette_2019_04") %>%
   mutate(pft = ifelse(pft == "c4_graminoid", 
                       "c4_nonlegume",
@@ -22,11 +21,16 @@ df <- read.csv("../../TXeco/data/TXeco_data.csv",
                              "c3_nonlegume", 
                              ifelse(pft == "c3_legume", 
                                     "c3_legume", 
-                                    NA))),
+                                    ifelse(pft == "c3_shrub",
+                                           "c3_nonlegume",
+                                           NA)))),
          beta = ifelse(beta > 2000, NA, beta),
          beta = ifelse(pft == "c4_nonlegume" & beta > 400, NA, beta),
          beta = ifelse(pft == "c3_legume" & beta > 1000, NA, beta),
-         marea = ifelse(marea > 1000, NA, marea))
+         marea = ifelse(marea > 1000, NA, marea),
+         pft = factor(pft, 
+                      levels = c("c3_legume", "c3_nonlegume", "c4_nonlegume"))) %>%
+  filter(!is.na(pft))
 
 ## Add colorblind friendly palette
 cbbPalette3 <- c("#DDAA33", "#4477AA", "#BB5566")
@@ -37,16 +41,16 @@ length(df$pft[df$pft == "c3_nonlegume"])
 length(df$pft[df$pft == "c4_nonlegume"])
 
 ## Remove outliers from statistical models
-df$beta[c(64, 217, 387, 406)] <- NA
-df$chi[c(131, 366, 494)] <- NA
-df$chi[c(396, 487)] <- NA
-df$chi[c(175, 435, 438, 480)] <- NA
-df$chi[c(221, 429)] <- NA
+df$beta[c(403, 422)] <- NA
+df$chi[c(134, 382, 412, 510)] <- NA
+df$chi[c(451, 454, 503)] <- NA
+df$chi[c(178, 445, 496)] <- NA
+df$chi[c(233)] <- NA
 df$narea[df$narea > 10] <- NA
-df$narea[c(269)] <- NA
-df$n.leaf[488] <- NA
+df$narea[284] <- NA
+df$n.leaf[504] <- NA
 df$marea[df$marea > 1000] <- NA
-df$marea[c(20, 21, 269, 303)] <- NA
+df$marea[c(20, 21, 284, 318)] <- NA
 
 ## Add general models
 beta <- lmer(sqrt(beta) ~ wn90_perc * soil.no3n * pft + (1 | NCRS.code), 
@@ -72,10 +76,10 @@ beta.no3n.ind <- data.frame(emmeans(beta, ~1, "soil.no3n",
 ## Plot
 beta.no3n <- ggplot(data = subset(df, !is.na(pft)), 
                     aes(x = soil.no3n, y = sqrt(beta))) +
-  geom_point(aes(fill = pft, shape = pft), size = 3) +
+  geom_point(aes(fill = pft, shape = pft), size = 3, alpha = 0.5) +
   geom_ribbon(data = beta.no3n.ind, 
               aes(x = soil.no3n, y = emmean, ymin = lower.CL, 
-                  ymax = upper.CL), fill = "black", alpha = 0.25) +
+                  ymax = upper.CL), fill = "black", alpha = 0.5) +
   geom_line(data = beta.no3n.ind, aes(x = soil.no3n, y = emmean), 
             size = 2, color = "black") +
   scale_fill_manual(values = c(cbbPalette3), 
@@ -113,11 +117,11 @@ beta.sm.pft <- data.frame(emmeans(beta, ~pft, "wn90_perc",
 # Plot
 beta.h2o <- ggplot(data = subset(df, !is.na(pft)), 
                    aes(x = wn90_perc, y = sqrt(beta))) +
-  geom_point(aes(fill = pft, shape = pft), size = 3) +
+  geom_point(aes(fill = pft, shape = pft), size = 3, alpha = 0.5) +
   geom_ribbon(data = beta.sm.pft,
               aes(x = wn90_perc, y = emmean, ymin = lower.CL,
                   ymax = upper.CL),
-              alpha = 0.25, fill = "#4477AA") +
+              alpha = 0.5, fill = "#4477AA") +
   geom_line(data = beta.sm.pft,
             aes(x = wn90_perc, y = emmean),
             size = 2, color = "#4477AA") +
@@ -156,7 +160,7 @@ beta.h2o.ind.plot <- ggplot(data = subset(df, !is.na(pft)),
   geom_point(aes(fill = pft), size = 3, shape = 21) +
   geom_ribbon(data = beta.sm.ind,
               aes(x = wn90_perc, y = emmean, ymin = lower.CL,
-                  ymax = upper.CL), alpha = 0.25) +
+                  ymax = upper.CL), alpha = 0.5) +
   geom_line(data = beta.sm.ind,
             aes(x = wn90_perc, y = emmean), linewidth = 2) +
   scale_fill_manual(values = c(cbbPalette3), 
@@ -206,10 +210,10 @@ chi.vpd.ind <- data.frame(
   filter(pft != "c4_nonlegume")
 
 chi.vpd <- ggplot(data = df, aes(x = vpd90, y = chi)) +
-  geom_point(aes(fill = pft, shape = pft), size = 3) +
+  geom_point(aes(fill = pft, shape = pft), size = 3, alpha = 0.5) +
   geom_ribbon(data = chi.vpd.ind, 
               aes(x = vpd90, y = emmean, ymin = lower.CL, 
-                  ymax = upper.CL, fill = pft), alpha = 0.25) +
+                  ymax = upper.CL, fill = pft), alpha = 0.5) +
   geom_line(data = chi.vpd.ind, aes(x = vpd90, y = emmean, color = pft), 
             size = 2) +
   scale_fill_manual(values = c(cbbPalette3), 
@@ -247,10 +251,10 @@ chi.no3n.pft <- data.frame(emmeans(chi, ~pft, "soil.no3n",
   filter(pft == "c4_nonlegume")
 
 chi.no3n <- ggplot(data = df, aes(x = soil.no3n, y = chi)) +
-  geom_point(aes(fill = pft, shape = pft), size = 3) +
+  geom_point(aes(fill = pft, shape = pft), size = 3, alpha = 0.5) +
   geom_ribbon(data = chi.no3n.pft, 
               aes(x = soil.no3n, y = emmean, ymin = lower.CL, 
-                  ymax = upper.CL, fill = pft), alpha = 0.25) +
+                  ymax = upper.CL, fill = pft), alpha = 0.5) +
   geom_line(data = chi.no3n.pft, aes(x = soil.no3n, y = emmean, color = pft), 
             size = 2) +
   scale_fill_manual(values = c(cbbPalette3), 
@@ -287,10 +291,10 @@ chi.sm.pft <- data.frame(
   filter(pft == "c4_nonlegume")
 
 chi.sm <- ggplot(data = df, aes(x = wn90_perc, y = chi)) +
-  geom_point(aes(fill = pft, shape = pft), size = 3) +
+  geom_point(aes(fill = pft, shape = pft), size = 3, alpha = 0.5) +
   geom_ribbon(data = chi.sm.pft, 
               aes(x = wn90_perc, y = emmean, ymin = lower.CL, 
-                  ymax = upper.CL, fill = pft), alpha = 0.25) +
+                  ymax = upper.CL, fill = pft), alpha = 0.5) +
   geom_line(data = chi.sm.pft, aes(x = wn90_perc, y = emmean, color = pft), 
             size = 2) +
   scale_fill_manual(values = c(cbbPalette3), 
@@ -345,11 +349,10 @@ narea.chi.pft.cleaned <- narea.chi.legume %>%
 
 narea.chi <- ggplot(data = subset(df, !is.na(pft)),
                     aes(x = chi, y = log(narea))) +
-  geom_point(aes(fill = pft, shape = pft), size = 3) +
+  geom_point(aes(fill = pft, shape = pft), size = 3, alpha = 0.5) +
   geom_ribbon(data = narea.chi.pft.cleaned, 
               aes(x = chi, y = emmean, ymin = lower.CL, ymax = upper.CL,
-                  fill = pft), 
-              alpha = 0.25) +
+                  fill = pft), alpha = 0.5) +
   geom_line(data = narea.chi.pft.cleaned,
             aes(x = chi, y = emmean, color = pft),
             size = 2) +
@@ -389,10 +392,10 @@ narea.no3n.ind <- data.frame(emmeans(narea, ~1, "soil.no3n",
 
 narea.no3n <- ggplot(data = subset(df, !is.na(pft)), 
                      aes(x = soil.no3n, y = log(narea))) +
-  geom_point(aes (fill = pft, shape = pft), size = 3) +
+  geom_point(aes (fill = pft, shape = pft), size = 3, alpha = 0.5) +
   geom_ribbon(data = narea.no3n.ind, 
               aes(x = soil.no3n, y = emmean, ymin = lower.CL, ymax = upper.CL), 
-              alpha = 0.25, fill = "black") +
+              alpha = 0.5, fill = "black") +
   geom_line(data = narea.no3n.ind,
             aes(x = soil.no3n, y = emmean),
             size = 2, color = "black") +
@@ -427,10 +430,10 @@ narea.sm.ind <- data.frame(emmeans(narea, ~1, "wn90_perc",
 
 narea.sm <- ggplot(data = subset(df, !is.na(pft)), 
                    aes(x = wn90_perc, y = log(narea))) +
-  geom_point(aes(fill = pft, shape = pft), size = 3) +
+  geom_point(aes(fill = pft, shape = pft), size = 3, alpha = 0.5) +
   geom_ribbon(data = narea.sm.ind, 
               aes(x = wn90_perc, y = emmean, ymin = lower.CL, ymax = upper.CL), 
-              alpha = 0.25, fill = "black") +
+              alpha = 0.5, fill = "black") +
   geom_line(data = narea.sm.ind,
             aes(x = wn90_perc, y = emmean),
             size = 2, color = "black") +
@@ -468,7 +471,7 @@ nmass.chi.ind <- data.frame(
 
 nmass.chi <- ggplot(data = subset(df, !is.na(pft)), 
                          aes(x = chi, y = log(n.leaf))) +
-  geom_point(aes(fill = pft, shape = pft), size = 3) +
+  geom_point(aes(fill = pft, shape = pft), size = 3, alpha = 0.5) +
   scale_fill_manual(values = c(cbbPalette3), 
                     labels = c(expression("C"[3]*" N-fixer"),
                                expression("C"[3]*" non-fixer"),
@@ -502,11 +505,11 @@ nmass.no3n.ind <- data.frame(emmeans(nmass, ~1, "soil.no3n",
 
 nmass.no3n <- ggplot(data = subset(df, !is.na(pft)), 
                          aes(x = soil.no3n, y = log(n.leaf))) +
-  geom_point(aes(fill = pft, shape = pft), size = 3) +
+  geom_point(aes(fill = pft, shape = pft), size = 3, alpha = 0.5) +
   geom_ribbon(data = nmass.no3n.ind,
               aes(x = soil.no3n, y = emmean, 
                   ymin = lower.CL, ymax = upper.CL), 
-              alpha = 0.25) +
+              alpha = 0.5) +
   geom_line(data = nmass.no3n.ind,
             aes(x = soil.no3n, y = emmean),
             size = 2, color = "black") +
@@ -541,11 +544,11 @@ nmass.sm.ind <- data.frame(emmeans(nmass, ~1, "wn90_perc",
 
 nmass.sm <- ggplot(data = subset(df, !is.na(pft)), 
                      aes(x = wn90_perc, y = log(n.leaf))) +
-  geom_point(aes(fill = pft, shape = pft), size = 3) +
+  geom_point(aes(fill = pft, shape = pft), size = 3, alpha = 0.5) +
   geom_ribbon(data = nmass.sm.ind,
               aes(x = wn90_perc, y = emmean, 
                   ymin = lower.CL, ymax = upper.CL), 
-              alpha = 0.25) +
+              alpha = 0.5) +
   geom_line(data = nmass.sm.ind,
             aes(x = wn90_perc, y = emmean),
             size = 2, color = "black") +
@@ -591,11 +594,11 @@ marea.chi.pft.cleaned <- marea.chi.legume %>%
 
 marea.chi <- ggplot(data = subset(df, !is.na(pft)), 
                          aes(x = chi, y = log(marea))) +
-  geom_point(aes(fill = pft, shape = pft), size = 3) +
+  geom_point(aes(fill = pft, shape = pft), size = 3, alpha = 0.5) +
   geom_ribbon(data = marea.chi.pft.cleaned,
               aes(x = chi, y = emmean, 
                   ymin = lower.CL, ymax = upper.CL, fill = pft), 
-              alpha = 0.25) +
+              alpha = 0.5) +
   geom_line(data = marea.chi.pft.cleaned,
             aes(x = chi, y = emmean, color = pft),
             size = 2) +
@@ -636,10 +639,10 @@ marea.no3n.pft <- data.frame(emmeans(marea, ~pft, "soil.no3n",
 
 marea.no3n <- ggplot(data = subset(df, !is.na(pft)), 
                      aes(x = soil.no3n, y = log(marea))) +
-  geom_point(aes(fill = pft, shape = pft), size = 3) +
+  geom_point(aes(fill = pft, shape = pft), size = 3, alpha = 0.5) +
   geom_ribbon(data = marea.no3n.pft,
               aes(x = soil.no3n, y = emmean, ymin = lower.CL, 
-                  ymax = upper.CL, fill = pft), alpha = 0.25) +
+                  ymax = upper.CL, fill = pft), alpha = 0.5) +
   geom_line(data = marea.no3n.pft,
             aes(x = soil.no3n, y = emmean, color = pft),
             size = 2) +
@@ -678,7 +681,7 @@ marea.sm.ind <- data.frame(
 
 marea.sm <- ggplot(data = subset(df, !is.na(pft)), 
                      aes(x = wn90_perc, y = log(marea))) +
-  geom_point(aes(fill = pft, shape = pft), size = 3) +
+  geom_point(aes(fill = pft, shape = pft), size = 3, alpha = 0.5) +
   scale_fill_manual(values = c(cbbPalette3), 
                     labels = c(expression("C"[3]*" N-fixer"),
                                expression("C"[3]*" non-fixer"),
@@ -719,7 +722,7 @@ dev.off()
 ##########################################################################
 beta.var <- ggplot(data = df, aes(x = sqrt(beta))) +
   geom_density(aes(fill = photo), alpha = 0.75) +
-  scale_fill_manual(values = c("#004488", "#BB5566"),
+  scale_fill_manual(values = c("#4477AA", "#BB5566"),
                     labels = c(expression("C"[3]),
                                expression("C"[4]))) +
   scale_x_continuous(limits = c(-2.5, 45), breaks = seq(0, 45, 15)) +
