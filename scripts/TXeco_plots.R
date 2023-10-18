@@ -720,16 +720,16 @@ dev.off()
 ##########################################################################
 ## Create density plot explaining variance in beta
 ##########################################################################
-beta.var <- ggplot(data = df, aes(x = sqrt(beta))) +
-  geom_density(aes(fill = photo), alpha = 0.75) +
-  scale_fill_manual(values = c("#4477AA", "#BB5566"),
-                    labels = c(expression("C"[3]),
-                               expression("C"[4]))) +
-  scale_x_continuous(limits = c(-2.5, 45), breaks = seq(0, 45, 15)) +
+beta.var <- ggplot(data = df, aes(x = sqrt(beta), color = pft)) +
+  geom_density(aes(color = photo), fill = NA, linewidth = 2) +
+  scale_color_manual(values = c("#4477AA", "#BB5566"),
+                     labels = c(expression("C"[3]),
+                                expression("C"[4]))) +
+  scale_x_continuous(limits = c(-2, 45), breaks = seq(0, 45, 15)) +
   scale_y_continuous(limits = c(0, 0.4), breaks = seq(0, 0.4, 0.1)) +
   labs(x = expression(bold(sqrt(beta))),
        y = "Density",
-       fill = "Photo. pathway") +
+       color = "Photosynthetic\npathway") +
   theme_bw(base_size = 18)
 beta.var
 
